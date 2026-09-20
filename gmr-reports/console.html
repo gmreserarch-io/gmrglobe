@@ -1239,6 +1239,65 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
     // back to a hard-coded GROWTH-tier key in five places - a working credential on
     // api.gmrglobe.com, published in this page's source. Naming it here would publish
     // it again, so it is only described.
+
+    // Every call that carries a key goes through here. A tenant can be deleted, and a key
+    // can be revoked, while a browser still holds the session that used them: that is what
+    // happened to the demo tenants, and the console answered by resending the dead key on
+    // every action and putting the raw 401 body in an alert().
+    let deadKeyHandled = false;
+
+    function clearStoredSession() {
+      for (const k of ['gmr_sso_session', 'gmr_active_api_key', 'gmr_active_tenant']) {
+        try { localStorage.removeItem(k); } catch (e) { /* private windows throw */ }
+      }
+    }
+
+    function showDeadKeyBanner() {
+      if (document.getElementById('deadKeyBanner')) return;
+      const b = document.createElement('div');
+      b.id = 'deadKeyBanner';
+      b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:9999;padding:10px 16px;' +
+        'background:#7c2d12;color:#fff;font-size:13px;display:flex;gap:12px;align-items:center;' +
+        'justify-content:center;flex-wrap:wrap;box-shadow:0 2px 12px rgba(0,0,0,.4)';
+      const msg = document.createElement('span');
+      msg.textContent = 'Tu sesion ya no es valida en el servidor. Crea un espacio de pruebas para seguir usando la consola.';
+      const act = document.createElement('button');
+      act.textContent = 'Crear espacio de pruebas';
+      act.style.cssText = 'background:#fff;color:#7c2d12;border:0;border-radius:6px;padding:5px 12px;' +
+        'font:inherit;font-weight:700;cursor:pointer';
+      act.onclick = () => {
+        b.remove();
+        const t = document.querySelector('[data-tab="tenants"], #tab-tenants, a[href="#tenants"]');
+        if (t && t.click) t.click();
+        const nameEl = document.getElementById('newTenantName');
+        if (nameEl && nameEl.focus) nameEl.focus();
+      };
+      const close = document.createElement('button');
+      close.textContent = '\u00d7';
+      close.setAttribute('aria-label', 'Cerrar');
+      close.style.cssText = 'background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer;line-height:1';
+      close.onclick = () => b.remove();
+      b.append(msg, act, close);
+      document.body.appendChild(b);
+    }
+
+    function handleDeadKey() {
+      if (deadKeyHandled) return;
+      deadKeyHandled = true;
+      clearStoredSession();
+      showDeadKeyBanner();
+    }
+
+    // A 401 from an endpoint that takes no key is not a dead session, it is a bad request,
+    // so the sandbox signup is left alone.
+    async function apiFetch(url, opts) {
+      const res = await fetch(url, opts);
+      if (res.status === 401 && String(url).indexOf('/tenants/sandbox') === -1) {
+        handleDeadKey();
+      }
+      return res;
+    }
+
     function currentApiKey() {
       const el = document.getElementById('activeKeyInput');
       return (el && el.value ? el.value : '').trim();
@@ -1407,7 +1466,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         // An empty API_BASE means same-origin, so it must not gate this call.
         if (!result) {
           try {
-            const res = await fetch(`${API_BASE}/api/ai/template-assistant`, {
+            const res = await apiFetch(`${API_BASE}/api/ai/template-assistant`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ prompt, format: selectedFormat, currentJrxml, currentParams, currentData, mode })
@@ -1877,7 +1936,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
           throw new Error('Se necesita una API key. Inicia sesion, o prueba sin registro en sandbox.gmrglobe.com');
         }
 
-        const res = await fetch(`${API_BASE}/api/reports/render`, {
+        const res = await apiFetch(`${API_BASE}/api/reports/render`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1919,7 +1978,11 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
           </a>
         `;
       } catch (err) {
-        alert("Render error: " + err.message);
+        // A visitor does not need the status code; the banner above already explains a
+        // dead session, and the panel below carries the detail.
+        if (!deadKeyHandled) {
+          alert("No se pudo generar el documento. Revisa la plantilla y los datos.");
+        }
         metrics.innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
         statusBadge.className = "text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30";
         statusBadge.innerText = "Error";
@@ -1940,7 +2003,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         return;
       }
       try {
-        const res = await fetch(`${API_BASE}/api/reports/render?type=invoice&output=xlsx`, {
+        const res = await apiFetch(`${API_BASE}/api/reports/render?type=invoice&output=xlsx`, {
           headers: { 'X-API-Key': activeKey }
         });
         if (!res.ok) {
@@ -1985,7 +2048,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       const tenantId = document.getElementById('tenantSelect').value;
       try {
         const activeKey = currentApiKey();
-        const res = await fetch(`${API_BASE}/api/saas/tenants/${encodeURIComponent(tenantId)}/usage`,
+        const res = await apiFetch(`${API_BASE}/api/saas/tenants/${encodeURIComponent(tenantId)}/usage`,
           activeKey ? { headers: { 'X-API-Key': activeKey } } : {});
         if (res.ok) {
           hideUsageError();
@@ -2032,7 +2095,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       // Math.random() is not a secret, and a plan chosen here is a plan anyone can
       // choose. Production tenants come from a Stripe checkout or from an administrator.
       try {
-        const res = await fetch(`${API_BASE}/api/saas/tenants/sandbox`, {
+        const res = await apiFetch(`${API_BASE}/api/saas/tenants/sandbox`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name })
@@ -2187,7 +2250,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
 
       try {
         const name = pendingBinaryRpt.name.replace(/\.rpt$/i, '');
-        const res = await fetch(`${API_BASE}/api/reports/convert?name=${encodeURIComponent(name)}`, {
+        const res = await apiFetch(`${API_BASE}/api/reports/convert?name=${encodeURIComponent(name)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/octet-stream', 'X-API-Key': key },
           body: pendingBinaryRpt
@@ -2752,7 +2815,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       saveBtn.innerHTML = '<span>⏳</span> Guardando...';
 
       try {
-        const response = await fetch(`${API_BASE}/api/reports/templates`, {
+        const response = await apiFetch(`${API_BASE}/api/reports/templates`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2802,7 +2865,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       const badge = document.getElementById('savedTemplatesCountBadge');
 
       try {
-        const res = await fetch(`${API_BASE}/api/reports/templates`, {
+        const res = await apiFetch(`${API_BASE}/api/reports/templates`, {
           headers: { 'X-API-Key': apiKey }
         });
         if (!res.ok) return;
@@ -2840,7 +2903,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       const apiKey = currentApiKey();
 
       try {
-        const res = await fetch(`${API_BASE}/api/reports/templates/${encodeURIComponent(name)}`, {
+        const res = await apiFetch(`${API_BASE}/api/reports/templates/${encodeURIComponent(name)}`, {
           headers: { 'X-API-Key': apiKey }
         });
         if (!res.ok) throw new Error('Plantilla no encontrada');

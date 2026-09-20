@@ -499,10 +499,6 @@
               <span class="text-slate-400">IP Pública Clúster:</span>
               <span class="font-mono text-slate-200">129.158.243.168</span>
             </div>
-            <div class="flex justify-between py-1.5 border-b border-slate-800">
-              <span class="text-slate-400">Fallback sslip.io:</span>
-              <span class="font-mono text-cyan-400">reports.129.158.243.168.sslip.io</span>
-            </div>
             <div class="flex justify-between py-1.5">
               <span class="text-slate-400">Compatibilidad Motor de Renderizado:</span>
               <span class="text-emerald-400 font-semibold">JasperReports 6.21.3+ (.jrxml)</span>
@@ -747,7 +743,6 @@
   <!-- JAVASCRIPT LOGIC & SSO AUTHENTICATION -->
   <script>
     const API_BASE = 'https://api.gmrglobe.com';
-    const FALLBACK_API = 'https://reports.129.158.243.168.sslip.io';
 
     // STRICT MASTER ADMIN WHITELIST CONFIGURATION (NOMINATED ACCOUNTS ONLY)
     const ADMIN_WHITELIST_EMAILS = [
@@ -779,7 +774,6 @@
           requestsPerMinute: 5000,
           monthlyQuota: 2000000,
           maskedApiKey: 'gmr_live_ent_••••••••',
-          apiKey: 'gmr_live_ent_key_99999',
           active: true,
           createdAt: '2026-07-01'
         },
@@ -788,22 +782,20 @@
           name: 'Fintech Soluciones Andinas',
           plan: 'SCALE',
           planName: 'Scale',
-          requestsPerMinute: 1200,
+          requestsPerMinute: 1500,
           monthlyQuota: 500000,
           maskedApiKey: 'gmr_live_scale_••••••••',
-          apiKey: 'gmr_live_scale_key_55555',
           active: true,
           createdAt: '2026-08-15'
         },
         {
           tenantId: 'tenant-pro',
           name: 'Acme Logistics Pro',
-          plan: 'STARTUP',
-          planName: 'Startup',
-          requestsPerMinute: 300,
+          plan: 'GROWTH',
+          planName: 'Growth',
+          requestsPerMinute: 400,
           monthlyQuota: 100000,
           maskedApiKey: 'gmr_live_pro_••••••••',
-          apiKey: 'gmr_live_pro_key_67890',
           active: true,
           createdAt: '2026-08-01'
         },
@@ -813,9 +805,8 @@
           plan: 'FREE',
           planName: 'Developer Free',
           requestsPerMinute: 60,
-          monthlyQuota: 1000,
+          monthlyQuota: 1500,
           maskedApiKey: 'gmr_live_free_••••••••',
-          apiKey: 'gmr_live_free_key_12345',
           active: true,
           createdAt: '2026-09-01'
         }
@@ -1068,13 +1059,6 @@
           body: JSON.stringify({ password })
         }).catch(() => null);
 
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/admin/auth`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
-          }).catch(() => null);
-        }
 
         if (res && res.ok) {
           const data = await res.json();
@@ -1135,17 +1119,6 @@
           })
         }).catch(() => null);
 
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/admin/auth`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              password,
-              challengeId: currentAdminChallengeId,
-              twoFactorCode: otp
-            })
-          }).catch(() => null);
-        }
 
         if (res && res.ok) {
           const data = await res.json();
@@ -1259,9 +1232,6 @@
     async function fetchClusterPlans() {
       try {
         let res = await fetch(`${API_BASE}/api/saas/plans`).catch(() => null);
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/plans`).catch(() => null);
-        }
         if (res && res.ok) {
           const plans = await res.json();
           if (Array.isArray(plans) && plans.length > 0) {
@@ -1290,9 +1260,6 @@
     async function fetchClusterInvoices() {
       try {
         let res = await fetch(`${API_BASE}/api/saas/invoices`, { headers: getAuthHeaders() }).catch(() => null);
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/invoices`, { headers: getAuthHeaders() }).catch(() => null);
-        }
         if (res && (res.status === 401 || res.status === 403)) {
           showToast('⚠️ Sesión expirada o no autorizada');
           adminSsoLogout();
@@ -1325,9 +1292,6 @@
     async function fetchClusterTenants() {
       try {
         let res = await fetch(`${API_BASE}/api/saas/tenants`, { headers: getAuthHeaders() }).catch(() => null);
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/tenants`, { headers: getAuthHeaders() }).catch(() => null);
-        }
         if (res && (res.status === 401 || res.status === 403)) {
           showToast('⚠️ Sesión expirada o no autorizada');
           adminSsoLogout();
@@ -1348,9 +1312,6 @@
     async function fetchClusterLeads() {
       try {
         let res = await fetch(`${API_BASE}/api/leads`, { headers: getAuthHeaders() }).catch(() => null);
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/leads`, { headers: getAuthHeaders() }).catch(() => null);
-        }
         if (res && (res.status === 401 || res.status === 403)) {
           showToast('⚠️ Sesión expirada o no autorizada');
           adminSsoLogout();
@@ -1753,9 +1714,6 @@
     async function fetchExternalSources() {
       try {
         let res = await fetch(`${API_BASE}/api/saas/admin/external-sources`, { headers: getAuthHeaders() }).catch(() => null);
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/admin/external-sources`, { headers: getAuthHeaders() }).catch(() => null);
-        }
         if (res && res.ok) {
           const data = await res.json();
           if (data && Array.isArray(data.sources)) {
@@ -1895,13 +1853,6 @@
           body: JSON.stringify(payload)
         }).catch(() => null);
 
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/admin/external-sources/test`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(payload)
-          }).catch(() => null);
-        }
 
         if (res && res.ok) {
           const data = await res.json();
@@ -1934,13 +1885,6 @@
           body: JSON.stringify(src)
         }).catch(() => null);
 
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/admin/external-sources/test`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(src)
-          }).catch(() => null);
-        }
 
         if (res && res.ok) {
           const data = await res.json();
@@ -1993,13 +1937,6 @@
           body: JSON.stringify(config)
         }).catch(() => null);
 
-        if (!res || !res.ok) {
-          res = await fetch(`${FALLBACK_API}/api/saas/admin/external-sources`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(config)
-          }).catch(() => null);
-        }
       } catch (e) {}
 
       const existingIdx = state.externalSources.findIndex(s => s.sourceId === sourceId);
@@ -2025,12 +1962,6 @@
           headers: getAuthHeaders()
         }).catch(() => null);
 
-        if (!res || !res.ok) {
-          await fetch(`${FALLBACK_API}/api/saas/admin/external-sources/${sourceId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders()
-          }).catch(() => null);
-        }
       } catch (e) {}
 
       state.externalSources = state.externalSources.filter(s => s.sourceId !== sourceId);
@@ -2055,10 +1986,6 @@
         showToast('Validando autorización administrativa...');
         const path = '/api/saas/admin/docs/' + encodeURIComponent(docId);
         let res = await fetch(`${API_BASE}${path}`, { headers }).catch(() => null);
-        if (!res || !res.ok) {
-          const fallbackRes = await fetch(`${FALLBACK_API}${path}`, { headers }).catch(() => null);
-          if (fallbackRes) res = fallbackRes;
-        }
         if (!res || !res.ok) {
           if (res && (res.status === 401 || res.status === 403)) {
             alert('Acceso restringido: Se requiere autenticación de Administrador Maestro 2FA.');

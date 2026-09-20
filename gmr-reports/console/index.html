@@ -38,7 +38,7 @@
         <span class="font-bold text-sm tracking-tight text-white flex items-center gap-2">
           GMR Reports <span class="text-emerald-400 font-semibold">Studio</span>
         </span>
-        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">v1.3 GA</span>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">v1.7.5</span>
         <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hidden sm:inline">GraalVM Native</span>
       </div>
     </div>
@@ -49,9 +49,9 @@
       <div class="flex items-center gap-2 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-lg text-xs">
         <span class="text-slate-400 text-[11px]" data-i18n="console.active_tenant">Inquilino:</span>
         <select id="tenantSelect" onchange="onTenantChanged()" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
-          <option value="tenant-free" class="bg-slate-900 text-white">Comunidad (Free Tier)</option>
-          <option value="tenant-pro" class="bg-slate-900 text-white" selected>Acme Logistics (Pro Tier)</option>
-          <option value="tenant-enterprise" class="bg-slate-900 text-white">Global Finance (Enterprise Tier)</option>
+          <option data-i18n="hdr.tenant_free" value="tenant-free" class="bg-slate-900 text-white">Comunidad (Free Tier)</option>
+          <option data-i18n="hdr.tenant_pro" value="tenant-pro" class="bg-slate-900 text-white" selected>Acme Logistics (Pro Tier)</option>
+          <option data-i18n="hdr.tenant_ent" value="tenant-enterprise" class="bg-slate-900 text-white">Global Finance (Enterprise Tier)</option>
         </select>
       </div>
 
@@ -68,12 +68,12 @@
       <!-- Resources & Docs Dropdown -->
       <div class="relative group">
         <button class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700/80 transition flex items-center gap-1.5">
-          <span>📚 Recursos</span>
+          <span data-i18n="hdr.resources">📚 Recursos</span>
           <span class="text-[10px] text-slate-400">▼</span>
         </button>
         <div class="absolute right-0 mt-1 w-48 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-50">
           <a href="/gmr-reports/portal" class="px-3.5 py-2 text-xs text-slate-300 hover:text-emerald-400 hover:bg-slate-800/80 flex items-center gap-2 transition">
-            <span>🏢</span> <span>Portal Clientes</span>
+            <span>🏢</span> <span data-i18n="hdr.portal">Portal Clientes</span>
           </a>
           <a href="https://api.gmrglobe.com/q/swagger-ui/" target="_blank" class="px-3.5 py-2 text-xs text-slate-300 hover:text-emerald-400 hover:bg-slate-800/80 flex items-center gap-2 transition">
             <span>⚡</span> <span>Swagger UI</span>
@@ -82,10 +82,10 @@
             <span>📄</span> <span>OpenAPI 3.1 Spec</span>
           </a>
           <a href="/gmr-reports/docs/pdf/Manual_Usuario_GMR_Reports_v1.3.pdf" download="Manual_Usuario_GMR_Reports_v1.3.pdf" class="px-3.5 py-2 text-xs text-emerald-400 hover:text-emerald-300 hover:bg-slate-800/80 flex items-center gap-2 font-semibold transition border-t border-slate-800/80">
-            <span>📥</span> <span>Manual de Usuario (Tenant)</span>
+            <span>📥</span> <span data-i18n="hdr.manual">Manual de Usuario (Tenant)</span>
           </a>
           <div class="border-t border-slate-800 my-1"></div>
-          <div class="px-3 py-1.5 text-[10px] text-slate-500 uppercase font-semibold">SSO Login</div>
+          <div data-i18n="hdr.sso" class="px-3 py-1.5 text-[10px] text-slate-500 uppercase font-semibold">SSO Login</div>
           <div class="grid grid-cols-2 gap-1 px-2 pb-1">
             <button onclick="loginWithProvider('github')" class="px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded text-[11px] text-center">GitHub</button>
             <button onclick="loginWithProvider('google')" class="px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded text-[11px] text-center">Google</button>
@@ -99,18 +99,10 @@
 
   <!-- Navigation Tabs -->
   <div class="bg-slate-900/40 border-b border-slate-800/80 px-6 flex gap-6 text-sm shrink-0">
-    <button onclick="switchTab('studio')" id="tabBtn-studio" data-i18n="console.tab_studio" class="py-2.5 border-b-2 font-semibold transition border-emerald-500 text-emerald-400 flex items-center gap-2 text-xs">
-      <span>⚡</span> Studio Sandbox
-    </button>
-    <button onclick="switchTab('analytics')" id="tabBtn-analytics" data-i18n="console.tab_usage" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">
-      <span>📊</span> Uso &amp; Cuotas
-    </button>
-    <button onclick="switchTab('keys')" id="tabBtn-keys" data-i18n="console.tab_keys" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">
-      <span>🔑</span> Claves API &amp; Aprovisionamiento
-    </button>
-    <button onclick="switchTab('quickstart')" id="tabBtn-quickstart" data-i18n="console.tab_quickstart" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">
-      <span>📦</span> SDK &amp; Inicio Rápido
-    </button>
+    <button onclick="switchTab('studio')" id="tabBtn-studio" data-i18n="console.tab_studio" class="py-2.5 border-b-2 font-semibold transition border-emerald-500 text-emerald-400 flex items-center gap-2 text-xs">🎨 Studio</button>
+    <button onclick="switchTab('analytics')" id="tabBtn-analytics" data-i18n="console.tab_usage" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">📊 Usage and quotas</button>
+    <button onclick="switchTab('keys')" id="tabBtn-keys" data-i18n="console.tab_keys" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">🔑 API keys</button>
+    <button onclick="switchTab('quickstart')" id="tabBtn-quickstart" data-i18n="console.tab_quickstart" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">🚀 SDKs and quickstart</button>
   </div>
 
   <!-- TAB 1: STUDIO SANDBOX -->
@@ -123,13 +115,13 @@
       <div class="px-4 py-2 bg-slate-900/90 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2 shrink-0">
         <!-- Motor selector -->
         <div class="flex items-center gap-2">
-          <span class="text-xs font-semibold text-slate-300">Motor:</span>
+          <span data-i18n="studio.engine" class="text-xs font-semibold text-slate-300">Motor:</span>
           <select id="templateFormatSelect" onchange="onFormatSelected()" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-lg px-2.5 py-1 focus:outline-none font-semibold cursor-pointer">
-            <option value="crystal">Crystal Reports (.rpt o .rpt.xml)</option>
-            <option value="jrxml">JasperReports (.jrxml)</option>
-            <option value="birt">Eclipse BIRT (.rptdesign)</option>
+            <option data-i18n="studio.engine_crystal" value="crystal">Crystal Reports (.rpt o .rpt.xml)</option>
+            <option data-i18n="studio.engine_jasper" value="jrxml">JasperReports (.jrxml)</option>
+            <option data-i18n="studio.engine_birt" value="birt">Eclipse BIRT (.rptdesign)</option>
           </select>
-          <span id="formatDescription" class="text-[11px] text-slate-400 hidden lg:inline font-mono">AOT Native Sub-Millisecond</span>
+          <span id="formatDescription" data-i18n="studio.fmt_jasper" class="text-[11px] text-slate-400 hidden lg:inline font-mono">JasperReports (.jrxml)</span>
         </div>
 
         <!-- Presets, Mis Plantillas & Reset -->
@@ -137,17 +129,17 @@
           <!-- Mis Plantillas Guardadas Dropdown -->
           <div class="relative group">
             <button class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition">
-              <span>📁</span> <span>Mis Plantillas</span>
+              <span>📁</span> <span data-i18n="studio.my_templates">Mis Plantillas</span>
               <span id="savedTemplatesCountBadge" class="text-[10px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300">0</span>
               <span class="text-[10px] text-slate-400">▼</span>
             </button>
             <div id="savedTemplatesMenu" class="absolute right-0 mt-1 w-72 bg-slate-900 border border-slate-700/90 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-50">
               <div class="px-3 py-1.5 text-[11px] font-semibold text-slate-400 border-b border-slate-800 flex justify-between items-center">
-                <span>Plantillas en tu Tenant</span>
-                <button onclick="loadSavedTenantTemplates()" class="text-cyan-400 hover:underline text-[10px]">↻ Actualizar</button>
+                <span data-i18n="studio.tenant_templates">Plantillas en tu Tenant</span>
+                <button data-i18n="studio.refresh" onclick="loadSavedTenantTemplates()" class="text-cyan-400 hover:underline text-[10px]">↻ Actualizar</button>
               </div>
               <div id="savedTemplatesList" class="max-h-56 overflow-y-auto py-1">
-                <div class="px-3 py-3 text-center text-slate-500 text-xs">Sin plantillas guardadas aún.<br><span class="text-[10px] text-slate-600">Guarda una con el botón "Guardar en Tenant"</span></div>
+                <div class="px-3 py-3 text-center text-slate-500 text-xs">Sin plantillas guardadas aún.<br><span data-i18n="studio.save_hint" class="text-[10px] text-slate-600">Guarda una con el botón "Guardar en Tenant"</span></div>
               </div>
             </div>
           </div>
@@ -155,18 +147,18 @@
           <!-- Enterprise Presets Dropdown -->
           <div class="relative group">
             <button class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700/80 flex items-center gap-1.5 transition">
-              <span>💎</span> <span class="hidden sm:inline">Ejemplos</span>
+              <span>💎</span> <span data-i18n="studio.examples" class="hidden sm:inline">Ejemplos</span>
               <span class="text-[10px] text-slate-400">▼</span>
             </button>
             <div class="absolute right-0 mt-1 w-64 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1 hidden group-hover:block z-50">
               <button onclick="loadTemplatePreset('crystal')" class="w-full text-left px-3 py-2 text-xs text-purple-300 hover:bg-purple-950/40 flex items-center gap-2 transition">
-                <span>💎</span> <div><div class="font-bold">SAP Crystal Reports</div><div class="text-[10px] text-slate-400">Drilldown jerárquico &amp; Cross-Tabs</div></div>
+                <span>💎</span> <div><div class="font-bold">SAP Crystal Reports</div><div data-i18n="studio.ex_crystal_desc" class="text-[10px] text-slate-400">Drilldown jerárquico &amp; Cross-Tabs</div></div>
               </button>
               <button onclick="loadTemplatePreset('jrxml')" class="w-full text-left px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-950/40 flex items-center gap-2 transition">
-                <span>🧾</span> <div><div class="font-bold">JasperReports Factura</div><div class="text-[10px] text-slate-400">Código QR 2D, tablas &amp; totales</div></div>
+                <span>🧾</span> <div><div data-i18n="studio.ex_jasper" class="font-bold">JasperReports Factura</div><div data-i18n="studio.ex_jasper_desc" class="text-[10px] text-slate-400">Código QR 2D, tablas &amp; totales</div></div>
               </button>
               <button onclick="loadTemplatePreset('birt')" class="w-full text-left px-3 py-2 text-xs text-cyan-300 hover:bg-cyan-950/40 flex items-center gap-2 transition">
-                <span>🌐</span> <div><div class="font-bold">Eclipse BIRT Logistics</div><div class="text-[10px] text-slate-400">Auditoría de flota &amp; gráficos</div></div>
+                <span>🌐</span> <div><div data-i18n="studio.ex_birt" class="font-bold">Eclipse BIRT Logistics</div><div data-i18n="studio.ex_birt_desc" class="text-[10px] text-slate-400">Auditoría de flota &amp; gráficos</div></div>
               </button>
             </div>
           </div>
@@ -181,22 +173,22 @@
       <div class="px-4 bg-slate-950/70 border-b border-slate-800/80 flex items-center justify-between shrink-0">
         <div class="flex gap-4 text-xs font-semibold">
           <button onclick="switchEditorTab('template')" id="tabSubBtn-template" class="py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-1.5 transition">
-            <span>📝</span> Plantilla de Reporte
+            <span>📝</span> <span data-i18n="studio.tab_template">Report template</span>
           </button>
           <button onclick="switchEditorTab('data')" id="tabSubBtn-data" class="py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition">
-            <span>📊</span> Datos &amp; Parámetros (JSON)
+            <span>📊</span> <span data-i18n="studio.tab_data">Data and parameters (JSON)</span>
           </button>
         </div>
 
         <div class="flex items-center gap-2">
           <!-- Quick Render Button -->
           <button onclick="renderDynamicPdf()" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold transition flex items-center gap-1.5 shadow-sm" title="Compilar y visualizar PDF en vivo">
-            <span>⚡</span> <span>Generar PDF</span>
+            <span>⚡</span> <span data-i18n="studio.make_pdf">Generar PDF</span>
           </button>
 
           <!-- AI Assistant Toggle Button -->
           <button onclick="toggleAiDrawer()" id="btnToggleAi" class="px-2.5 py-1 rounded-lg bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 text-[11px] font-semibold transition flex items-center gap-1.5">
-            <span>✨</span> <span>Asistente IA</span>
+            <span>✨</span> <span data-i18n="studio.ai">Asistente IA</span>
             <span class="text-[9px] px-1 py-0.2 rounded bg-purple-500/20 text-purple-200">Gemini</span>
           </button>
         </div>
@@ -206,22 +198,22 @@
       <div id="aiDrawer" class="p-3 bg-gradient-to-r from-purple-950/30 via-slate-900/50 to-slate-950/80 border-b border-purple-500/30 space-y-2 shrink-0">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-purple-300 flex items-center gap-1">✨ Diseñar o Modificar con IA</span>
-            <span class="text-[10px] text-slate-400">Pide cambios en lenguaje natural</span>
+            <span data-i18n="studio.ai_title" class="text-xs font-bold text-purple-300 flex items-center gap-1">✨ Diseñar o Modificar con IA</span>
+            <span data-i18n="studio.ai_hint" class="text-[10px] text-slate-400">Pide cambios en lenguaje natural</span>
           </div>
           <div class="flex items-center gap-1 text-[10px]">
-            <button onclick="applyAiPromptPreset('Añade un encabezado con fondo gris claro y bordes redondeados')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Estilo Encabezado</button>
-            <button onclick="applyAiPromptPreset('Convierte en factura comercial con desglose de impuestos e ítems')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Factura</button>
-            <button onclick="applyAiPromptPreset('Genera estado de cuenta bancario con balance y transacciones')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Estado Cuenta</button>
+            <button data-i18n="studio.ai_header" onclick="applyAiPromptPreset('Añade un encabezado con fondo gris claro y bordes redondeados')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Estilo Encabezado</button>
+            <button data-i18n="common.invoice" onclick="applyAiPromptPreset('Convierte en factura comercial con desglose de impuestos e ítems')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Factura</button>
+            <button data-i18n="studio.ai_statement" onclick="applyAiPromptPreset('Genera estado de cuenta bancario con balance y transacciones')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Estado Cuenta</button>
           </div>
         </div>
         <div class="flex gap-2">
           <input type="text" id="aiTemplatePrompt" placeholder="Ej: Cambia los colores a azul marino y agrega un campo de descuento..." class="flex-1 bg-slate-950 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-400" onkeydown="if(event.key === 'Enter') generateTemplateWithAi()" />
           <button onclick="generateTemplateWithAi()" id="btnAiGenerate" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-bold text-xs shadow-lg shadow-purple-900/30 transition flex items-center gap-1.5 shrink-0">
-            <span id="aiBtnIcon">✨</span> <span id="aiBtnText">Aplicar</span>
+            <span id="aiBtnIcon">✨</span> <span data-i18n="studio.apply" id="aiBtnText">Aplicar</span>
           </button>
           <button id="btnUndoAi" onclick="undoLastAiChange()" disabled title="Deshacer último cambio AI" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 text-[11px] font-semibold transition flex items-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed shrink-0">
-            <span>↩</span> <span>Deshacer</span>
+            <span>↩</span> <span data-i18n="studio.undo">Deshacer</span>
           </button>
         </div>
         <div id="aiTemplateFeedback" class="text-[11px] text-slate-400 hidden flex items-center gap-2 pt-0.5">
@@ -238,21 +230,21 @@
         <input type="file" id="assetMultiFileInput" class="hidden" multiple accept=".jrxml,.jasper,.xml,.png,.jpg,.jpeg,.svg" onchange="handleAssetMultiUpload(event)" />
         <div class="flex items-center justify-between pb-2 text-[11px] text-slate-400 font-mono shrink-0">
           <div class="flex items-center gap-2">
-            <span class="font-semibold text-slate-300">Fuente de la Plantilla (XML / JRXML / RPT):</span>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Edición en vivo</span>
+            <span data-i18n="studio.source" class="font-semibold text-slate-300">Fuente de la Plantilla (XML / JRXML / RPT):</span>
+            <span data-i18n="studio.live_edit" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Edición en vivo</span>
           </div>
           <div class="flex items-center gap-2">
             <button type="button" onclick="document.getElementById('bundleFileInput').click()" class="px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Importa un paquete comprimido (.zip o .tar.gz) con plantilla, subreportes y assets">
-              <span>📦</span> <span>Cargar Bundle (.zip/.tar.gz)</span>
+              <span>📦</span> <span data-i18n="studio.load_bundle">Cargar Bundle (.zip/.tar.gz)</span>
             </button>
             <button type="button" onclick="document.getElementById('folderFileInput').click()" class="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Importa una carpeta completa de reporte con sus subdirectorios y assets">
-              <span>📁</span> <span>Cargar Carpeta</span>
+              <span>📁</span> <span data-i18n="studio.load_folder">Cargar Carpeta</span>
             </button>
             <button type="button" onclick="document.getElementById('templateFileInput').click()" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Importa un archivo .jrxml, .rpt o .rptdesign desde tu equipo">
-              <span>📥</span> <span>Cargar Plantilla</span>
+              <span>📥</span> <span data-i18n="studio.load_template">Cargar Plantilla</span>
             </button>
             <button type="button" onclick="insertBankLogoToTemplate()" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Inserta el logotipo oficial del banco en el encabezado de la plantilla">
-              <span>🏦</span> <span>Insertar Logo Banco</span>
+              <span>🏦</span> <span data-i18n="studio.insert_logo">Insertar Logo Banco</span>
             </button>
           </div>
         </div>
@@ -262,15 +254,15 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="text-amber-400 text-sm">📦</span>
-              <span class="text-xs font-bold text-amber-200" id="requiredAssetsTitle">Recursos Externos Detectados</span>
-              <span id="requiredAssetsBadge" class="text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">0 requeridos</span>
+              <span data-i18n="studio.external" class="text-xs font-bold text-amber-200" id="requiredAssetsTitle">Recursos Externos Detectados</span>
+              <span data-i18n="studio.external_count" id="requiredAssetsBadge" class="text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">0 requeridos</span>
             </div>
             <div class="flex items-center gap-2">
               <button type="button" onclick="cancelAndClearAssets()" id="btnCancelAssets" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-red-400 border border-slate-700 text-[11px] font-semibold transition flex items-center gap-1 shadow-sm" title="Cancelar vinculación y purgar recursos cargados de la memoria">
-                <span>✕</span> <span>Cancelar / Limpiar</span>
+                <span>✕</span> <span data-i18n="studio.clear">Cancelar / Limpiar</span>
               </button>
               <button type="button" onclick="document.getElementById('assetMultiFileInput').click()" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] transition flex items-center gap-1 shadow-md shadow-amber-950/50">
-                <span>📤</span> <span>Cargar Subreportes / Assets</span>
+                <span>📤</span> <span data-i18n="studio.load_assets">Cargar Subreportes / Assets</span>
               </button>
             </div>
           </div>
@@ -289,9 +281,9 @@
           <div class="w-full md:w-1/2 flex flex-col bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
             <div class="flex items-center justify-between pb-2">
               <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <span>🔑</span> Parámetros (Map):
+                <span>🔑</span> <span data-i18n="studio.params_label">Parameters:</span>
               </label>
-              <button onclick="formatJsonEditor('paramsInput')" class="text-[10px] text-cyan-400 hover:underline font-mono">Formatear JSON</button>
+              <button data-i18n="common.format_json" onclick="formatJsonEditor('paramsInput')" class="text-[10px] text-cyan-400 hover:underline font-mono">Formatear JSON</button>
             </div>
             <textarea id="paramsInput" class="flex-1 bg-slate-900/90 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500/50 resize-none leading-relaxed" spellcheck="false">{
   "REPORT_TITLE": "SAP Xtreme Sales by Customer & Region",
@@ -305,9 +297,9 @@
           <div class="w-full md:w-1/2 flex flex-col bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
             <div class="flex items-center justify-between pb-2">
               <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <span>📋</span> Registros de Datos (List):
+                <span>📋</span> <span data-i18n="studio.rows_label">Data rows:</span>
               </label>
-              <button onclick="formatJsonEditor('dataInput')" class="text-[10px] text-cyan-400 hover:underline font-mono">Formatear JSON</button>
+              <button data-i18n="common.format_json" onclick="formatJsonEditor('dataInput')" class="text-[10px] text-cyan-400 hover:underline font-mono">Formatear JSON</button>
             </div>
             <textarea id="dataInput" class="flex-1 bg-slate-900/90 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500/50 resize-none leading-relaxed" spellcheck="false">[
   {
@@ -340,14 +332,14 @@
       <div class="p-3 border-t border-slate-800/80 bg-slate-900/80 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2 text-xs font-mono text-slate-400" id="renderMetrics">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>Listo para compilar</span>
+          <span data-i18n="studio.ready">Listo para compilar</span>
         </div>
         <div class="flex items-center gap-2.5">
           <button onclick="renderSampleExcel()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition border border-slate-700/80 flex items-center gap-1.5">
-            <span>📊</span> <span>Exportar XLSX</span>
+            <span>📊</span> <span data-i18n="studio.export_xlsx">Exportar XLSX</span>
           </button>
           <button onclick="renderDynamicPdf()" id="btnRenderPdf" class="px-5 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs transition shadow-lg shadow-emerald-500/25 flex items-center gap-2">
-            <span>⚡</span> <span>Generar / Renderizar PDF</span>
+            <span>⚡</span> <span data-i18n="studio.render">Generar / Renderizar PDF</span>
           </button>
         </div>
       </div>
@@ -359,9 +351,9 @@
       <div class="px-4 py-2 border-b border-slate-800/80 bg-slate-900/60 flex items-center justify-between text-xs shrink-0">
         <div class="flex items-center gap-2.5">
           <span class="font-bold text-slate-200 flex items-center gap-1.5">
-            <span>👁️</span> Vista Previa en Vivo
+            <span>👁️</span> <span data-i18n="studio.live_preview">Preview</span>
           </span>
-          <span id="previewStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-slate-800 text-slate-400">Awaiting Render</span>
+          <span data-i18n="studio.awaiting" id="previewStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-slate-800 text-slate-400">Awaiting Render</span>
         </div>
         <div class="flex items-center gap-2" id="downloadLinks">
           <!-- Dynamic Download Button inserted here -->
@@ -370,8 +362,8 @@
       <div class="flex-1 relative flex items-center justify-center p-3 bg-slate-900/20">
         <div id="emptyPreviewPlaceholder" class="text-center text-slate-500 max-w-xs">
           <div class="text-5xl mb-3">📄</div>
-          <p class="text-sm font-semibold text-slate-300">Sin documento generado</p>
-          <p class="text-xs mt-1 text-slate-500">Presiona "Renderizar Reporte" para compilar AOT en milisegundos con GraalVM</p>
+          <p data-i18n="studio.empty_title" class="text-sm font-semibold text-slate-300">Sin documento generado</p>
+          <p data-i18n="studio.empty_body" class="text-xs mt-1 text-slate-500">Presiona "Renderizar Reporte" para compilar AOT en milisegundos con GraalVM</p>
         </div>
         <iframe id="pdfViewer" class="w-full h-full rounded-xl border border-slate-800/80 shadow-2xl hidden bg-white"></iframe>
       </div>
@@ -384,41 +376,41 @@
       <div class="max-w-4xl mx-auto space-y-6">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-bold text-white tracking-tight">Tenant Usage & Quotas</h2>
-            <p class="text-sm text-slate-400">Real-time consumption metrics tracked by the SaaS Gateway</p>
+            <h2 data-i18n="usage.title" class="text-xl font-bold text-white tracking-tight">Usage and quotas</h2>
+            <p data-i18n="usage.subtitle" class="text-sm text-slate-400">What this tenant has consumed in the current billing month</p>
           </div>
           <button onclick="refreshUsage()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700">
-            🔄 Refresh Metrics
+            <span data-i18n="usage.refresh">🔄 Refresh</span>
           </button>
+        </div>
+
+        <!-- Shown when the figures could not be fetched. Without it the panel keeps the
+             numbers written into the markup and presents them as live readings. -->
+        <div id="usageError" class="hidden rounded-xl border border-amber-500/40 bg-amber-950/20 p-4 text-sm text-amber-200">
+          <span data-i18n="usage.load_failed">The figures could not be loaded, so none are shown. Check that the active tenant's key is the right one.</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Current Plan</div>
-            <div id="metricPlan" class="text-2xl font-bold text-emerald-400 mt-2">PRO</div>
-            <div id="metricRpm" class="text-xs text-slate-500 mt-1">300 req / min limit</div>
+            <div data-i18n="usage.plan" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Current plan</div>
+            <div id="metricPlan" class="text-2xl font-bold text-emerald-400 mt-2">&mdash;</div>
+
           </div>
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Monthly Used</div>
-            <div id="metricMonthlyUsed" class="text-2xl font-bold text-white mt-2">0</div>
-            <div id="metricMonthlyQuota" class="text-xs text-slate-500 mt-1">of 25,000 monthly quota</div>
+            <div data-i18n="usage.used" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Used this month</div>
+            <div id="metricMonthlyUsed" class="text-2xl font-bold text-white mt-2">&mdash;</div>
+            <div id="metricMonthlyQuota" class="text-xs text-slate-500 mt-1">&nbsp;</div>
           </div>
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quota Remaining</div>
-            <div id="metricRemaining" class="text-2xl font-bold text-cyan-400 mt-2">25,000</div>
-            <div class="text-xs text-slate-500 mt-1">resets at month end</div>
+            <div data-i18n="usage.remaining" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quota remaining</div>
+            <div id="metricRemaining" class="text-2xl font-bold text-cyan-400 mt-2">&mdash;</div>
+            <div data-i18n="usage.resets" class="text-xs text-slate-500 mt-1">resets at the end of the month</div>
           </div>
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex flex-col justify-between">
             <div>
-              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Volume Generated</div>
-              <div id="metricVolume" class="text-2xl font-bold text-purple-400 mt-2">0 KB</div>
-              <div id="metricTotalReqs" class="text-xs text-slate-500 mt-1">0 total requests</div>
-            </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between">
-              <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-                <span>📉</span> <span>Ahorro RAM vs JVM:</span>
-              </span>
-              <span id="metricRamSavings" class="text-xs font-mono font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">885 MB</span>
+              <div data-i18n="usage.volume" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Volume generated</div>
+              <div id="metricVolume" class="text-2xl font-bold text-purple-400 mt-2">&mdash;</div>
+              <div id="metricTotalReqs" class="text-xs text-slate-500 mt-1">&nbsp;</div>
             </div>
           </div>
         </div>
@@ -426,7 +418,7 @@
         <!-- Quota Progress Bar -->
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
           <div class="flex justify-between text-xs font-semibold">
-            <span class="text-slate-300">Billing Cycle Quota Consumption</span>
+            <span data-i18n="usage.cycle" class="text-slate-300">Quota used this billing cycle</span>
             <span id="quotaPercentage" class="text-emerald-400">0%</span>
           </div>
           <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
@@ -440,64 +432,74 @@
     <div id="tabContent-keys" class="flex-1 p-8 overflow-y-auto hidden">
       <div class="max-w-4xl mx-auto space-y-6">
         <div>
-          <h2 class="text-xl font-bold text-white tracking-tight">API Key Management</h2>
-          <p class="text-sm text-slate-400">Manage tenant credentials and provision new customer accounts</p>
+          <h2 data-i18n="keys.title" class="text-xl font-bold text-white tracking-tight">API Key Management</h2>
+          <p data-i18n="keys.subtitle" class="text-sm text-slate-400">Manage the credentials this browser is using</p>
         </div>
 
         <!-- Active Key Display Card -->
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-4">
-          <div class="text-xs font-semibold text-slate-300">Active Tenant Secret Key:</div>
+          <div data-i18n="keys.active_label" class="text-xs font-semibold text-slate-300">Active tenant secret key:</div>
           <div class="flex items-center gap-3">
             <input type="text" id="activeKeyInput" readonly class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm font-mono text-emerald-400 focus:outline-none">
             <button id="btnCopyKey" onclick="copyActiveKey()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
-              Copy Key
+              <span data-i18n="keys.copy">Copy key</span>
             </button>
           </div>
           <div class="flex items-center gap-2 pt-2 border-t border-slate-800/80 justify-between">
-            <span class="text-xs text-slate-500">Authenticate requests by passing this token via <code class="text-slate-300 font-mono">X-API-Key</code>.</span>
-            <button onclick="revokeActiveTenant()" class="px-3 py-1.5 bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800/50 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5">
-              <span>🗑️</span> <span>Revoke & Delete Tenant</span>
+            <span data-i18n-html="keys.auth_hint" class="text-xs text-slate-500">Authenticate requests by passing this token via <code class="text-slate-300 font-mono">X-API-Key</code>.</span>
+            <!--
+              This used to be "Revoke & Delete Tenant", and it called DELETE
+              /api/saas/tenants/{id} with no credentials at all. The API requires master
+              admin authentication, so it answered 401 every time -- and the handler
+              ignored the response, removed the tenant from the list and announced that it
+              had been revoked. Nothing was ever deleted and the console said otherwise.
+              Worse, three of the tenants in that list are the demo ones shipped in this
+              page and shared by every visitor; offering to delete those to the public was
+              not something to leave standing even while it was broken.
+
+              What a visitor can legitimately do is drop the key their own browser is
+              holding, which is all this does now. Revoking a tenant for real is an
+              administrator's action and lives in the admin console, where the request
+              actually carries an Authorization header.
+            -->
+            <button onclick="disconnectThisBrowser()" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5">
+              <span data-i18n="keys.disconnect">Disconnect this browser</span>
             </button>
           </div>
+          <p data-i18n="keys.revoke_note" class="text-[11px] text-slate-600 leading-relaxed">
+            This only forgets the key on this computer; the tenant and its documents stay as they are. To revoke a tenant for good, an administrator does it from the admin console.
+          </p>
         </div>
 
         <!-- Upgrade Banner -->
         <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div>
             <div class="font-bold text-white flex items-center gap-2">
-              <span>💳 Subscribe via Stripe Billing</span>
-              <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded">Self-Service</span>
+              <span data-i18n="keys.stripe_title">💳 Subscribe via Stripe Billing</span>
+              <span data-i18n="keys.stripe_badge" class="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded">Self-Service</span>
             </div>
-            <p class="text-slate-400 mt-0.5">Need 25k+ documents, multi-tenancy quotas, or SLA 99.9%? Activate Launch ($49/mo), Growth ($149/mo), or Scale ($499/mo).</p>
+            <p data-i18n="keys.stripe_body" class="text-slate-400 mt-0.5">Need 25k+ documents, multi-tenancy quotas, or SLA 99.9%? Activate Launch ($49/mo), Growth ($149/mo), or Scale ($499/mo).</p>
           </div>
-          <a href="/gmr-reports/#pricing" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition shrink-0">
-            View Stripe Plans →
-          </a>
+          <a href="/gmr-reports/#pricing" data-i18n="keys.stripe_cta" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition shrink-0">View Stripe Plans →</a>
         </div>
 
         <!-- Provision New Tenant Form -->
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-4">
-          <h3 class="text-sm font-bold text-white">Crear un sandbox</h3>
-          <p class="text-xs text-slate-400 -mt-1">
-            Alta inmediata, sin tarjeta. El identificador y la clave los genera el servidor
-            y la clave se muestra una sola vez.
-            <span class="text-slate-300">100 documentos/mes, 20 peticiones/minuto.</span>
-          </p>
+          <h3 data-i18n="keys.sandbox_title" class="text-sm font-bold text-white">Create a sandbox</h3>
+          <p data-i18n-html="keys.sandbox_body" class="text-xs text-slate-400 -mt-1">Starts immediately, no card. The server generates the identifier and the key, and the key is shown once. <span class="text-slate-300">100 documents a month, 20 requests a minute.</span></p>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label class="text-xs text-slate-400">Nombre de la organizacion:</label>
+              <label data-i18n="keys.sandbox_org_label" class="text-xs text-slate-400">Organisation name:</label>
               <input type="text" id="newTenantName" placeholder="MyCorp S.A." class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-xs text-slate-200 mt-1 focus:outline-none">
             </div>
             <div>
-              <label class="text-xs text-slate-400">Plan:</label>
+              <label data-i18n="keys.sandbox_plan_label" class="text-xs text-slate-400">Plan:</label>
               <div class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-xs text-slate-400 mt-1">
-                Sandbox &mdash; para produccion, <a href="/gmr-reports/licensing" class="text-emerald-400 hover:underline">suscribete</a>
+<span data-i18n-html="keys.sandbox_plan">Sandbox &mdash; for production, <a href="/gmr-reports/licensing" class="text-emerald-400 hover:underline">subscribe</a></span>
               </div>
             </div>
           </div>
-          <button onclick="provisionTenant()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white rounded-lg border border-slate-700 transition">
-            + Crear sandbox
-          </button>
+          <button onclick="provisionTenant()" data-i18n="keys.sandbox_create" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white rounded-lg border border-slate-700 transition">+ Create sandbox</button>
         </div>
       </div>
     </div>
@@ -506,8 +508,8 @@
     <div id="tabContent-quickstart" class="flex-1 p-8 overflow-y-auto hidden">
       <div class="max-w-4xl mx-auto space-y-6">
         <div>
-          <h2 class="text-xl font-bold text-white tracking-tight">Client Integration & Quickstart</h2>
-          <p class="text-sm text-slate-400">Copy pre-configured code snippets with your active API key</p>
+          <h2 data-i18n="quickstart.title" class="text-xl font-bold text-white tracking-tight">Client Integration &amp; Quickstart</h2>
+          <p data-i18n="quickstart.subtitle" class="text-sm text-slate-400">Copy pre-configured code snippets with your active API key</p>
         </div>
 
         <div class="space-y-4">
@@ -1744,7 +1746,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       const fmt = document.getElementById('templateFormatSelect').value;
       const desc = document.getElementById('formatDescription');
       if (fmt === 'birt') {
-        desc.innerText = 'Eclipse BIRT (.rptdesign) — Master Page Layout, Scalar Parameter Expressions & Multi-Column Matrix';
+        desc.innerText = GMR_I18N.t('studio.fmt_birt', 'Eclipse BIRT (.rptdesign)');
         displayCachedPresetPreview('birt');
         document.getElementById('jrxmlInput').value = sampleBirtXml;
         document.getElementById('paramsInput').value = JSON.stringify({
@@ -1761,7 +1763,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
           { "flightId": "GMR-CARGO-104", "destination": "London Heathrow Sky (LHR)", "carrier": "British Cargo B747-8F", "payloadKg": "27,000 kg", "status": "CUSTOMS INSPECTED", "turnaroundTime": "19 min" }
         ], null, 2);
       } else if (fmt === 'crystal') {
-        desc.innerText = 'SAP Crystal Reports XI-2020 — SAP Xtreme DB Drilldown, Group Hierarchies & Cross-Tab KPIs';
+        desc.innerText = GMR_I18N.t('studio.fmt_crystal', 'SAP Crystal Reports (.rpt)');
         displayCachedPresetPreview('crystal');
         document.getElementById('jrxmlInput').value = sampleCrystalXml;
         document.getElementById('paramsInput').value = JSON.stringify({
@@ -1786,7 +1788,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
           { "Customer_Name": "Tokyo Cybernetics Corp [APAC]", "Region": "APAC", "Order_ID": "ORD-30090", "Product_Line": "Superconducting Thermal Couplers", "Quantity": 8, "Unit_Price": "$12,400.00", "Discount_Rate": "5%", "Extended_Price": "$94,240.00" }
         ], null, 2);
       } else {
-        desc.innerText = 'JasperReports .jrxml — 2D QR Verification, Vector Rounded Cards, AST Expressions & Currency Patterns';
+        desc.innerText = GMR_I18N.t('studio.fmt_jasper', 'JasperReports (.jrxml)');
         displayCachedPresetPreview('jrxml');
         document.getElementById('jrxmlInput').value = sampleJrxml;
         document.getElementById('paramsInput').value = JSON.stringify({
@@ -2021,6 +2023,27 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       }
     }
 
+    // Every figure on the usage panel starts as a dash and is only replaced by something
+    // the server sent. When the call fails they stay dashes and this says why, rather
+    // than the panel quietly showing the numbers that happen to be in the HTML.
+    function showUsageUnavailable() {
+      ['metricPlan', 'metricMonthlyUsed', 'metricRemaining', 'metricVolume']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.innerText = '\u2014'; });
+      ['metricRpm', 'metricMonthlyQuota', 'metricTotalReqs']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '&nbsp;'; });
+      const pct = document.getElementById('quotaPercentage');
+      if (pct) pct.innerText = '\u2014';
+      const bar = document.getElementById('quotaProgressBar');
+      if (bar) bar.style.width = '0%';
+      const box = document.getElementById('usageError');
+      if (box) box.classList.remove('hidden');
+    }
+
+    function hideUsageError() {
+      const box = document.getElementById('usageError');
+      if (box) box.classList.add('hidden');
+    }
+
     async function refreshUsage() {
       const tenantId = document.getElementById('tenantSelect').value;
       try {
@@ -2028,28 +2051,34 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         const res = await apiFetch(`${API_BASE}/api/saas/tenants/${encodeURIComponent(tenantId)}/usage`,
           activeKey ? { headers: { 'X-API-Key': activeKey } } : {});
         if (res.ok) {
+          hideUsageError();
           const data = await res.json();
           document.getElementById('metricPlan').innerText = data.plan;
           document.getElementById('metricMonthlyUsed').innerText = data.monthlyUsed.toLocaleString();
-          document.getElementById('metricMonthlyQuota').innerText = `of ${data.monthlyQuota.toLocaleString()} monthly quota`;
+          document.getElementById('metricMonthlyQuota').innerText =
+            GMR_I18N.t('usage.of_quota', 'of {quota} a month')
+              .replace('{quota}', data.monthlyQuota.toLocaleString());
           document.getElementById('metricRemaining').innerText = data.quotaRemaining.toLocaleString();
           document.getElementById('metricVolume').innerText = `${(data.totalBytesGenerated / 1024).toFixed(1)} KB`;
-          document.getElementById('metricTotalReqs').innerText = `${data.totalRequests} total requests`;
+          document.getElementById('metricTotalReqs').innerText =
+            GMR_I18N.t('usage.total_requests', '{n} requests in total')
+              .replace('{n}', data.totalRequests.toLocaleString());
 
           const pct = Math.min(100, Math.round((data.monthlyUsed / data.monthlyQuota) * 100));
           document.getElementById('quotaPercentage').innerText = `${pct}%`;
           document.getElementById('quotaProgressBar').style.width = `${pct}%`;
 
-          // Infrastructure RAM savings gamification vs JVM
-          const monthlyUsed = data.monthlyUsed || 0;
-          const ramSavedMb = Math.round(850 + (monthlyUsed * 1.2));
-          const ramSavingsEl = document.getElementById('metricRamSavings');
-          if (ramSavingsEl) {
-            ramSavingsEl.innerText = `${ramSavedMb} MB`;
-          }
+          // "Ahorro RAM vs JVM" used to be shown here as 850 + monthlyUsed * 1.2,
+          // computed in the browser and owing nothing to any measurement -- the comment
+          // above it called it gamification. It sat beside real quota figures on a
+          // product that sells itself on publishing numbers it can reproduce. If a
+          // saving is worth showing, it has to come from the server having measured one.
+        } else {
+          showUsageUnavailable();
         }
       } catch (e) {
         console.error("Failed to load usage", e);
+        showUsageUnavailable();
       }
     }
 
@@ -2099,33 +2128,57 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       }
     }
 
-    async function revokeActiveTenant() {
-      const tenantId = document.getElementById('tenantSelect').value;
+    // The three tenants written into the page. They belong to the demo and every
+    // visitor sees the same ones, so no visitor gets to remove them.
+    const DEMO_TENANTS = new Set(['tenant-free', 'tenant-pro', 'tenant-enterprise']);
+
+    /**
+     * Forgets the key this browser is holding. Deliberately local: there is no request
+     * to the server here, because a visitor has no authority to delete a tenant and the
+     * API is right to refuse. The previous version of this function sent an
+     * unauthenticated DELETE, ignored the 401 that always came back, and told the user
+     * the tenant had been revoked.
+     */
+    function disconnectThisBrowser() {
+      const select = document.getElementById('tenantSelect');
+      const tenantId = select.value;
       if (!tenantId) return;
 
-      if (!confirm(`Are you sure you want to permanently revoke and delete tenant "${tenantId}"? Their API key will be immediately invalidated.`)) {
+      if (DEMO_TENANTS.has(tenantId)) {
+        alert(GMR_I18N.t('keys.demo_cannot_disconnect',
+          'This is one of the example tenants built into the page, not yours. ' +
+          'Create a sandbox to get a key of your own.'));
+        return;
+      }
+
+      if (!confirm(GMR_I18N.t('keys.disconnect_confirm',
+        'Forget the key for "{tenant}" on this computer? The tenant itself is not ' +
+        'touched, and you can paste the key back in later.').replace('{tenant}', tenantId))) {
         return;
       }
 
       try {
-        const res = await apiFetch(`${API_BASE}/api/saas/tenants/${encodeURIComponent(tenantId)}`, {
-          method: 'DELETE'
-        });
-
-        delete tenantKeys[tenantId];
-        const select = document.getElementById('tenantSelect');
-        const opt = Array.from(select.options).find(o => o.value === tenantId);
-        if (opt) select.removeChild(opt);
-
-        if (select.options.length > 0) {
-          select.selectedIndex = 0;
-          onTenantChanged();
-        }
-
-        alert(`Tenant "${tenantId}" has been revoked and removed.`);
-      } catch (err) {
-        alert("Error revoking tenant: " + err.message);
+        localStorage.removeItem('gmr_active_api_key');
+        localStorage.removeItem('gmr_active_tenant');
+      } catch (e) {
+        // Private windows and blocked site data both throw here. Nothing was stored in
+        // that case either, so carrying on clears the session exactly as well.
       }
+
+      delete tenantKeys[tenantId];
+      const opt = Array.from(select.options).find(o => o.value === tenantId);
+      if (opt) select.removeChild(opt);
+
+      if (select.options.length > 0) {
+        select.selectedIndex = 0;
+        onTenantChanged();
+      }
+
+      const keyInput = document.getElementById('activeKeyInput');
+      if (keyInput) keyInput.value = '';
+
+      alert(GMR_I18N.t('keys.disconnect_done',
+        'This browser has forgotten the key. The tenant is untouched.'));
     }
 
 
@@ -2301,9 +2354,9 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
           select.value = format;
           const desc = document.getElementById('formatDescription');
           if (desc) {
-            if (format === 'crystal') desc.innerText = 'SAP Crystal Reports (.rpt / .rpt.xml) — Cargado desde archivo local';
-            else if (format === 'birt') desc.innerText = 'Eclipse BIRT (.rptdesign) — Cargado desde archivo local';
-            else desc.innerText = 'JasperReports (.jrxml) — Cargado desde archivo local';
+            if (format === 'crystal') desc.innerText = GMR_I18N.t('studio.fmt_loaded_crystal', 'SAP Crystal Reports (.rpt) \u2014 loaded from your own file');
+            else if (format === 'birt') desc.innerText = GMR_I18N.t('studio.fmt_loaded_birt', 'Eclipse BIRT (.rptdesign) \u2014 loaded from your own file');
+            else desc.innerText = GMR_I18N.t('studio.fmt_loaded_jasper', 'JasperReports (.jrxml) \u2014 loaded from your own file');
           }
         }
 
@@ -2542,11 +2595,11 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       const desc = document.getElementById('formatDescription');
       if (desc) {
         if (format === 'crystal') {
-          desc.innerText = 'SAP Crystal Reports XI-2020 — SAP Xtreme DB Drilldown, Group Hierarchies & Cross-Tab KPIs';
+          desc.innerText = GMR_I18N.t('studio.fmt_crystal', 'SAP Crystal Reports (.rpt)');
         } else if (format === 'birt') {
-          desc.innerText = 'Eclipse BIRT (.rptdesign) — Master Page Layout, Scalar Parameter Expressions & Multi-Column Matrix';
+          desc.innerText = GMR_I18N.t('studio.fmt_birt', 'Eclipse BIRT (.rptdesign)');
         } else {
-          desc.innerText = 'JasperReports .jrxml — 2D QR Verification, Vector Rounded Cards, AST Expressions & Currency Patterns';
+          desc.innerText = GMR_I18N.t('studio.fmt_jasper', 'JasperReports (.jrxml)');
         }
       }
 
@@ -2789,7 +2842,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
           setTimeout(() => {
             closeSaveTemplateModal();
             saveBtn.disabled = false;
-            saveBtn.innerHTML = '<span>💾</span> Guardar Plantilla';
+            saveBtn.innerHTML = '<span>💾</span> ' + GMR_I18N.t('dlg.save_button', 'Save the template');
           }, 2500);
         } else {
           throw new Error(data.error || 'Error al guardar');
@@ -2799,7 +2852,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         alertBox.innerText = 'Error: ' + err.message;
         alertBox.classList.remove('hidden');
         saveBtn.disabled = false;
-        saveBtn.innerHTML = '<span>💾</span> Guardar Plantilla';
+        saveBtn.innerHTML = '<span>💾</span> ' + GMR_I18N.t('dlg.save_button', 'Save the template');
       }
     }
 
@@ -2964,35 +3017,35 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
     <div class="bg-slate-900 border border-slate-700/90 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <span>💾</span> Guardar Plantilla en Tenant Cloud
+          <span>💾</span> <span data-i18n="dlg.save_title">Save the template to your tenant</span>
         </h3>
         <button onclick="closeSaveTemplateModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block text-slate-300 font-semibold mb-1">Nombre único de la plantilla (identificador API):</label>
+          <label data-i18n="dlg.tpl_name" class="block text-slate-300 font-semibold mb-1">Nombre único de la plantilla (identificador API):</label>
           <input type="text" id="saveModalName" placeholder="ej: factura-comercial-v1" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-cyan-400" />
           <p class="text-[10px] text-slate-500 mt-1">Se renderiza con <code>POST /api/reports/render</code> y <code>{"templateName": "{nombre}"}</code></p>
         </div>
 
         <div>
-          <label class="block text-slate-300 font-semibold mb-1">Descripción / Notas:</label>
+          <label data-i18n="dlg.tpl_notes" class="block text-slate-300 font-semibold mb-1">Descripción / Notas:</label>
           <input type="text" id="saveModalDesc" placeholder="ej: Factura B2B con desglose de impuestos y QR" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-400" />
         </div>
 
         <div class="bg-slate-950 border border-slate-800 rounded-lg p-3 text-[11px] text-slate-400 space-y-1">
-          <div class="flex justify-between"><span class="text-slate-500">Inquilino activo:</span> <span id="saveModalTenant" class="text-emerald-400 font-semibold"></span></div>
-          <div class="flex justify-between"><span class="text-slate-500">Motor de reporte:</span> <span id="saveModalFormat" class="text-cyan-400 font-semibold"></span></div>
+          <div class="flex justify-between"><span data-i18n="dlg.active_tenant" class="text-slate-500">Inquilino activo:</span> <span id="saveModalTenant" class="text-emerald-400 font-semibold"></span></div>
+          <div class="flex justify-between"><span data-i18n="dlg.engine" class="text-slate-500">Motor de reporte:</span> <span id="saveModalFormat" class="text-cyan-400 font-semibold"></span></div>
         </div>
 
         <div id="saveModalAlert" class="hidden p-3 rounded-lg text-xs"></div>
       </div>
 
       <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
-        <button onclick="closeSaveTemplateModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancelar</button>
+        <button data-i18n="common.cancel" onclick="closeSaveTemplateModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancelar</button>
         <button onclick="confirmSaveTemplateToTenant()" id="btnConfirmSaveTemplate" class="px-5 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-cyan-500/20">
-          <span>💾</span> Guardar Plantilla
+          <span>💾</span> <span data-i18n="dlg.save_button">Save the template</span>
         </button>
       </div>
     </div>
@@ -3003,7 +3056,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
     <div class="bg-slate-900 border border-purple-500/40 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <span>💎</span> <span>Archivo Binario Propietario SAP Crystal (.rpt)</span>
+          <span>💎</span> <span data-i18n="dlg.rpt_title">Archivo Binario Propietario SAP Crystal (.rpt)</span>
         </h3>
         <button onclick="closeBinaryRptModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
       </div>
@@ -3011,7 +3064,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       <div class="space-y-3 text-xs text-slate-300">
         <div class="p-3 bg-purple-950/40 border border-purple-500/30 rounded-xl space-y-2">
           <div class="font-bold text-purple-300 flex items-center gap-1.5">
-            <span>ℹ️</span> <span>Estructura OLE2 de Windows Detectada</span>
+            <span>ℹ️</span> <span data-i18n="dlg.rpt_ole2">Estructura OLE2 de Windows Detectada</span>
           </div>
           <p class="leading-relaxed">
             El archivo que has subido está en formato binario cerrado de Microsoft/SAP (Compound File Binary Format). El motor <b>GMR Reports Cloud AOT</b> ejecuta en entornos Linux ultraligeros y procesa la especificación de definición abierta <b>Crystal Reports XML (.rpt.xml)</b>.
@@ -3019,7 +3072,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         </div>
 
         <div class="space-y-2 pt-1">
-          <div class="font-semibold text-white">¿Cómo compilar este reporte en GMR Reports?</div>
+          <div data-i18n="dlg.rpt_how" class="font-semibold text-white">¿Cómo compilar este reporte en GMR Reports?</div>
           <ul class="space-y-1.5 text-slate-300 pl-4 list-disc">
             <li><b>Desde Crystal Reports Designer:</b> Selecciona <code>Archivo &gt; Exportar &gt; Definición de Reporte (XML)</code> y guarda como <code>.rpt.xml</code>.</li>
             <li><b>O deja que lo convirtamos ahora:</b> el <b>Migration Toolkit</b> decodifica el
@@ -3032,16 +3085,16 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
 
       <div class="flex items-center justify-between pt-3 border-t border-slate-800">
         <div class="flex items-center gap-3">
-          <button onclick="closeBinaryRptModal()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+          <button data-i18n="dlg.close" onclick="closeBinaryRptModal()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
             Cerrar
           </button>
-          <button id="convertRptBtn" onclick="convertPendingRpt()" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition shadow-lg shadow-cyan-600/30">
+          <button data-i18n="dlg.convert" id="convertRptBtn" onclick="convertPendingRpt()" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition shadow-lg shadow-cyan-600/30">
             Convertir este .rpt
           </button>
           <span id="convertRptStatus" class="text-xs text-slate-400"></span>
         </div>
         <button onclick="loadTemplatePreset('crystal'); closeBinaryRptModal();" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-purple-600/30">
-          <span>💎</span> <span>Cargar Ejemplo SAP Xtreme XML</span>
+          <span>💎</span> <span data-i18n="dlg.load_xtreme">Cargar Ejemplo SAP Xtreme XML</span>
         </button>
       </div>
     </div>
@@ -3053,7 +3106,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-950/40">
         <div class="flex items-center gap-2">
           <span class="text-purple-400 text-base">✨</span>
-          <span class="font-bold text-slate-100 text-sm">Vista Previa — Cambios del Asistente AI</span>
+          <span data-i18n="dlg.ai_preview" class="font-bold text-slate-100 text-sm">Vista Previa — Cambios del Asistente AI</span>
         </div>
         <button onclick="closeAiPreview()" class="text-slate-400 hover:text-white text-xl font-mono leading-none transition">&times;</button>
       </div>
@@ -3062,20 +3115,20 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       </div>
       <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
         <div>
-          <div class="text-[10px] text-slate-400 mb-1 font-semibold uppercase tracking-wider">Explicación del Cambio:</div>
+          <div data-i18n="dlg.ai_why" class="text-[10px] text-slate-400 mb-1 font-semibold uppercase tracking-wider">Explicación del Cambio:</div>
           <div id="aiPreviewExplanation" class="text-xs text-slate-200 bg-slate-800/60 rounded-xl px-3.5 py-2.5 border border-slate-700 leading-relaxed"></div>
         </div>
         <div>
-          <div class="text-[10px] text-slate-400 mb-1 font-semibold uppercase tracking-wider">Vista previa de la plantilla resultante:</div>
+          <div data-i18n="dlg.ai_result" class="text-[10px] text-slate-400 mb-1 font-semibold uppercase tracking-wider">Vista previa de la plantilla resultante:</div>
           <pre id="aiPreviewCode" class="text-[11px] font-mono text-emerald-300 bg-slate-950 rounded-xl p-3 overflow-x-auto border border-slate-800 max-h-56 overflow-y-auto"></pre>
         </div>
       </div>
       <div class="flex items-center justify-end gap-2.5 px-5 py-3.5 border-t border-slate-800 bg-slate-950/40">
-        <button onclick="closeAiPreview()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">
+        <button data-i18n="dlg.discard" onclick="closeAiPreview()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">
           ✕ Descartar
         </button>
         <button onclick="applyAiPreview()" class="px-5 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white text-xs font-bold shadow-lg shadow-purple-900/40 transition flex items-center gap-1.5">
-          <span>✅</span> <span>Aplicar Cambios</span>
+          <span>✅</span> <span data-i18n="dlg.apply_changes">Aplicar Cambios</span>
         </button>
       </div>
     </div>
@@ -3086,7 +3139,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
     <div class="bg-slate-900 border border-purple-500/40 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <span>📦</span> <span>Seleccionar Plantilla Principal</span>
+          <span>📦</span> <span data-i18n="dlg.pick_main">Seleccionar Plantilla Principal</span>
         </h3>
         <button onclick="closeMainTemplateModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
       </div>
@@ -3095,7 +3148,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       </p>
       <div id="bundleCandidatesList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
       <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
-        <button onclick="closeMainTemplateModal()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+        <button data-i18n="common.cancel" onclick="closeMainTemplateModal()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
           Cancelar
         </button>
       </div>

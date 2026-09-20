@@ -78,6 +78,7 @@
       <a href="/gmr-reports/admin" class="text-xs text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-md hover:bg-rose-500/10 transition flex items-center gap-1.5 border border-rose-500/30">
         <span>🛡️ Admin Ops</span>
       </a>
+      <a href="/gmr-reports/docs/pdf/Manual_Usuario_GMR_Reports_v1.3.pdf" download="Manual_Usuario_GMR_Reports_v1.3.pdf" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700/80 flex items-center gap-1.5 transition"><span>📥</span> <span>Manual Usuario</span></a>
       <a href="/gmr-reports/console" class="text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-md hover:bg-slate-800 transition flex items-center gap-1.5 border border-slate-700">
         <span>⚡ Console Sandbox</span>
       </a>
@@ -927,7 +928,6 @@ npm install @gmreserarch-io/reports-client</code></pre>
   <!-- JAVASCRIPT LOGIC -->
   <script>
     const API_BASE = 'https://api.gmrglobe.com';
-    const FALLBACK_API = 'https://reports.129.158.243.168.sslip.io';
 
     // Current State
     let currentPortalData = null;
@@ -1157,15 +1157,7 @@ npm install @gmreserarch-io/reports-client</code></pre>
             body: JSON.stringify({ key, password })
           });
         } catch (netErr) {
-          try {
-            res = await fetch(`${FALLBACK_API}/api/saas/portal/auth`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ key, password })
-            });
-          } catch (fErr) {
-            res = null;
-          }
+          res = null;
         }
 
         if (res) {
@@ -1270,15 +1262,7 @@ npm install @gmreserarch-io/reports-client</code></pre>
             body: JSON.stringify({ key: pendingCredentials.key, challengeId: pendingChallengeId })
           });
         } catch (netErr) {
-          try {
-            res = await fetch(`${FALLBACK_API}/api/saas/portal/resend-2fa`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ key: pendingCredentials.key, challengeId: pendingChallengeId })
-            });
-          } catch(fErr) {
-            res = null;
-          }
+          res = null;
         }
 
         if (res && res.ok) {
@@ -1391,15 +1375,7 @@ npm install @gmreserarch-io/reports-client</code></pre>
             body: JSON.stringify({ key, password, twoFactorCode, challengeId: pendingChallengeId })
           });
         } catch (netErr) {
-          try {
-            res = await fetch(`${FALLBACK_API}/api/saas/portal/auth`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ key, password, twoFactorCode, challengeId: pendingChallengeId })
-            });
-          } catch (fErr) {
-            res = null;
-          }
+          res = null;
         }
 
         if (res) {
