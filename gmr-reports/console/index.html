@@ -876,9 +876,9 @@ with open("invoice.pdf", "wb") as f:
                 <reportElement x="0" y="0" width="535" height="110" forecolor="#0f172a" backcolor="#0f172a"/>
             </rectangle>
             <staticText>
-                <reportElement x="16" y="14" width="300" height="24" forecolor="#ffffff"/>
+                <reportElement x="16" y="14" width="310" height="24" forecolor="#ffffff"/>
                 <textElement><font size="16" isBold="true"/></textElement>
-                <text><![CDATA[GMR GLOBAL AEROSPACE &amp; CLOUD]]></text>
+                <text><![CDATA[GMR GLOBAL AEROSPACE & CLOUD]]></text>
             </staticText>
             <staticText>
                 <reportElement x="16" y="38" width="300" height="14" forecolor="#94a3b8"/>
@@ -938,7 +938,7 @@ Support: gmr-rep-support@gmrglobe.com]]></text>
             <staticText>
                 <reportElement x="330" y="8" width="185" height="12" forecolor="#64748b"/>
                 <textElement textAlignment="Right"><font size="7" isBold="true"/></textElement>
-                <text><![CDATA[PAYMENT STATUS &amp; SETTLEMENT:]]></text>
+                <text><![CDATA[PAYMENT STATUS & SETTLEMENT:]]></text>
             </staticText>
             <staticText>
                 <reportElement x="330" y="20" width="185" height="14" forecolor="#10b981"/>
@@ -969,7 +969,7 @@ Support: gmr-rep-support@gmrglobe.com]]></text>
                 <text><![CDATA[SKU]]></text>
             </staticText>
             <staticText>
-                <reportElement x="106" y="6" width="180" height="14" forecolor="#ffffff"/>
+                <reportElement x="106" y="6" width="196" height="14" forecolor="#ffffff"/>
                 <textElement><font size="8" isBold="true"/></textElement>
                 <text><![CDATA[SERVICE / ITEM SPECIFICATION]]></text>
             </staticText>
@@ -1012,7 +1012,7 @@ Support: gmr-rep-support@gmrglobe.com]]></text>
                 <textFieldExpression><![CDATA[$F{sku}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="106" y="3" width="180" height="14" forecolor="#1e293b"/>
+                <reportElement x="106" y="3" width="196" height="14" forecolor="#1e293b"/>
                 <textElement><font size="8"/></textElement>
                 <textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
             </textField>
@@ -1416,13 +1416,18 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
 
       if (isCrystal) {
         return { intent: 'CREATE_NEW', format: 'crystal', template: sampleCrystalXml,
-          params: { 'REPORT_TITLE': 'SAP Crystal Report', 'CORPORATION_NAME': 'Corporation SA' },
-          data: [{ 'Customer_Name': 'Cliente A', 'Region': 'LATAM', 'Extended_Price': '$1,000.00' }],
+          params: { 'REPORT_TITLE': 'Sales by Customer & Region', 'CORPORATION_NAME': 'Corporation SA',
+                    'PERIOD': 'FY 2026', 'CURRENCY_CODE': 'All amounts in USD',
+                    'TOTAL_REVENUE': '$1,000.00', 'TOTAL_ORDERS': '1', 'AVG_ORDER': '$1,000.00' },
+          data: [{ 'Customer_Name': 'Cliente A', 'Region': 'LATAM', 'Order_ID': 'ORD-0001',
+                   'Product_Line': 'Servicios', 'Quantity': 1, 'Extended_Price': '$1,000.00' }],
           explanation: 'Template SAP Crystal Reports generado desde base estándar.', source: 'gmr-smart-synthesizer' };
       }
       if (isBirt) {
         return { intent: 'CREATE_NEW', format: 'birt', template: sampleBirtXml,
-          params: { 'ORGANIZATION_NAME': 'Mi Organización' },
+          params: { 'ORGANIZATION_NAME': 'Mi Organización', 'DISPATCH_FACILITY': 'Terminal 1',
+                    'AUDIT_CYCLE': 'Turno actual', 'TOTAL_PAYLOAD': '1,000 kg',
+                    'FLIGHTS_AUDITED': '1', 'COMPLIANCE_SCORE': '100%' },
           data: [{ 'flightId': 'CARGO-001', 'destination': 'Destino A', 'carrier': 'Carrier', 'payloadKg': '1,000 kg', 'status': 'ACTIVO', 'turnaroundTime': '30 min' }],
           explanation: 'Template Eclipse BIRT generado para logística.', source: 'gmr-smart-synthesizer' };
       }
@@ -1535,17 +1540,18 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
     }
 
     const sampleBirtXml = `<?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1" name="OperationalFleetAuditReport">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1" name="CargoDispatchAudit">
     <simple-master-page name="MasterPage" orientation="portrait"/>
-    
-    <!-- BIRT Scalar Parameters -->
+
+    <!-- Report parameters, referenced as params["NAME"] -->
     <scalar-parameter name="ORGANIZATION_NAME"/>
     <scalar-parameter name="DISPATCH_FACILITY"/>
     <scalar-parameter name="AUDIT_CYCLE"/>
-    <scalar-parameter name="TOTAL_PAYLOAD_METRIC"/>
+    <scalar-parameter name="TOTAL_PAYLOAD"/>
     <scalar-parameter name="COMPLIANCE_SCORE"/>
+    <scalar-parameter name="FLIGHTS_AUDITED"/>
 
-    <!-- BIRT Dataset Columns -->
+    <!-- Dataset columns, referenced as row["name"] -->
     <column name="flightId"/>
     <column name="destination"/>
     <column name="carrier"/>
@@ -1553,168 +1559,333 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
     <column name="status"/>
     <column name="turnaroundTime"/>
 
-    <page-header id="10">
-        <label id="11">
-            <text-property name="text">ECLIPSE BIRT ENTERPRISE — LOGISTICS &amp; CARGO DISPATCH AUDIT</text-property>
+    <!-- ============ PAGE HEADER: masthead ============ -->
+    <page-header id="10" height="92">
+        <label id="11" x="0" y="0" width="535" height="84">
+            <text-property name="text"> </text-property>
+            <property name="backgroundColor">#064E3B</property>
+        </label>
+
+        <label id="12" x="18" y="14" width="330" height="20">
+            <text-property name="text">ECLIPSE BIRT</text-property>
             <property name="fontSize">15pt</property>
             <property name="fontWeight">bold</property>
+            <property name="color">#FFFFFF</property>
         </label>
-        <data id="12">
-            <property name="expression">params["ORGANIZATION_NAME"]</property>
-        </data>
-        <data id="13">
-            <property name="expression">params["DISPATCH_FACILITY"]</property>
-        </data>
-        <data id="14">
-            <property name="expression">params["AUDIT_CYCLE"]</property>
-        </data>
-        <text id="15">
-            <text-property name="text">------------------------------------------------------------------------------------------------------------------------</text-property>
-        </text>
-        <label id="16">
-            <text-property name="text">FLIGHT / DESTINATION / CARRIER / PAYLOAD (KG) / STATUS / SLA TURNAROUND</text-property>
-            <property name="fontSize">9pt</property>
+        <label id="13" x="18" y="36" width="330" height="14">
+            <text-property name="text">Cargo Dispatch Audit</text-property>
+            <property name="fontSize">10pt</property>
             <property name="fontWeight">bold</property>
+            <property name="color">#6EE7B7</property>
         </label>
-        <text id="17">
-            <text-property name="text">------------------------------------------------------------------------------------------------------------------------</text-property>
-        </text>
+        <data id="14" x="18" y="54" width="330" height="12">
+            <property name="expression">params["ORGANIZATION_NAME"]</property>
+            <property name="fontSize">8pt</property>
+            <property name="color">#D1FAE5</property>
+        </data>
+        <data id="15" x="18" y="68" width="330" height="12">
+            <property name="expression">params["DISPATCH_FACILITY"]</property>
+            <property name="fontSize">7pt</property>
+            <property name="color">#A7F3D0</property>
+        </data>
+
+        <label id="16" x="368" y="14" width="149" height="56">
+            <text-property name="text"> </text-property>
+            <property name="backgroundColor">#10B981</property>
+        </label>
+        <label id="17" x="378" y="20" width="129" height="10">
+            <text-property name="text">TOTAL PAYLOAD</text-property>
+            <property name="fontSize">7pt</property>
+            <property name="fontWeight">bold</property>
+            <property name="color">#D1FAE5</property>
+            <property name="textAlign">right</property>
+        </label>
+        <data id="18" x="378" y="32" width="129" height="18">
+            <property name="expression">params["TOTAL_PAYLOAD"]</property>
+            <property name="fontSize">14pt</property>
+            <property name="fontWeight">bold</property>
+            <property name="color">#FFFFFF</property>
+            <property name="textAlign">right</property>
+        </data>
+        <data id="19" x="378" y="52" width="129" height="10">
+            <property name="expression">params["AUDIT_CYCLE"]</property>
+            <property name="fontSize">7pt</property>
+            <property name="color">#D1FAE5</property>
+            <property name="textAlign">right</property>
+        </data>
     </page-header>
 
-    <detail id="20">
-        <data id="21">
-            <property name="resultSetColumn">flightId</property>
-        </data>
-        <data id="22">
-            <property name="resultSetColumn">destination</property>
-        </data>
-        <data id="23">
-            <property name="resultSetColumn">carrier</property>
-        </data>
-        <data id="24">
-            <property name="resultSetColumn">payloadKg</property>
-        </data>
-        <data id="25">
-            <property name="resultSetColumn">status</property>
-        </data>
-        <data id="26">
-            <property name="resultSetColumn">turnaroundTime</property>
-        </data>
-    </detail>
+    <!-- ============ TABLE: column headings and one row per flight ============ -->
+    <table id="20">
+        <header id="21" height="22">
+            <label id="22" x="0" y="0" width="535" height="18">
+                <text-property name="text"> </text-property>
+                <property name="backgroundColor">#334155</property>
+            </label>
+            <label id="23" x="8" y="4" width="92" height="11">
+                <text-property name="text">FLIGHT</text-property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#FFFFFF</property>
+            </label>
+            <label id="24" x="104" y="4" width="128" height="11">
+                <text-property name="text">DESTINATION</text-property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#FFFFFF</property>
+            </label>
+            <label id="25" x="236" y="4" width="118" height="11">
+                <text-property name="text">CARRIER</text-property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#FFFFFF</property>
+            </label>
+            <label id="26" x="358" y="4" width="66" height="11">
+                <text-property name="text">PAYLOAD</text-property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#FFFFFF</property>
+                <property name="textAlign">right</property>
+            </label>
+            <label id="27" x="428" y="4" width="60" height="11">
+                <text-property name="text">STATUS</text-property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#FFFFFF</property>
+            </label>
+            <label id="28" x="492" y="4" width="35" height="11">
+                <text-property name="text">T/A</text-property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#FFFFFF</property>
+                <property name="textAlign">right</property>
+            </label>
+        </header>
 
-    <page-footer id="30">
-        <text id="31">
-            <text-property name="text">------------------------------------------------------------------------------------------------------------------------</text-property>
-        </text>
-        <data id="32">
-            <property name="expression">params["TOTAL_PAYLOAD_METRIC"]</property>
-        </data>
-        <data id="33">
-            <property name="expression">params["COMPLIANCE_SCORE"]</property>
-        </data>
-        <text id="34">
-            <text-property name="text">GMR Reports™ AOT Execution — Native compilation from Eclipse BIRT XML without Java runtime overhead.</text-property>
-        </text>
+        <detail id="30" height="19">
+            <label id="31" x="0" y="18" width="535" height="1">
+                <text-property name="text"> </text-property>
+                <property name="backgroundColor">#E2E8F0</property>
+            </label>
+            <data id="32" x="8" y="4" width="92" height="11">
+                <property name="expression">row["flightId"]</property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#0F172A</property>
+            </data>
+            <data id="33" x="104" y="4" width="128" height="11">
+                <property name="expression">row["destination"]</property>
+                <property name="fontSize">7pt</property><property name="color">#334155</property>
+            </data>
+            <data id="34" x="236" y="4" width="118" height="11">
+                <property name="expression">row["carrier"]</property>
+                <property name="fontSize">7pt</property><property name="color">#475569</property>
+            </data>
+            <data id="35" x="358" y="4" width="66" height="11">
+                <property name="expression">row["payloadKg"]</property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#0F172A</property>
+                <property name="textAlign">right</property>
+            </data>
+            <data id="36" x="428" y="4" width="60" height="11">
+                <property name="expression">row["status"]</property>
+                <property name="fontSize">6pt</property><property name="color">#059669</property>
+            </data>
+            <data id="37" x="492" y="4" width="35" height="11">
+                <property name="expression">row["turnaroundTime"]</property>
+                <property name="fontSize">7pt</property><property name="color">#334155</property>
+                <property name="textAlign">right</property>
+            </data>
+        </detail>
+
+        <footer id="40" height="56">
+            <label id="41" x="300" y="8" width="235" height="44">
+                <text-property name="text"> </text-property>
+                <property name="backgroundColor">#F0FDF4</property>
+            </label>
+            <label id="42" x="312" y="16" width="120" height="11">
+                <text-property name="text">FLIGHTS AUDITED</text-property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#047857</property>
+            </label>
+            <data id="43" x="432" y="16" width="91" height="11">
+                <property name="expression">params["FLIGHTS_AUDITED"]</property>
+                <property name="fontSize">8pt</property><property name="fontWeight">bold</property>
+                <property name="color">#064E3B</property>
+                <property name="textAlign">right</property>
+            </data>
+            <label id="44" x="312" y="32" width="120" height="11">
+                <text-property name="text">COMPLIANCE</text-property>
+                <property name="fontSize">7pt</property><property name="fontWeight">bold</property>
+                <property name="color">#047857</property>
+            </label>
+            <data id="45" x="432" y="32" width="91" height="11">
+                <property name="expression">params["COMPLIANCE_SCORE"]</property>
+                <property name="fontSize">8pt</property><property name="fontWeight">bold</property>
+                <property name="color">#059669</property>
+                <property name="textAlign">right</property>
+            </data>
+        </footer>
+    </table>
+
+    <!-- ============ PAGE FOOTER ============ -->
+    <page-footer id="50" height="28">
+        <label id="51" x="0" y="4" width="535" height="1">
+            <text-property name="text"> </text-property>
+            <property name="backgroundColor">#CBD5E1</property>
+        </label>
+        <label id="52" x="0" y="12" width="380" height="10">
+            <text-property name="text">Manifest figures verified against carrier ACARS records.</text-property>
+            <property name="fontSize">7pt</property>
+            <property name="color">#94A3B8</property>
+        </label>
+        <auto-text id="53" x="440" y="12" width="95" height="10" type="page-number">
+            <property name="fontSize">7pt</property>
+            <property name="color">#94A3B8</property>
+            <property name="textAlign">right</property>
+        </auto-text>
     </page-footer>
 </report>`;
 
     const sampleCrystalXml = `<?xml version="1.0" encoding="UTF-8"?>
-<CrystalReport Name="SAP_Xtreme_Sales_By_Customer_Grouped" MajorVersion="14" MinorVersion="0">
+<CrystalReport Name="Xtreme_Sales_By_Customer_And_Region" MajorVersion="14" MinorVersion="0">
     <PageOptions Orientation="Portrait"/>
 
-    <!-- Crystal Parameter Prompts & Selection Formulas ({?Param}) -->
+    <!-- Interactive prompts ({?Parameter}) -->
     <ParameterField Name="REPORT_TITLE"/>
     <ParameterField Name="CORPORATION_NAME"/>
-    <ParameterField Name="REGION_PROMPT"/>
-    <ParameterField Name="DATE_RANGE_PROMPT"/>
-    <ParameterField Name="DRILLDOWN_LEVEL"/>
+    <ParameterField Name="PERIOD"/>
+    <ParameterField Name="REGION_FILTER"/>
     <ParameterField Name="CURRENCY_CODE"/>
-    <ParameterField Name="CONFIDENTIALITY_NOTICE"/>
-    <ParameterField Name="TOTAL_REVENUE_METRIC"/>
-    <ParameterField Name="TOTAL_ORDERS_METRIC"/>
-    <ParameterField Name="AVG_ORDER_METRIC"/>
+    <ParameterField Name="TOTAL_REVENUE"/>
+    <ParameterField Name="TOTAL_ORDERS"/>
+    <ParameterField Name="AVG_ORDER"/>
     <ParameterField Name="AUDIT_SIGNATURE"/>
+    <ParameterField Name="CONFIDENTIALITY_NOTICE"/>
 
-    <!-- Database Fields & Formulas ({Table.Field}) -->
+    <!-- Database fields ({Table.Field}) -->
     <DatabaseField Name="Customer_Name"/>
     <DatabaseField Name="Region"/>
     <DatabaseField Name="Order_ID"/>
     <DatabaseField Name="Product_Line"/>
     <DatabaseField Name="Quantity"/>
     <DatabaseField Name="Unit_Price"/>
-    <DatabaseField Name="Discount_Rate"/>
     <DatabaseField Name="Extended_Price"/>
 
-    <!-- Report Header Section (Title, Subtitle, Filter Criteria) -->
-    <Section Type="ReportHeaderSection">
-        <TextObject>
-            <Text>SAP CRYSTAL REPORTS ENTERPRISE — DRILLDOWN SALES HIERARCHY</Text>
-            <Font Size="15" Bold="true"/>
+    <!-- ============ REPORT HEADER: masthead, printed once ============ -->
+    <Section Type="ReportHeaderSection" Height="96">
+        <BoxObject X="0" Y="0" Width="535" Height="88" BackColor="#0F172A" BorderRadius="6"/>
+
+        <TextObject X="18" Y="14" Width="330" Height="20" ForeColor="#FFFFFF">
+            <Text>SAP CRYSTAL REPORTS</Text>
+            <Font Name="Helvetica" Size="15" Bold="true"/>
         </TextObject>
-        <TextObject>
-            <Text>Database Schema: SAP Xtreme Retail Database (xtreme.mdb Benchmark Model)</Text>
-            <Font Size="9"/>
+        <FieldObject X="18" Y="36" Width="330" Height="14" FieldName="{?REPORT_TITLE}" ForeColor="#A78BFA">
+            <Font Name="Helvetica" Size="10" Bold="true"/>
+        </FieldObject>
+        <FieldObject X="18" Y="54" Width="330" Height="12" FieldName="{?CORPORATION_NAME}" ForeColor="#CBD5E1">
+            <Font Name="Helvetica" Size="8"/>
+        </FieldObject>
+        <FieldObject X="18" Y="68" Width="330" Height="12" FieldName="{?REGION_FILTER}" ForeColor="#94A3B8">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
+
+        <BoxObject X="368" Y="14" Width="149" Height="60" BackColor="#7C3AED" BorderRadius="4"/>
+        <TextObject X="378" Y="22" Width="129" Height="10" ForeColor="#DDD6FE" Alignment="Right">
+            <Text>NET REVENUE</Text>
+            <Font Name="Helvetica" Size="7" Bold="true"/>
         </TextObject>
-        <LineObject/>
-        <FieldObject FieldName="{?CORPORATION_NAME}"/>
-        <FieldObject FieldName="{?DATE_RANGE_PROMPT}"/>
-        <FieldObject FieldName="{?REGION_PROMPT}"/>
-        <FieldObject FieldName="{?DRILLDOWN_LEVEL}"/>
-        <LineObject/>
+        <FieldObject X="378" Y="36" Width="129" Height="18" FieldName="{?TOTAL_REVENUE}" ForeColor="#FFFFFF" Alignment="Right">
+            <Font Name="Helvetica" Size="14" Bold="true"/>
+        </FieldObject>
+        <FieldObject X="378" Y="56" Width="129" Height="10" FieldName="{?PERIOD}" ForeColor="#DDD6FE" Alignment="Right">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
     </Section>
 
-    <!-- Page Header Section (Column Headers & Group Summary Indicator) -->
-    <Section Type="PageHeaderSection">
-        <TextObject>
-            <Text>HIERARCHICAL GROUP: [REGION] &gt;&gt; [CUSTOMER] &gt;&gt; [ORDERS]</Text>
-            <Font Size="10" Bold="true"/>
+    <!-- ============ PAGE HEADER: column headings, repeated ============ -->
+    <Section Type="PageHeaderSection" Height="22">
+        <BoxObject X="0" Y="0" Width="535" Height="18" BackColor="#334155"/>
+        <TextObject X="8" Y="4" Width="150" Height="11" ForeColor="#FFFFFF">
+            <Text>CUSTOMER</Text><Font Name="Helvetica" Size="7" Bold="true"/>
         </TextObject>
-        <LineObject/>
-        <TextObject>
-            <Text>CUSTOMER / REGION / ORDER ID / PRODUCT / EXTENDED PRICE</Text>
-            <Font Size="8" Bold="true"/>
+        <TextObject X="162" Y="4" Width="62" Height="11" ForeColor="#FFFFFF">
+            <Text>REGION</Text><Font Name="Helvetica" Size="7" Bold="true"/>
         </TextObject>
-        <LineObject/>
+        <TextObject X="228" Y="4" Width="68" Height="11" ForeColor="#FFFFFF">
+            <Text>ORDER</Text><Font Name="Helvetica" Size="7" Bold="true"/>
+        </TextObject>
+        <TextObject X="300" Y="4" Width="118" Height="11" ForeColor="#FFFFFF">
+            <Text>PRODUCT LINE</Text><Font Name="Helvetica" Size="7" Bold="true"/>
+        </TextObject>
+        <TextObject X="422" Y="4" Width="30" Height="11" ForeColor="#FFFFFF" Alignment="Right">
+            <Text>QTY</Text><Font Name="Helvetica" Size="7" Bold="true"/>
+        </TextObject>
+        <TextObject X="456" Y="4" Width="71" Height="11" ForeColor="#FFFFFF" Alignment="Right">
+            <Text>EXT. PRICE</Text><Font Name="Helvetica" Size="7" Bold="true"/>
+        </TextObject>
     </Section>
 
-    <!-- Group Header Section (Simulated Group Header in Crystal XML) -->
-    <Section Type="GroupHeaderSection">
-        <TextObject>
-            <Text>&gt;&gt; GROUP SUMMARY: COMMERCIAL &amp; AEROSPACE FLEET ACCOUNTS</Text>
-            <Font Size="9" Bold="true"/>
-        </TextObject>
+    <!-- ============ DETAIL: one framed row per transaction ============ -->
+    <Section Type="DetailSection" Height="19">
+        <BoxObject X="0" Y="0" Width="535" Height="19" BorderColor="#E2E8F0"/>
+        <FieldObject X="8" Y="5" Width="150" Height="11" FieldName="{Customer.Customer_Name}" ForeColor="#0F172A">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
+        <FieldObject X="162" Y="5" Width="62" Height="11" FieldName="{Customer.Region}" ForeColor="#475569">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
+        <FieldObject X="228" Y="5" Width="68" Height="11" FieldName="{Orders.Order_ID}" ForeColor="#1E293B">
+            <Font Name="Helvetica" Size="7" Bold="true"/>
+        </FieldObject>
+        <FieldObject X="300" Y="5" Width="118" Height="11" FieldName="{Orders.Product_Line}" ForeColor="#334155">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
+        <FieldObject X="422" Y="5" Width="30" Height="11" FieldName="{Orders.Quantity}" ForeColor="#334155" Alignment="Right">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
+        <FieldObject X="456" Y="5" Width="71" Height="11" FieldName="{Orders.Extended_Price}" ForeColor="#0F172A" Alignment="Right">
+            <Font Name="Helvetica" Size="7" Bold="true"/>
+        </FieldObject>
     </Section>
 
-    <!-- Detail Section (Repeated per transaction record) -->
-    <Section Type="DetailSection">
-        <FieldObject FieldName="{Customer.Customer_Name}"/>
-        <FieldObject FieldName="{Orders.Order_ID}"/>
-        <FieldObject FieldName="{Orders.Product_Line}"/>
-        <FieldObject FieldName="{Orders.Extended_Price}"/>
+    <!-- ============ REPORT FOOTER: totals panel, printed once ============ -->
+    <Section Type="ReportFooterSection" Height="92">
+        <BoxObject X="300" Y="12" Width="235" Height="66" BackColor="#F8FAFC" BorderColor="#CBD5E1" BorderRadius="4"/>
+
+        <TextObject X="312" Y="20" Width="120" Height="11" ForeColor="#64748B">
+            <Text>ORDERS</Text><Font Name="Helvetica" Size="7" Bold="true"/>
+        </TextObject>
+        <FieldObject X="432" Y="20" Width="91" Height="11" FieldName="{?TOTAL_ORDERS}" ForeColor="#0F172A" Alignment="Right">
+            <Font Name="Helvetica" Size="8" Bold="true"/>
+        </FieldObject>
+
+        <TextObject X="312" Y="36" Width="120" Height="11" ForeColor="#64748B">
+            <Text>AVERAGE ORDER</Text><Font Name="Helvetica" Size="7" Bold="true"/>
+        </TextObject>
+        <FieldObject X="432" Y="36" Width="91" Height="11" FieldName="{?AVG_ORDER}" ForeColor="#0F172A" Alignment="Right">
+            <Font Name="Helvetica" Size="8" Bold="true"/>
+        </FieldObject>
+
+        <LineObject X="312" Y="52" Width="211" Color="#CBD5E1"/>
+
+        <TextObject X="312" Y="58" Width="120" Height="13" ForeColor="#0F172A">
+            <Text>TOTAL</Text><Font Name="Helvetica" Size="9" Bold="true"/>
+        </TextObject>
+        <FieldObject X="432" Y="58" Width="91" Height="13" FieldName="{?TOTAL_REVENUE}" ForeColor="#7C3AED" Alignment="Right">
+            <Font Name="Helvetica" Size="11" Bold="true"/>
+        </FieldObject>
+
+        <FieldObject X="0" Y="20" Width="290" Height="11" FieldName="{?AUDIT_SIGNATURE}" ForeColor="#64748B">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
+        <FieldObject X="0" Y="34" Width="290" Height="11" FieldName="{?CURRENCY_CODE}" ForeColor="#94A3B8">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
     </Section>
 
-    <!-- Report Footer Section (Grand Totals, Cross-Tab Summary & Signoff) -->
-    <Section Type="ReportFooterSection">
-        <LineObject/>
-        <TextObject>
-            <Text>EXECUTIVE SUMMARY &amp; CROSS-TAB FINANCIAL TOTALS</Text>
-            <Font Size="11" Bold="true"/>
-        </TextObject>
-        <FieldObject FieldName="{?TOTAL_REVENUE_METRIC}"/>
-        <FieldObject FieldName="{?TOTAL_ORDERS_METRIC}"/>
-        <FieldObject FieldName="{?AVG_ORDER_METRIC}"/>
-        <LineObject/>
-        <FieldObject FieldName="{?AUDIT_SIGNATURE}"/>
-    </Section>
-
-    <!-- Page Footer Section (Legal Notice & Engine Attestation) -->
-    <Section Type="PageFooterSection">
-        <LineObject/>
-        <TextObject>
-            <Text>GMR Reports AOT GraalVM Native Engine — Sub-Millisecond Native Crystal Compilation</Text>
-            <Font Size="8"/>
-        </TextObject>
-        <FieldObject FieldName="{?CONFIDENTIALITY_NOTICE}"/>
+    <!-- ============ PAGE FOOTER: rule and notice, repeated ============ -->
+    <Section Type="PageFooterSection" Height="30">
+        <LineObject X="0" Y="6" Width="535" Color="#CBD5E1"/>
+        <FieldObject X="0" Y="12" Width="380" Height="10" FieldName="{?CONFIDENTIALITY_NOTICE}" ForeColor="#94A3B8">
+            <Font Name="Helvetica" Size="7"/>
+        </FieldObject>
+        <SpecialVarObject X="440" Y="12" Width="95" Height="10" Type="PageNumber" ForeColor="#94A3B8" Alignment="Right">
+            <Font Name="Helvetica" Size="7"/>
+        </SpecialVarObject>
     </Section>
 </CrystalReport>`;
 
@@ -1741,10 +1912,10 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         viewer.src = cached.dataUri;
 
         statusBadge.className = "text-[10px] px-2.5 py-0.5 rounded-full font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold flex items-center gap-1 shadow-sm";
-        statusBadge.innerHTML = `<span>⚡</span> <span>Compilado AOT en ${cached.timing}</span>`;
+        statusBadge.innerHTML = `<span>⚡</span> <span>Renderizado en ${cached.timing}</span>`;
 
         if (metrics) {
-          metrics.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span> <span>Compilado en <b class="text-emerald-400">${cached.timing}</b></span> • <span>Tamaño: <b>${cached.sizeKb}</b></span> • <span class="text-cyan-400">GraalVM Native Cache</span>`;
+          metrics.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span> <span>Renderizado en <b class="text-emerald-400">${cached.timing}</b></span> • <span>Tamaño: <b>${cached.sizeKb}</b></span> • <span class="text-slate-400">mediana de 7 llamadas, red incluida</span>`;
         }
 
         if (downloadLinks) {
@@ -1765,42 +1936,118 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         displayCachedPresetPreview('birt');
         document.getElementById('jrxmlInput').value = sampleBirtXml;
         document.getElementById('paramsInput').value = JSON.stringify({
-          "ORGANIZATION_NAME": "Global Multimodal Freight & Orbital Logistics Hub",
-          "DISPATCH_FACILITY": "Terminal 4 Cargo Logistics Center (JFK-FRA Direct)",
-          "AUDIT_CYCLE": "Operational Shift: 24/7 Peak Cycle — September 2026",
-          "TOTAL_PAYLOAD_METRIC": "Consolidated Cargo Mass: 142,850.00 kg (100% manifest verified)",
-          "COMPLIANCE_SCORE": "FAA / ICAO Compliance Index: 99.98% SLA Met"
+          "ORGANIZATION_NAME": "Global Multimodal Freight & Logistics Hub",
+          "DISPATCH_FACILITY": "Terminal 4 Cargo Center - JFK",
+          "AUDIT_CYCLE": "Shift 2026-09-20",
+          "TOTAL_PAYLOAD": "142,850 kg",
+          "FLIGHTS_AUDITED": "4",
+          "COMPLIANCE_SCORE": "99.98%"
         }, null, 2);
         document.getElementById('dataInput').value = JSON.stringify([
-          { "flightId": "GMR-CARGO-101", "destination": "Frankfurt Cargo City (FRA)", "carrier": "Lufthansa Cargo B777F", "payloadKg": "42,500 kg", "status": "CLEARED FOR DEPARTURE", "turnaroundTime": "42 min" },
-          { "flightId": "GMR-CARGO-102", "destination": "Tokyo Haneda Logistics (HND)", "carrier": "All Nippon B777-200F", "payloadKg": "38,200 kg", "status": "RAMP LOADED", "turnaroundTime": "35 min" },
-          { "flightId": "GMR-CARGO-103", "destination": "Singapore Changi Air (SIN)", "carrier": "Singapore Cargo A350F", "payloadKg": "35,150 kg", "status": "IN-TRANSIT (FLIGHT GMR92)", "turnaroundTime": "28 min" },
-          { "flightId": "GMR-CARGO-104", "destination": "London Heathrow Sky (LHR)", "carrier": "British Cargo B747-8F", "payloadKg": "27,000 kg", "status": "CUSTOMS INSPECTED", "turnaroundTime": "19 min" }
+          {
+            "flightId": "GMR-CARGO-101",
+            "destination": "Frankfurt Cargo City (FRA)",
+            "carrier": "Lufthansa Cargo B777F",
+            "payloadKg": "42,500 kg",
+            "status": "CLEARED",
+            "turnaroundTime": "42 min"
+          },
+          {
+            "flightId": "GMR-CARGO-102",
+            "destination": "Tokyo Haneda (HND)",
+            "carrier": "All Nippon B777-200F",
+            "payloadKg": "38,200 kg",
+            "status": "RAMP LOADED",
+            "turnaroundTime": "35 min"
+          },
+          {
+            "flightId": "GMR-CARGO-103",
+            "destination": "Singapore Changi (SIN)",
+            "carrier": "Singapore Cargo A350F",
+            "payloadKg": "35,150 kg",
+            "status": "IN TRANSIT",
+            "turnaroundTime": "28 min"
+          },
+          {
+            "flightId": "GMR-CARGO-104",
+            "destination": "London Heathrow (LHR)",
+            "carrier": "British Cargo B747-8F",
+            "payloadKg": "27,000 kg",
+            "status": "INSPECTED",
+            "turnaroundTime": "19 min"
+          }
         ], null, 2);
       } else if (fmt === 'crystal') {
         desc.innerText = GMR_I18N.t('studio.fmt_crystal', 'SAP Crystal Reports (.rpt)');
         displayCachedPresetPreview('crystal');
         document.getElementById('jrxmlInput').value = sampleCrystalXml;
         document.getElementById('paramsInput').value = JSON.stringify({
-          "REPORT_TITLE": "SAP Xtreme Sales by Customer & Region",
+          "REPORT_TITLE": "Sales by Customer & Region",
           "CORPORATION_NAME": "Xtreme Mountain Sports & Industrial Holding AG",
-          "REGION_PROMPT": "Filter: Region = 'Americas & Western Europe' (Interactive Prompt)",
-          "DATE_RANGE_PROMPT": "Period: Fiscal Year 2026 (01/01/2026 - 31/12/2026)",
-          "DRILLDOWN_LEVEL": "Active Drilldown Path: Region > Customer Name > Order Breakdown",
-          "CURRENCY_CODE": "USD ($)",
-          "CONFIDENTIALITY_NOTICE": "CONFIDENTIAL — STRICTLY FOR INTERNAL MANAGEMENT & AUDIT PURPOSES",
-          "TOTAL_REVENUE_METRIC": "Consolidated Net Revenue: $3,842,500.00 USD (100% Reconciled)",
-          "TOTAL_ORDERS_METRIC": "Total Processed Orders: 1,482 Commercial Transactions",
-          "AVG_ORDER_METRIC": "Average Transaction Value: $2,592.78 USD (Growth +14.2% YoY)",
-          "AUDIT_SIGNATURE": "Audited & Verified: SAP Xtreme Certified Data Model // GMR AOT Engine"
+          "PERIOD": "FY 2026",
+          "REGION_FILTER": "Filter: Region in (North America, EMEA, APAC)",
+          "CURRENCY_CODE": "All amounts in USD",
+          "TOTAL_REVENUE": "$374,170.00",
+          "TOTAL_ORDERS": "6",
+          "AVG_ORDER": "$62,361.67",
+          "AUDIT_SIGNATURE": "Source: SAP Xtreme sample data model",
+          "CONFIDENTIALITY_NOTICE": "Confidential - internal management and audit use only"
         }, null, 2);
         document.getElementById('dataInput').value = JSON.stringify([
-          { "Customer_Name": "Alloy Wheels Inc. [North America]", "Region": "North America", "Order_ID": "ORD-10021", "Product_Line": "Racing Wheels & Aerodynamic Rims", "Quantity": 24, "Unit_Price": "$1,250.00", "Discount_Rate": "5%", "Extended_Price": "$28,500.00" },
-          { "Customer_Name": "Alloy Wheels Inc. [North America]", "Region": "North America", "Order_ID": "ORD-10022", "Product_Line": "Carbon Composite Struts", "Quantity": 10, "Unit_Price": "$3,200.00", "Discount_Rate": "0%", "Extended_Price": "$32,000.00" },
-          { "Customer_Name": "Bavarian Motor Dynamics [EMEA]", "Region": "EMEA", "Order_ID": "ORD-20045", "Product_Line": "Telemetry Inverters & Controllers", "Quantity": 40, "Unit_Price": "$2,100.00", "Discount_Rate": "8%", "Extended_Price": "$77,280.00" },
-          { "Customer_Name": "Bavarian Motor Dynamics [EMEA]", "Region": "EMEA", "Order_ID": "ORD-20046", "Product_Line": "Avionics Bus Master Sensors", "Quantity": 15, "Unit_Price": "$4,500.00", "Discount_Rate": "10%", "Extended_Price": "$60,750.00" },
-          { "Customer_Name": "Tokyo Cybernetics Corp [APAC]", "Region": "APAC", "Order_ID": "ORD-30089", "Product_Line": "Optoelectronic Cryo-Valves", "Quantity": 50, "Unit_Price": "$1,850.00", "Discount_Rate": "12%", "Extended_Price": "$81,400.00" },
-          { "Customer_Name": "Tokyo Cybernetics Corp [APAC]", "Region": "APAC", "Order_ID": "ORD-30090", "Product_Line": "Superconducting Thermal Couplers", "Quantity": 8, "Unit_Price": "$12,400.00", "Discount_Rate": "5%", "Extended_Price": "$94,240.00" }
+          {
+            "Customer_Name": "Alloy Wheels Inc.",
+            "Region": "North America",
+            "Order_ID": "ORD-10021",
+            "Product_Line": "Racing Wheels & Rims",
+            "Quantity": 24,
+            "Unit_Price": "$1,250.00",
+            "Extended_Price": "$28,500.00"
+          },
+          {
+            "Customer_Name": "Alloy Wheels Inc.",
+            "Region": "North America",
+            "Order_ID": "ORD-10022",
+            "Product_Line": "Carbon Composite Struts",
+            "Quantity": 10,
+            "Unit_Price": "$3,200.00",
+            "Extended_Price": "$32,000.00"
+          },
+          {
+            "Customer_Name": "Bavarian Motor Dynamics",
+            "Region": "EMEA",
+            "Order_ID": "ORD-20045",
+            "Product_Line": "Telemetry Inverters",
+            "Quantity": 40,
+            "Unit_Price": "$2,100.00",
+            "Extended_Price": "$77,280.00"
+          },
+          {
+            "Customer_Name": "Bavarian Motor Dynamics",
+            "Region": "EMEA",
+            "Order_ID": "ORD-20046",
+            "Product_Line": "Avionics Bus Sensors",
+            "Quantity": 15,
+            "Unit_Price": "$4,500.00",
+            "Extended_Price": "$60,750.00"
+          },
+          {
+            "Customer_Name": "Tokyo Cybernetics Corp",
+            "Region": "APAC",
+            "Order_ID": "ORD-30089",
+            "Product_Line": "Optoelectronic Cryo-Valves",
+            "Quantity": 50,
+            "Unit_Price": "$1,850.00",
+            "Extended_Price": "$81,400.00"
+          },
+          {
+            "Customer_Name": "Tokyo Cybernetics Corp",
+            "Region": "APAC",
+            "Order_ID": "ORD-30090",
+            "Product_Line": "Superconducting Couplers",
+            "Quantity": 8,
+            "Unit_Price": "$12,400.00",
+            "Extended_Price": "$94,240.00"
+          }
         ], null, 2);
       } else {
         desc.innerText = GMR_I18N.t('studio.fmt_jasper', 'JasperReports (.jrxml)');
@@ -1816,17 +2063,52 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
           "DUE_DATE": "2026-09-30",
           "QR_VERIFY_URL": "https://gmrglobe.com/verify/INV-2026-X990",
           "CURRENCY_SYMBOL": "$",
-          "SUBTOTAL": 57400.00,
-          "DISCOUNT_AMOUNT": 5740.00,
-          "TAX_AMOUNT": 9298.80,
-          "TOTAL_NET": 60958.80
+          "SUBTOTAL": 63900,
+          "DISCOUNT_AMOUNT": 6390,
+          "TAX_AMOUNT": 10351.8,
+          "TOTAL_NET": 67861.8
         }, null, 2);
-        // Pre-render immediately
         document.getElementById('dataInput').value = JSON.stringify([
-          { "lineNo": 1, "sku": "GMR-AOT-01", "description": "GMR Core Engine Enterprise Cluster (8 Nodes, Sub-ms)", "category": "Licensing", "quantity": 1, "unitPrice": 32000.0, "discountPct": 0.10, "total": 28800.0 },
-          { "lineNo": 2, "sku": "GMR-HSM-02", "description": "FIPS 140-2 Level 3 BouncyCastle Hardware HSM Integration", "category": "Security", "quantity": 2, "unitPrice": 4500.0, "discountPct": 0.10, "total": 8100.0 },
-          { "lineNo": 3, "sku": "GMR-SUP-03", "description": "24/7/365 Tier-4 Dedicated Mission Support SLA (15-min)", "category": "Support", "quantity": 12, "unitPrice": 1200.0, "discountPct": 0.10, "total": 12960.0 },
-          { "lineNo": 4, "sku": "GMR-MIG-04", "description": "Automated Crystal Reports & BIRT Binary Migration Toolkit", "category": "Tooling", "quantity": 1, "unitPrice": 8500.0, "discountPct": 0.10, "total": 7650.0 }
+          {
+            "lineNo": 1,
+            "sku": "GMR-AOT-01",
+            "description": "GMR Core Engine Enterprise Cluster (8 nodes)",
+            "category": "Licensing",
+            "quantity": 1,
+            "unitPrice": 32000,
+            "discountPct": 0.1,
+            "total": 28800
+          },
+          {
+            "lineNo": 2,
+            "sku": "GMR-HSM-02",
+            "description": "FIPS 140-2 Level 3 HSM Integration",
+            "category": "Security",
+            "quantity": 2,
+            "unitPrice": 4500,
+            "discountPct": 0.1,
+            "total": 8100
+          },
+          {
+            "lineNo": 3,
+            "sku": "GMR-SUP-03",
+            "description": "24/7 Tier-4 Mission Support SLA (15-min)",
+            "category": "Support",
+            "quantity": 12,
+            "unitPrice": 1200,
+            "discountPct": 0.1,
+            "total": 12960
+          },
+          {
+            "lineNo": 4,
+            "sku": "GMR-MIG-04",
+            "description": "Crystal Reports & BIRT Migration Toolkit",
+            "category": "Tooling",
+            "quantity": 1,
+            "unitPrice": 8500,
+            "discountPct": 0.1,
+            "total": 7650
+          }
         ], null, 2);
       }
     }
