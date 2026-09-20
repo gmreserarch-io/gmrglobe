@@ -603,12 +603,27 @@ with open("invoice.pdf", "wb") as f:
     }
 
     // ── AI Template History (Undo Stack) ────────────────────────────────────
+    // A snapshot is the whole editor, not just the XML. The assistant rewrites the
+    // template, the parameters, the data and sometimes the engine; undoing only the
+    // template left the Crystal report on screen with a Jasper invoice's parameters and
+    // rows behind it, so the table came back empty and nothing said why.
     const templateHistory = [];
     const MAX_TEMPLATE_HISTORY = 10;
 
-    function pushTemplateToHistory(xml) {
-      if (!xml || xml.trim().length < 10) return;
-      templateHistory.push(xml);
+    function currentEditorState() {
+      return {
+        template: document.getElementById('jrxmlInput').value,
+        params: document.getElementById('paramsInput')?.value || '',
+        data: document.getElementById('dataInput')?.value || '',
+        format: document.getElementById('templateFormatSelect')?.value || 'jrxml',
+      };
+    }
+
+    function pushTemplateToHistory(state) {
+      // Still accepts a bare string: older call sites passed the XML alone.
+      const snapshot = typeof state === 'string' ? { template: state } : state;
+      if (!snapshot || !snapshot.template || snapshot.template.trim().length < 10) return;
+      templateHistory.push(snapshot);
       if (templateHistory.length > MAX_TEMPLATE_HISTORY) templateHistory.shift();
       const btn = document.getElementById('btnUndoAi');
       if (btn) btn.disabled = false;
@@ -617,7 +632,19 @@ with open("invoice.pdf", "wb") as f:
     function undoLastAiChange() {
       if (templateHistory.length === 0) return;
       const previous = templateHistory.pop();
-      document.getElementById('jrxmlInput').value = previous;
+
+      document.getElementById('jrxmlInput').value = previous.template;
+      if (previous.params !== undefined && document.getElementById('paramsInput')) {
+        document.getElementById('paramsInput').value = previous.params;
+      }
+      if (previous.data !== undefined && document.getElementById('dataInput')) {
+        document.getElementById('dataInput').value = previous.data;
+      }
+      const fmtSelect = document.getElementById('templateFormatSelect');
+      if (previous.format && fmtSelect && fmtSelect.value !== previous.format) {
+        fmtSelect.value = previous.format;
+      }
+
       if (templateHistory.length === 0) {
         const btn = document.getElementById('btnUndoAi');
         if (btn) btn.disabled = true;
@@ -1494,9 +1521,14 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
             if (res.ok) {
               const data = await res.json();
               if (data?.template || data?.jrxml) {
-                result = { template: data.template || data.jrxml, intent: mode, format: data.format || selectedFormat,
+                result = { template: data.template || data.jrxml, intent: mode,
+                  format: data.format || selectedFormat,
                   params: data.params, data: data.data,
-                  explanation: data.explanation || 'Cambio aplicado vía backend.', source: 'backend-ai' };
+                  // The backend says so explicitly when it declined; older builds did not
+                  // send the field, and for those a template present means it applied.
+                  applied: data.applied !== undefined ? data.applied : true,
+                  explanation: data.explanation || 'Cambio aplicado vía backend.',
+                  source: data.source || 'backend-ai' };
               }
             }
           } catch (e) { console.warn('Backend gateway failed:', e); }
@@ -1507,17 +1539,39 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
           result = synthesizeLocalTemplate(prompt, selectedFormat, currentJrxml, currentParams, currentData);
         }
 
-        // Validate result
-        if (!result?.template) throw new Error('No se pudo generar la plantilla. Por favor reformula tu requerimiento.');
+        // The assistant is allowed to decline, and declining must leave the editor alone.
+        // Before this, every reply carried a template, so "I did not understand" arrived as
+        // a commercial invoice that replaced whatever the user had open.
+        if (result.applied === false || !result?.template) {
+          feedbackBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30';
+          feedbackBadge.innerText = 'Sin cambios';
+          feedbackMsg.innerText = result?.explanation
+            || 'No se pudo generar la plantilla. Reformula tu peticion; tu trabajo no se ha tocado.';
+          return;
+        }
 
-        // Update format selector if AI detected another engine
-        if (result.format) {
+        // A template written in another dialect must never be loaded under the engine the
+        // user selected: it renders an all but empty page and nothing explains why. The
+        // assistant answering Crystal with JasperReports is exactly how this was found.
+        const asked = document.getElementById('templateFormatSelect')?.value || 'jrxml';
+        const claimed = result.format || asked;
+        const actual = detectTemplateDialect(result.template);
+        if (actual && actual !== asked) {
+          feedbackBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30';
+          feedbackBadge.innerText = 'Formato incorrecto';
+          feedbackMsg.innerText =
+            'El asistente respondio en ' + (DIALECT_LABEL[actual] || actual) + ' y el motor '
+            + 'seleccionado es ' + (DIALECT_LABEL[asked] || asked) + ', asi que tu plantilla '
+            + 'no se ha modificado. Reformula la peticion o cambia el motor.';
+          return;
+        }
+        if (claimed !== asked) {
           const select = document.getElementById('templateFormatSelect');
-          if (select && select.value !== result.format) select.value = result.format;
+          if (select) select.value = claimed;
         }
 
         feedbackBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30';
-        feedbackBadge.innerText = result.source === 'gemini-ai' ? '✨ Gemini 2.0 Flash' : '⚡ GMR Smart Synthesizer';
+        feedbackBadge.innerText = aiSourceLabel(result.source);
         feedbackMsg.innerText = result.explanation;
 
         // Show preview modal before touching the editor!
@@ -3240,6 +3294,33 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
     // ── AI Preview Modal Handlers ──────────────────────────────────────────
     let aiPreviewPendingResult = null;
 
+    /**
+     * Where the answer came from, named honestly. Anything that was not Gemini used to be
+     * labelled "GMR Smart Synthesizer", including answers from the backend, so a backend
+     * reply looked as though the assistant had never run.
+     */
+    function aiSourceLabel(source) {
+      if (source === 'gemini-ai') return '✨ Gemini 2.0 Flash';
+      if (source === 'backend-ai') return '✨ Asistente del servidor';
+      if (source === 'offline-catalog') return '📚 Catalogo sin conexion';
+      return '⚡ GMR Smart Synthesizer';
+    }
+
+    /** The dialect a template is written in, read from its root element. */
+    function detectTemplateDialect(xml) {
+      const head = (xml || '').slice(0, 4000);
+      if (head.includes('<jasperReport')) return 'jrxml';
+      if (head.includes('<CrystalReport') || head.includes('<CrystalDocument')) return 'crystal';
+      if (head.includes('eclipse.org/birt') || /<report[\s>]/.test(head)) return 'birt';
+      return null;
+    }
+
+    const DIALECT_LABEL = {
+      jrxml: 'JasperReports (.jrxml)',
+      crystal: 'SAP Crystal Reports (.rpt)',
+      birt: 'Eclipse BIRT (.rptdesign)',
+    };
+
     function showAiPreview(result) {
       aiPreviewPendingResult = result;
       const modal = document.getElementById('aiPreviewModal');
@@ -3260,7 +3341,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         statsEl.textContent =
           `Modo: ${result.intent === 'CREATE_NEW' ? '🆕 Nuevo template' : '✏️ Edición quirúrgica'} · ` +
           `${newLines} líneas (${diff > 0 ? (newLines > currentLines ? '+' : '-') + diff : 'sin cambio de longitud'} vs actual) · ` +
-          `Origen: ${result.source === 'gemini-ai' ? 'Gemini 2.0 Flash' : 'GMR Synthesizer'}`;
+          `Origen: ${aiSourceLabel(result.source).replace(/^\S+\s/, '')}`;
       }
 
       const expEl = document.getElementById('aiPreviewExplanation');
@@ -3284,9 +3365,8 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       const result = aiPreviewPendingResult;
       closeAiPreview();
 
-      // Save current to undo history before applying!
-      const currentXml = document.getElementById('jrxmlInput').value;
-      pushTemplateToHistory(currentXml);
+      // The whole editor is saved, because the whole editor is about to change.
+      pushTemplateToHistory(currentEditorState());
 
       // Apply the template
       document.getElementById('jrxmlInput').value = result.template;
@@ -3304,7 +3384,7 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       const feedbackMsg = document.getElementById('aiFeedbackMessage');
       if (feedbackBadge) {
         feedbackBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-        feedbackBadge.innerText = result.source === 'gemini-ai' ? '✨ Gemini 2.0 Flash' : '⚡ GMR Smart Synthesizer';
+        feedbackBadge.innerText = aiSourceLabel(result.source);
       }
       if (feedbackMsg) feedbackMsg.innerText = result.explanation || 'Cambios aplicados exitosamente.';
 
