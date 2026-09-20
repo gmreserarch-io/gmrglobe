@@ -71,7 +71,7 @@
           <span data-i18n="hdr.resources">📚 Recursos</span>
           <span class="text-[10px] text-slate-400">▼</span>
         </button>
-        <div class="absolute right-0 mt-1 w-48 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-50">
+        <div class="absolute right-0 mt-1 before:absolute before:-top-1 before:inset-x-0 before:h-1 before:content-[''] w-48 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-50">
           <a href="/gmr-reports/portal" class="px-3.5 py-2 text-xs text-slate-300 hover:text-emerald-400 hover:bg-slate-800/80 flex items-center gap-2 transition">
             <span>🏢</span> <span data-i18n="hdr.portal">Portal Clientes</span>
           </a>
@@ -133,7 +133,7 @@
               <span id="savedTemplatesCountBadge" class="text-[10px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300">0</span>
               <span class="text-[10px] text-slate-400">▼</span>
             </button>
-            <div id="savedTemplatesMenu" class="absolute right-0 mt-1 w-72 bg-slate-900 border border-slate-700/90 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-50">
+            <div id="savedTemplatesMenu" class="absolute right-0 mt-1 before:absolute before:-top-1 before:inset-x-0 before:h-1 before:content-[''] w-72 bg-slate-900 border border-slate-700/90 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-50">
               <div class="px-3 py-1.5 text-[11px] font-semibold text-slate-400 border-b border-slate-800 flex justify-between items-center">
                 <span data-i18n="studio.tenant_templates">Plantillas en tu Tenant</span>
                 <button data-i18n="studio.refresh" onclick="loadSavedTenantTemplates()" class="text-cyan-400 hover:underline text-[10px]">↻ Actualizar</button>
@@ -150,7 +150,7 @@
               <span>💎</span> <span data-i18n="studio.examples" class="hidden sm:inline">Ejemplos</span>
               <span class="text-[10px] text-slate-400">▼</span>
             </button>
-            <div class="absolute right-0 mt-1 w-64 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1 hidden group-hover:block z-50">
+            <div class="absolute right-0 mt-1 before:absolute before:-top-1 before:inset-x-0 before:h-1 before:content-[''] w-64 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1 hidden group-hover:block z-50">
               <button onclick="loadTemplatePreset('crystal')" class="w-full text-left px-3 py-2 text-xs text-purple-300 hover:bg-purple-950/40 flex items-center gap-2 transition">
                 <span>💎</span> <div><div class="font-bold">SAP Crystal Reports</div><div data-i18n="studio.ex_crystal_desc" class="text-[10px] text-slate-400">Drilldown jerárquico &amp; Cross-Tabs</div></div>
               </button>
