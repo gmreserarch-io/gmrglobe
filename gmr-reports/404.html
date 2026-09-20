@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GMR Reports — 404 Not Found</title>
+  <link rel="icon" type="image/svg+xml" href="/gmr-reports/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Smart Router for Backend APIs and Console
+    const p = window.location.pathname;
+    const backendOrigin = 'https://api.gmrglobe.com';
+    
+    if (p.startsWith('/q/') || p.startsWith('/api/')) {
+      window.location.replace(backendOrigin + p + window.location.search);
+    } else if (p.startsWith('/console')) {
+      window.location.replace('/console/');
+    }
+  </script>
+  <script src="/gmr-reports/assets/i18n.js"></script>
+</head>
+<body class="h-full flex flex-col items-center justify-center p-6 text-center">
+  <div class="max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+    <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+      404
+    </div>
+    <h1 class="text-xl font-bold text-white mb-2">Page Not Found</h1>
+    <p class="text-sm text-slate-400 mb-6">
+      The requested resource could not be found on the GMR Platform edge.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="/gmr-reports/" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs transition">
+        Return Home
+      </a>
+      <a href="/gmr-reports/console" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition">
+        Studio Sandbox
+      </a>
+    </div>
+  </div>
+</body>
+</html>

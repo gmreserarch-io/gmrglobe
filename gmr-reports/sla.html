@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Acuerdo de Nivel de Servicio (SLA) — GMR Reports</title>
+  <link rel="icon" type="image/svg+xml" href="/gmr-reports/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <script src="/gmr-reports/assets/i18n.js"></script>
+</head>
+<body class="min-h-full flex flex-col font-sans selection:bg-emerald-500 selection:text-white bg-slate-950">
+  <!-- Navbar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/gmr-reports/" class="flex items-center gap-3">
+        <div class="h-9 px-2 py-0.5 rounded-lg bg-white flex items-center justify-center border border-slate-700/40">
+          <img src="/gmr-reports/assets/logo-gmr.jpg" alt="GMR - Science in Action" class="h-6 w-auto object-contain" />
+        </div>
+        <span class="font-bold text-base text-white tracking-tight">GMR Reports</span>
+      </a>
+      
+      <div class="flex items-center gap-4">
+        <div class="inline-flex items-center rounded-lg bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs shadow-inner" role="group" aria-label="Language Selector">
+          <button type="button" onclick="GMR_I18N.setLanguage('es')" data-lang="es" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇪🇸</span> <span class="hidden sm:inline">ES</span>
+          </button>
+          <button type="button" onclick="GMR_I18N.setLanguage('en')" data-lang="en" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇺🇸</span> <span class="hidden sm:inline">EN</span>
+          </button>
+        </div>
+
+        <a href="/gmr-reports/" data-i18n="common.back_platform" class="text-xs text-slate-400 hover:text-emerald-400 font-semibold flex items-center gap-1 transition">
+          ← Volver a la Plataforma
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Container -->
+  <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div id="contentEs" class="space-y-8">
+      
+      <div class="mb-8">
+        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Fiabilidad Empresarial</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Acuerdo de Nivel de Servicio (99.9% SLA)</h1>
+        <p class="text-xs text-slate-400 mt-2">Aplica a Suscripciones Comerciales Scale ($499/mes) y Licencias Enterprise Dedicadas</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+          <div class="text-3xl font-extrabold text-emerald-400 font-mono">99.9%</div>
+          <div class="text-xs font-semibold text-white mt-1">Disponibilidad Mensual Garantizada</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">&lt; 43.8 min de inactividad máxima/mes</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+          <div class="text-3xl font-extrabold text-cyan-400 font-mono">&lt; 15 ms</div>
+          <div class="text-xs font-semibold text-white mt-1">Arranque en Frío del Motor AOT</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Renderizado de latencia ultra baja</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+          <div class="text-3xl font-extrabold text-purple-400 font-mono">24/7/365</div>
+          <div class="text-xs font-semibold text-white mt-1">Soporte Técnico de Ingeniería</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Respuesta de emergencia &lt; 15 min</div>
+        </div>
+      </div>
+
+    </div>
+    <div id="contentEn" class="space-y-8 hidden">
+      
+      <div class="mb-8">
+        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Enterprise Reliability</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Service Level Agreement (99.9% SLA)</h1>
+        <p class="text-xs text-slate-400 mt-2">Applies to Scale ($499/mo) and Dedicated Enterprise Subscriptions</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+          <div class="text-3xl font-extrabold text-emerald-400 font-mono">99.9%</div>
+          <div class="text-xs font-semibold text-white mt-1">Monthly Uptime Guarantee</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">&lt; 43.8 min max downtime/mo</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+          <div class="text-3xl font-extrabold text-cyan-400 font-mono">&lt; 15 ms</div>
+          <div class="text-xs font-semibold text-white mt-1">AOT Engine Cold Start</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Ultra-low latency rendering</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+          <div class="text-3xl font-extrabold text-purple-400 font-mono">24/7/365</div>
+          <div class="text-xs font-semibold text-white mt-1">Engineering Support</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">&lt; 15 min emergency response</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+    © 2026 GMR Solutions. <span class="text-purple-400 font-semibold">&gt;&gt; Science in Action</span>. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
+  </footer>
+
+  <script>
+    function syncPageLanguage(lang) {
+      const isEn = lang === 'en';
+      document.getElementById('contentEs').classList.toggle('hidden', isEn);
+      document.getElementById('contentEn').classList.toggle('hidden', !isEn);
+      document.getElementById('pageTitle').textContent = isEn ? "Service Level Agreement (SLA) — GMR Reports" : "Acuerdo de Nivel de Servicio (SLA) — GMR Reports";
+    }
+
+    window.addEventListener('gmr:languageChanged', function(e) {
+      syncPageLanguage(e.detail.lang);
+    });
+
+    // Initial sync
+    if (window.GMR_I18N) {
+      syncPageLanguage(GMR_I18N.getCurrentLanguage());
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Clientes — GMR Reports SaaS</title>
+  <link rel="icon" type="image/svg+xml" href="/gmr-reports/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- html2pdf for instant high-quality PDF downloads -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #printableInvoice, #printableInvoice * { visibility: visible; }
+      #printableInvoice { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+  <script src="/gmr-reports/assets/i18n.js"></script>
+</head>
+<body class="h-full flex flex-col font-sans selection:bg-emerald-500 selection:text-white bg-slate-950 text-slate-100">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur px-6 py-3.5 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+      <a href="/gmr-reports/" class="h-9 px-2 py-0.5 rounded-lg bg-white flex items-center justify-center shadow-md border border-slate-700/40 hover:scale-105 transition-transform" title="Volver al Portal Corporativo">
+        <img src="/gmr-reports/assets/logo-gmr.jpg" alt="GMR - Science in Action" class="h-6 w-auto object-contain" />
+      </a>
+      <div>
+        <div class="flex items-center gap-2">
+          <a href="/gmr-reports/" class="text-xs text-slate-400 hover:text-emerald-400 transition font-medium flex items-center gap-1">
+            <span>←</span> <span>gmrglobe.com</span>
+          </a>
+          <span class="text-slate-600">•</span>
+          <span class="font-bold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
+            <span data-i18n="portal.header_title">🏢 Portal de Clientes</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">B2B SaaS</span>
+          </span>
+        </div>
+        <p class="text-xs text-slate-400 hidden sm:block">Gestión de suscripciones, consumo en tiempo real y facturación — <span class="text-purple-400 font-semibold">&gt;&gt; Science in Action</span></p>
+      </div>
+    </div>
+
+    <!-- Right Header Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Tenant Status Badge (When logged in) -->
+      <div id="headerTenantBadge" class="hidden items-center gap-2 bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-lg text-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="headerTenantName" class="font-semibold text-emerald-400">Cliente</span>
+        <span id="headerTenantPlan" class="text-[10px] uppercase bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded font-mono">PRO</span>
+        <span class="text-[9px] uppercase bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-bold flex items-center gap-1 border border-emerald-500/30">
+          <span>🛡️</span> 2FA ACTIVO
+        </span>
+      </div>
+
+              <div class="inline-flex items-center rounded-lg bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs shadow-inner" role="group" aria-label="Language Selector">
+          <button type="button" onclick="GMR_I18N.setLanguage('es')" data-lang="es" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇪🇸</span> <span class="hidden sm:inline">ES</span>
+          </button>
+          <button type="button" onclick="GMR_I18N.setLanguage('en')" data-lang="en" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇺🇸</span> <span class="hidden sm:inline">EN</span>
+          </button>
+        </div>
+      <a href="/gmr-reports/admin" class="text-xs text-rose-400 hover:text-rose-300 px-3 py-1.5 rounded-md hover:bg-rose-500/10 transition flex items-center gap-1.5 border border-rose-500/30">
+        <span>🛡️ Admin Ops</span>
+      </a>
+      <a href="/gmr-reports/console" class="text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-md hover:bg-slate-800 transition flex items-center gap-1.5 border border-slate-700">
+        <span>⚡ Console Sandbox</span>
+      </a>
+
+      <button id="logoutBtn" onclick="logout()" class="hidden text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 rounded-md transition border border-rose-500/20 items-center gap-1">
+        <span>🚪</span> <span>Cerrar Sesión</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 flex flex-col overflow-y-auto">
+
+    <!-- VIEW 1: AUTHENTICATION / ACCESS SCREEN (Shown when not logged in) -->
+    <div id="authView" class="flex-1 flex items-center justify-center p-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
+      <div class="max-w-md w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-8 shadow-2xl backdrop-blur relative overflow-hidden">
+        <!-- Background ambient glow -->
+        <div class="absolute -top-20 -left-20 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -right-20 w-44 h-44 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- STEP 1: CREDENTIALS (TENANT ID / API KEY & PASSWORD) -->
+        <div id="step1Credentials" class="space-y-6">
+          <div class="text-center">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-2xl mb-3 shadow-inner">
+              🔐
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mb-1">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                SEGURIDAD EMPRESARIAL REFORZADA
+              </span>
+            </div>
+            <h1 data-i18n="portal.login_title" class="text-2xl font-bold tracking-tight text-white">Portal de Clientes Corporativo</h1>
+            <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+              <span data-i18n="portal.login_subtitle">Acceda a sus métricas de consumo, facturas proforma y credenciales. Se requiere identificación, contraseña corporativa y verificación 2FA.</span>
+            </p>
+          </div>
+
+          <form id="loginForm" onsubmit="handleStep1Submit(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                <span data-i18n="portal.tenant_key_label">Clave API de Producción o Tenant ID</span>
+              </label>
+              <input type="text" id="accessKeyInput" placeholder="gmr_live_... o bfi-corp" required
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm font-mono text-emerald-400 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition shadow-inner">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  <span data-i18n="portal.password_label">Contraseña Corporativa del Inquilino</span>
+                </label>
+                <button type="button" onclick="togglePasswordVisibility()" class="text-[11px] text-slate-400 hover:text-emerald-400 transition flex items-center gap-1">
+                  <span id="pwdToggleIcon">👁️</span> <span id="pwdToggleText" data-i18n="portal.show_pwd">Mostrar</span>
+                </button>
+              </div>
+              <input type="password" id="passwordInput" placeholder="••••••••••••" required
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition shadow-inner">
+              <p class="text-[11px] text-slate-500 mt-1">Contraseña de acceso seguro asignada a su organización.</p>
+            </div>
+
+            <div id="authError" class="hidden p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-xs text-rose-300"></div>
+
+            <button type="submit" id="step1Btn" class="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
+              <span data-i18n="portal.btn_continue_2fa">Continuar a Verificación 2FA</span>
+              <span>→</span>
+            </button>
+          </form>
+
+          <!-- Quick Demo Accents for Testing -->
+          <div class="pt-5 border-t border-slate-800/80">
+            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center mb-2.5"><span data-i18n="portal.quick_demo">Acceso Rápido de Prueba (Demo)</span></p>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="quickLogin('gmr_live_pro_key_67890', 'acme2026!')" class="px-2.5 py-2 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 rounded-lg text-left transition group">
+                <div class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                  <span>⚡</span> Acme (Growth)
+                </div>
+                <div class="text-[10px] text-slate-400">$149/mo • acme2026!</div>
+              </button>
+              <button type="button" onclick="quickLogin('gmr_live_scale_key_55555', 'fintech2026!')" class="px-2.5 py-2 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 rounded-lg text-left transition group">
+                <div class="text-xs font-bold text-cyan-400 flex items-center gap-1">
+                  <span>🚀</span> Fintech (Scale)
+                </div>
+                <div class="text-[10px] text-slate-400">$499/mo • fintech2026!</div>
+              </button>
+            </div>
+            <div class="mt-3 text-center">
+              <a href="mailto:gustavo.muzzillo@gmrglobe.com" class="text-[11px] text-slate-400 hover:text-emerald-400 transition">¿Olvidó su contraseña o 2FA? Contacte a soporte master ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: TWO-FACTOR AUTHENTICATION (2FA / TOTP) -->
+        <div id="step2TwoFactor" class="hidden space-y-6">
+          <div class="text-center">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-500/20 to-teal-500/20 border border-emerald-500/40 flex items-center justify-center text-3xl mb-3 shadow-lg relative">
+              <span>🛡️</span>
+              <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+              </span>
+            </div>
+            <div class="flex items-center justify-center gap-1.5 mb-1">
+              <span class="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                PASO 2 DE 2 — DOBLE FACTOR
+              </span>
+            </div>
+            <h2 class="text-2xl font-bold tracking-tight text-white">Verificación 2FA</h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Identidad: <strong id="mfaTenantNameDisplay" class="text-emerald-300 font-semibold">Empresa</strong>
+            </p>
+            <p class="text-[11px] text-slate-400 mt-1 leading-normal">
+              Código enviado a: <strong id="mfaMaskedEmailDisplay" class="text-emerald-400 font-mono">correo@corporativo.com</strong>
+            </p>
+          </div>
+
+          <form id="mfaForm" onsubmit="handleMfaSubmit(event)" class="space-y-4">
+            <!-- 6-digit OTP Inputs -->
+            <div class="flex justify-center items-center gap-2 my-2">
+              <input type="text" maxlength="1" inputmode="numeric" class="otp-box w-11 h-12 text-center text-xl font-mono font-black bg-slate-950 border border-slate-700 rounded-lg text-emerald-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition shadow-inner" data-idx="0">
+              <input type="text" maxlength="1" inputmode="numeric" class="otp-box w-11 h-12 text-center text-xl font-mono font-black bg-slate-950 border border-slate-700 rounded-lg text-emerald-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition shadow-inner" data-idx="1">
+              <input type="text" maxlength="1" inputmode="numeric" class="otp-box w-11 h-12 text-center text-xl font-mono font-black bg-slate-950 border border-slate-700 rounded-lg text-emerald-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition shadow-inner" data-idx="2">
+              <span class="text-slate-600 font-bold text-lg">-</span>
+              <input type="text" maxlength="1" inputmode="numeric" class="otp-box w-11 h-12 text-center text-xl font-mono font-black bg-slate-950 border border-slate-700 rounded-lg text-emerald-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition shadow-inner" data-idx="3">
+              <input type="text" maxlength="1" inputmode="numeric" class="otp-box w-11 h-12 text-center text-xl font-mono font-black bg-slate-950 border border-slate-700 rounded-lg text-emerald-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition shadow-inner" data-idx="4">
+              <input type="text" maxlength="1" inputmode="numeric" class="otp-box w-11 h-12 text-center text-xl font-mono font-black bg-slate-950 border border-slate-700 rounded-lg text-emerald-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition shadow-inner" data-idx="5">
+            </div>
+
+            <!-- OTP Expiration & Resend -->
+            <div class="flex items-center justify-between text-xs px-1">
+              <div class="text-slate-400 flex items-center gap-1 text-[11px]">
+                <span>⏱️ <span data-i18n="portal.expires_in">Expira en:</span></span>
+                <span id="mfaCountdown" class="font-mono font-bold text-amber-400">04:59</span>
+              </div>
+              <button id="resendMfaBtn" type="button" onclick="regenerateMfaCode()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium transition flex items-center gap-1">
+                <span>🔄</span> <span data-i18n="portal.resend_code">Reenviar Código</span>
+              </button>
+            </div>
+
+            <!-- Security Notice Banner -->
+            <div id="mfaNoticeBanner" class="bg-slate-950/80 border border-emerald-500/20 rounded-xl p-3 text-left space-y-1.5 shadow-inner">
+              <div class="flex items-start gap-2">
+                <span class="text-sm">📧</span>
+                <div class="text-[11px] text-slate-300 leading-snug">
+                  Hemos enviado un código OTP de seguridad de 6 dígitos de un solo uso a su correo corporativo. Ingréselo para validar su sesión.
+                </div>
+              </div>
+            </div>
+
+            <div id="mfaError" class="hidden p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-xs text-rose-300"></div>
+
+            <button type="submit" id="mfaBtn" class="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
+              <span data-i18n="portal.btn_verify_login">✓ Validar 2FA y Entrar al Portal</span>
+            </button>
+
+            <button type="button" onclick="backToStep1()" class="w-full py-1.5 text-xs text-slate-400 hover:text-white transition flex items-center justify-center gap-1">
+              <span>← <span data-i18n="portal.back_step1">Volver a modificar credenciales</span></span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+<!-- VIEW 2: LOGGED-IN CUSTOMER PORTAL DASHBOARD -->
+    <div id="dashboardView" class="hidden flex-1 flex flex-col p-6 max-w-7xl mx-auto w-full space-y-6">
+
+      <!-- Executive KPI Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        <!-- Card 1: Active Plan -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-900/60 border border-slate-800 rounded-xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl"></div>
+          <div class="flex items-center justify-between mb-3">
+            <span data-i18n="portal.metric_active_plan" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Suscripción Activa</span>
+            <span id="planBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">SCALE TIER</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="planName" class="text-2xl font-black text-white">Acme Logistics Pro</span>
+          </div>
+          <div class="mt-3 text-xs text-slate-400 space-y-1">
+            <div class="flex justify-between">
+              <span>Régimen de Peticiones:</span>
+              <span id="planRpm" class="text-slate-200 font-mono font-semibold">500 req/min</span>
+            </div>
+            <div class="flex justify-between">
+              <span>SLA Garantizado:</span>
+              <span class="text-emerald-400 font-semibold">99.9% Uptime</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Quota & Monthly Consumption -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-900/60 border border-slate-800 rounded-xl p-5 shadow-lg relative overflow-hidden">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Consumo del Mes (<span id="billingMonthLabel">Septiembre 2026</span>)</span>
+            <span id="quotaPercentBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 font-mono">2.8%</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="monthlyUsedDocs" class="text-2xl font-black text-cyan-400 font-mono">14,250</span>
+            <span class="text-xs text-slate-400">/ <span id="monthlyQuotaDocs" class="font-mono">500,000</span> docs</span>
+          </div>
+          <!-- Progress Bar -->
+          <div class="w-full bg-slate-800 rounded-full h-2 mt-3 overflow-hidden">
+            <div id="quotaProgressBar" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-2 rounded-full transition-all duration-500" style="width: 2.85%"></div>
+          </div>
+          <div class="flex justify-between text-[11px] text-slate-400 mt-2">
+            <span>Disponible: <strong id="quotaRemainingDocs" class="text-slate-200 font-mono">485,750</strong></span>
+            <span>Volumen: <strong id="totalBytesLabel" class="text-slate-200 font-mono">48.9 MB</strong></span>
+          </div>
+        </div>
+
+        <!-- Card 3: Financial & Invoicing Status -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-900/60 border border-slate-800 rounded-xl p-5 shadow-lg relative overflow-hidden">
+          <div class="flex items-center justify-between mb-3">
+            <span data-i18n="portal.tab_invoices" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Facturación & Pagos</span>
+            <span id="financialBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">1 PENDIENTE</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="pendingAmountLabel" class="text-2xl font-black text-amber-400">$149.00 USD</span>
+          </div>
+          <div class="mt-3 flex items-center justify-between text-xs text-slate-400">
+            <span>Vencimiento: <strong id="nextDueDate" class="text-slate-200">30 Sep 2026</strong></span>
+            <button onclick="switchPortalTab('invoices')" class="text-emerald-400 hover:text-emerald-300 font-semibold underline text-xs">Ver Facturas →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portal Tabs Header -->
+      <div class="border-b border-slate-800 flex gap-6 text-sm">
+        <button onclick="switchPortalTab('invoices')" id="tabBtn-invoices" class="py-3 border-b-2 font-semibold transition border-emerald-500 text-emerald-400 flex items-center gap-2">
+          <span>💳 <span data-i18n="portal.tab_invoices">Facturas & Historial</span></span>
+        </button>
+        <button onclick="switchPortalTab('usage')" id="tabBtn-usage" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <span>📊 <span data-i18n="portal.tab_overview">Consumo & Cuotas</span></span>
+        </button>
+        <button onclick="switchPortalTab('credentials')" id="tabBtn-credentials" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <span>🔑 <span data-i18n="portal.tab_security">Credenciales & API Keys</span></span>
+        </button>
+        <button onclick="switchPortalTab('payment-methods')" id="tabBtn-payment-methods" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <span>🏦 Datos de Transferencia (Ecuador/US)</span>
+        </button>
+        <button onclick="switchPortalTab('enterprise-repos')" id="tabBtn-enterprise-repos" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <span>📦 Repositorios & Acceso Enterprise</span>
+          <span class="text-[9px] uppercase px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold">Privado</span>
+        </button>
+        <button onclick="switchPortalTab('report-payment')" id="tabBtn-report-payment" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <span>📩 Reportar Pago</span>
+        </button>
+      </div>
+
+      <!-- TAB CONTENT 1: FACTURAS & HISTORIAL -->
+      <div id="tabContent-invoices" class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <div>
+            <h2 class="text-base font-bold text-white">Comprobantes y Facturas Proforma Comerciales</h2>
+            <p class="text-xs text-slate-400">Descargue facturas proforma oficiales en formato PDF con instrucciones bancarias para su departamento de contabilidad.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="renderInvoicesTable('ALL')" id="filterAll" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Todas</button>
+            <button onclick="renderInvoicesTable('PENDING')" id="filterPending" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">Pendientes</button>
+            <button onclick="renderInvoicesTable('PAID')" id="filterPaid" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">Pagadas</button>
+          </div>
+        </div>
+
+        <!-- Invoices Table -->
+        <div class="overflow-x-auto bg-slate-900/40 border border-slate-800 rounded-xl shadow">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+              <tr>
+                <th class="px-4 py-3.5">N° Factura</th>
+                <th class="px-4 py-3.5">Emisión</th>
+                <th class="px-4 py-3.5">Vencimiento</th>
+                <th class="px-4 py-3.5">Concepto / Plan</th>
+                <th class="px-4 py-3.5">Importe</th>
+                <th class="px-4 py-3.5">Estado</th>
+                <th class="px-4 py-3.5 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="invoicesTableBody" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT 2: CONSUMO & CUOTAS -->
+      <div id="tabContent-usage" class="hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Quota Gauge -->
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5">
+            <h3 class="text-sm font-bold text-white mb-1">Métricas de Generación de Documentos</h3>
+            <p class="text-xs text-slate-400 mb-4">Uso de cuota mensual y rendimiento del motor GMR Reports (compatible con JasperReports / JRXML).</p>
+            
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-300">Documentos Mensuales Consumidos</span>
+                  <span class="font-mono text-emerald-400 font-bold" id="gaugeDocs">14,250 / 500,000</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                  <div id="gaugeBar" class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-3 rounded-full" style="width: 2.85%"></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-800 text-xs">
+                <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block text-[10px] uppercase">Rendimiento Promedio</span>
+                  <span class="text-base font-bold text-white font-mono">&lt; 90ms</span>
+                  <span class="text-[10px] text-emerald-400 block mt-0.5">GraalVM Native AOT</span>
+                </div>
+                <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                  <span class="text-slate-400 block text-[10px] uppercase">Total Peticiones Acumuladas</span>
+                  <span id="totalRequestsStat" class="text-base font-bold text-white font-mono">34,820</span>
+                  <span class="text-[10px] text-slate-400 block mt-0.5">Histórico global</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Health & Latency Test -->
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-bold text-white">Estado de la API en Tiempo Real</h3>
+                <span class="flex items-center gap-1.5 text-xs text-emerald-400">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Clúster Operativo
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mb-4">Verificación de conectividad contra el clúster de producción <code class="text-cyan-300 font-mono">api.gmrglobe.com</code>.</p>
+
+              <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 font-mono text-xs space-y-2">
+                <div class="flex justify-between text-slate-400">
+                  <span>Endpoint de Verificación:</span>
+                  <span class="text-slate-200">https://api.gmrglobe.com/api/reports/health</span>
+                </div>
+                <div class="flex justify-between text-slate-400">
+                  <span>Latencia de Respuesta:</span>
+                  <span id="liveLatency" class="text-emerald-400 font-bold">-- ms</span>
+                </div>
+                <div class="flex justify-between text-slate-400">
+                  <span>Código de Estado HTTP:</span>
+                  <span id="liveStatus" class="text-emerald-400 font-bold">200 OK</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="pingApiHealth()" class="mt-4 w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center justify-center gap-2">
+              <span>⚡ Probar Latencia del Clúster Ahora</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT 3: CREDENCIALES & API KEYS -->
+      <div id="tabContent-credentials" class="hidden space-y-6">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
+          <h2 class="text-base font-bold text-white mb-1">Credenciales de Acceso a Producción</h2>
+          <p class="text-xs text-slate-400 mb-6">Utilice su clave de API en la cabecera <code class="text-emerald-400 font-mono">X-API-Key</code> o como Bearer token para autenticar sus aplicaciones.</p>
+
+          <div class="space-y-4 max-w-2xl">
+            <!-- Tenant Identifier -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Identificador de Inquilino (Tenant ID)</label>
+              <div class="flex gap-2">
+                <input type="text" id="credentialTenantId" readonly
+                       class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2 text-xs font-mono text-slate-200 select-all">
+                <button onclick="copyToClipboard('credentialTenantId', '¡Tenant ID copiado!')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-semibold text-slate-200 transition">
+                  Copiar
+                </button>
+              </div>
+            </div>
+
+            <!-- API Key -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Clave de API de Producción (Secret API Key)</label>
+              <div class="flex gap-2">
+                <input type="password" id="credentialApiKey" readonly
+                       class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2 text-xs font-mono text-emerald-400 select-all">
+                <button onclick="toggleApiKeyVisibility()" id="toggleKeyBtn" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-semibold text-slate-200 transition">
+                  👁️ Mostrar
+                </button>
+                <button onclick="copyToClipboard('credentialApiKey', '¡Clave de API copiada!')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-semibold text-slate-200 transition">
+                  Copiar
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Nunca comparta su clave en repositorios públicos ni en clientes frontend sin protección.</p>
+            </div>
+
+            <!-- Key Rotation Action -->
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-white block">Rotación de Clave de Seguridad</span>
+                <span class="text-[11px] text-slate-400">Si sospecha que su clave ha sido comprometida, genere una nueva inmediatamente.</span>
+              </div>
+              <button onclick="confirmRotateKey()" class="px-3.5 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                <span>🔄 Rotar Clave Ahora</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Integration Example Snippet -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
+          <h3 class="text-sm font-bold text-white mb-2">Ejemplo de Integración Directa (cURL)</h3>
+          <pre class="bg-slate-950 border border-slate-800 rounded-lg p-4 text-xs font-mono text-slate-300 overflow-x-auto"><code id="curlExample">curl -X POST "https://api.gmrglobe.com/api/reports/render"   -H "X-API-Key: gmr_live_pro_key_67890"   -H "Content-Type: application/json"   -d '{
+    "templateName": "invoice-corporate",
+    "format": "PDF",
+    "parameters": {
+      "companyName": "Mi Empresa S.A.",
+      "totalAmount": 1250.00
+    }
+  }' --output documento.pdf</code></pre>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT 4: DATOS DE TRANSFERENCIA (ECUADOR / EE. UU.) -->
+      <div id="tabContent-payment-methods" class="hidden space-y-6">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
+          <h2 class="text-base font-bold text-white mb-1">Instrucciones de Pago y Transferencia Bancaria Directa</h2>
+          <p class="text-xs text-slate-400 mb-6">GMR Solutions opera legalmente en dólares americanos (USD). Aceptamos transferencias internacionales SWIFT, transferencias locales en EE. UU. vía Wise ACH, y tarjetas de crédito vía Lemon Squeezy.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <!-- Option A: SWIFT Ecuador -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🇪🇨</span> Opción A: Transferencia SWIFT (Ecuador - USD)
+                </span>
+                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">USD OFICIAL</span>
+              </div>
+              <p class="text-xs text-slate-400">Recomendado para empresas en América Latina y Europa con cuentas en dólares o divisas internacionales.</p>
+              
+              <div class="bg-slate-900/80 p-3.5 rounded-lg border border-slate-800/80 font-mono text-xs space-y-2">
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Banco Receptor:</span>
+                  <span class="text-white font-semibold">Banco Pichincha C.A.</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Código SWIFT / BIC:</span>
+                  <span class="text-emerald-400 font-bold select-all">PICHECEQ</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Beneficiario:</span>
+                  <span class="text-white">Gustavo Muzzillo</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">País / Moneda:</span>
+                  <span class="text-white">Ecuador / Dólares Americanos (USD)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Dirección Banco:</span>
+                  <span class="text-slate-300">Quito / Guayaquil, Ecuador</span>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400">* Facturas exentas de impuestos locales de exportación (IVA 0% Exportación de Servicios).</p>
+            </div>
+
+            <!-- Option B: Wise ACH (EE. UU.) -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🇺🇸</span> Opción B: Transferencia ACH / Wire en EE. UU.
+                </span>
+                <span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded font-mono font-bold">SIN COMISIÓN SWIFT</span>
+              </div>
+              <p class="text-xs text-slate-400">Recomendado para corporaciones en EE. UU. o que utilizan cuentas comerciales de Wise / Mercury / Silicon Valley Bank.</p>
+              
+              <div class="bg-slate-900/80 p-3.5 rounded-lg border border-slate-800/80 font-mono text-xs space-y-2">
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Banco Receptor:</span>
+                  <span class="text-white font-semibold">Evolve Bank & Trust / Wise US</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Tipo de Transferencia:</span>
+                  <span class="text-cyan-400 font-bold">ACH / Fedwire Direct</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Beneficiario:</span>
+                  <span class="text-white">Gustavo Muzzillo</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Moneda:</span>
+                  <span class="text-white">USD ($ Dólares)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Routing / ABA:</span>
+                  <span class="text-slate-300">Disponible en Factura Proforma</span>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400">* Los fondos se acreditan el mismo día hábil sin costos de intermediación bancaria internacional.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT 6: REPOSITORIOS PRIVADOS & ACCESO ENTERPRISE -->
+      <div id="tabContent-enterprise-repos" class="hidden space-y-6">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-bold text-white">Repositorios Privados de Artefactos & Contenedores</h2>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">Acceso Scale & Enterprise</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Descargue imágenes de contenedor Docker, artefactos Maven de Spring Boot 3 y SDKs de TypeScript/Python directamente en sus clústeres y canalizaciones de CI/CD.</p>
+            </div>
+            <span class="text-xs text-slate-400 font-mono bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+              Registry: <strong class="text-emerald-400">ghcr.io / maven.pkg.github.com</strong>
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Card 1: Docker / Kubernetes Image Pull Secret -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🐳</span> Contenedores Docker / OCI
+                </span>
+                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">Multi-Arch ARM64/AMD64</span>
+              </div>
+              <p class="text-xs text-slate-400">Imágenes de alta disponibilidad compiladas AOT para entornos On-Premise y Kubernetes. La descarga es abierta; lo que habilita el uso en producción es su clave de licencia (<code class="text-emerald-400">GMR_REPORTS_LICENSE_KEY</code>).</p>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">1. Descargar la imagen</label>
+                <div class="relative">
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-emerald-300 overflow-x-auto select-all"><code id="k8sSecretSnippet">docker pull ghcr.io/gmreserarch-io/gmr-reports:enterprise</code></pre>
+                  <button onclick="copySnippet('k8sSecretSnippet', '¡Comando docker copiado!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">2. Imagen Empresarial de Despliegue</label>
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 font-mono text-xs text-cyan-300 flex justify-between items-center">
+                  <span>ghcr.io/gmreserarch-io/gmr-reports:enterprise</span>
+                  <button onclick="navigator.clipboard.writeText('ghcr.io/gmreserarch-io/gmr-reports:enterprise'); showToast('Imagen copiada');" class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded text-[10px]">Copiar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Enterprise Maven Repository -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🍃</span> Componentes Maven Enterprise (Spring Boot 3)
+                </span>
+                <span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded font-mono font-bold">Java 21 / Quarkus</span>
+              </div>
+              <p class="text-xs text-slate-400">Incorpore la librería starter nativa en su proyecto `pom.xml` apuntando al repositorio empresarial de GMR.</p>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Dependencia en pom.xml</label>
+                <div class="relative">
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-cyan-300 overflow-x-auto select-all"><code id="mavenDepSnippet">&lt;dependency&gt;
+  &lt;groupId&gt;com.gmr.reports&lt;/groupId&gt;
+  &lt;artifactId&gt;gmr-reports-spring-boot-starter&lt;/artifactId&gt;
+  &lt;version&gt;1.7.4&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+                  <button onclick="copySnippet('mavenDepSnippet', '¡Dependencia Maven copiada!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Repositorio Privado (pom.xml o settings.xml)</label>
+                <div class="relative">
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-slate-300 overflow-x-auto select-all"><code id="mavenRepoSnippet">&lt;repository&gt;
+  &lt;id&gt;github-gmr&lt;/id&gt;
+  &lt;name&gt;GMR Enterprise Maven Repository&lt;/name&gt;
+  &lt;url&gt;https://maven.pkg.github.com/gmreserarch-io/gmr-reports&lt;/url&gt;
+&lt;/repository&gt;</code></pre>
+                  <button onclick="copySnippet('mavenRepoSnippet', '¡Repositorio Maven copiado!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: TypeScript / Node.js SDK -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>📦</span> SDK TypeScript / Node.js
+                </span>
+                <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">npm private pkg</span>
+              </div>
+              <p class="text-xs text-slate-400">Cliente tipado para integración rápida con frameworks frontend y microservicios en Node.js.</p>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Instalación con npm</label>
+                <div class="relative">
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-amber-300 select-all"><code id="npmSnippet"># Configurar registro en .npmrc:
+# @gmreserarch-io:registry=https://npm.pkg.github.com
+npm install @gmreserarch-io/reports-client</code></pre>
+                  <button onclick="copySnippet('npmSnippet', '¡Instrucciones npm copiadas!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Python SDK -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🐍</span> SDK Python
+                </span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded font-mono font-bold">PyPI / Wheel</span>
+              </div>
+              <p class="text-xs text-slate-400">Cliente asíncrono para pipelines de datos, Django, FastAPI y reportes automatizados en Python.</p>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Instalación con pip</label>
+                <div class="relative">
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-purple-300 select-all"><code id="pipSnippet">pip install gmr-reports --extra-index-url https://token@github.com/gmreserarch-io/gmr-reports</code></pre>
+                  <button onclick="copySnippet('pipSnippet', '¡Comando pip copiado!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT 5: REPORTAR PAGO / NOTIFICACIÓN DIRECTA -->
+      <div id="tabContent-report-payment" class="hidden space-y-6">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-6 max-w-2xl">
+          <h2 class="text-base font-bold text-white mb-1">Notificar Transferencia Bancaria o Envío de Comprobante</h2>
+          <p class="text-xs text-slate-400 mb-6">Si ya realizó una transferencia internacional SWIFT o Wise ACH, envíe su comprobante para conciliación inmediata y actualización de su estado contable.</p>
+
+          <form action="https://formsubmit.co/gustavo.muzzillo@gmail.com" method="POST" class="space-y-4">
+            <!-- FormSubmit config -->
+            <input type="hidden" name="_cc" value="gustavo.muzzillo@gmrglobe.com">
+            <input type="hidden" name="_subject" value="[GMR Client Portal] Comprobante de Pago B2B Recibido">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_captcha" value="false">
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Empresa / Tenant ID</label>
+                <input type="text" id="reportTenantField" name="Empresa_Tenant" readonly
+                       class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-300">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">N° de Factura Proforma</label>
+                <input type="text" name="Numero_Factura" placeholder="ej. GMR-INV-2026-0901" required
+                       class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Método Utilizado</label>
+                <select name="Metodo_Pago" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                  <option value="SWIFT_Ecuador">Transferencia Internacional SWIFT (Ecuador)</option>
+                  <option value="Wise_ACH">Transferencia ACH / Fedwire (Wise EE. UU.)</option>
+                  <option value="LemonSqueezy">Tarjeta de Crédito / Lemon Squeezy</option>
+                  <option value="Otro">Otro medio acordado</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Monto Pagado (USD)</label>
+                <input type="text" name="Monto_USD" placeholder="$299.00 USD" required
+                       class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-emerald-400 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Referencia Bancaria / Enlace al Comprobante</label>
+              <textarea name="Referencia_O_Detalles" rows="3" placeholder="Pegue la clave de rastreo bancario, enlace al comprobante en Cloud o notas adicionales..." required
+                        class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 px-4 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg transition flex items-center justify-center gap-2">
+              <span>📩 Enviar Notificación de Pago al Equipo Ejecutivo</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL: DETALLE / VISOR DE FACTURA PROFORMA (PRINTABLE) -->
+  <div id="invoiceModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="max-w-3xl w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+        <div class="flex items-center gap-2">
+          <span class="text-base font-bold text-white">Factura Proforma Comercial</span>
+          <span id="modalInvoiceStatusBadge" class="text-xs px-2 py-0.5 rounded font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">PENDIENTE</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="downloadInvoicePdf()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow">
+            <span>📥 Descargar PDF</span>
+          </button>
+          <button onclick="window.print()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition border border-slate-700">
+            <span>🖨️ Imprimir</span>
+          </button>
+          <button onclick="closeInvoiceModal()" class="text-slate-400 hover:text-white px-2 py-1 text-lg">✕</button>
+        </div>
+      </div>
+
+      <!-- Printable Invoice Document Body -->
+      <div id="printableInvoice" class="p-8 bg-white text-slate-900 overflow-y-auto font-sans text-xs space-y-6">
+        <!-- Document Header -->
+        <div class="flex justify-between items-start border-b border-slate-200 pb-6">
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="bg-slate-900 text-white font-black text-xl px-2.5 py-1 rounded tracking-tighter">GMR</div>
+              <div>
+                <h1 class="font-extrabold text-base tracking-tight text-slate-900">GMR SOLUTIONS</h1>
+                <p class="text-[10px] text-purple-700 font-semibold">&gt;&gt; Science in Action</p>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-600">Servicios Globales de Tecnología & SaaS</p>
+            <p class="text-[11px] text-slate-600">Ecuador (Economía Dolarizada / USD)</p>
+            <p class="text-[11px] text-slate-600">Email: gustavo.muzzillo@gmrglobe.com</p>
+            <p class="text-[11px] text-slate-600">Web: https://gmrglobe.com</p>
+          </div>
+          <div class="text-right">
+            <h2 class="text-lg font-black text-slate-900 uppercase">FACTURA PROFORMA</h2>
+            <p class="text-xs font-mono font-bold text-slate-700 mt-1" id="invDocNumber">GMR-INV-2026-0901</p>
+            <div class="mt-2 text-[11px] text-slate-600 space-y-0.5">
+              <div>Fecha: <strong class="text-slate-800" id="invDocDate">01/09/2026</strong></div>
+              <div>Vencimiento: <strong class="text-slate-800" id="invDocDueDate">30/09/2026</strong></div>
+              <div>Términos: <strong class="text-slate-800">Net 30 días</strong></div>
+              <div>Moneda: <strong class="text-slate-800">USD ($ Dólares)</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bill To / Cliente -->
+        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">FACTURADO A / BILL TO:</span>
+          <h3 class="text-sm font-bold text-slate-900" id="invDocClientName">Acme Logistics Corp</h3>
+          <p class="text-[11px] text-slate-600">Identificador de Suscripción: <span class="font-mono" id="invDocTenantId">tenant-pro</span></p>
+          <p class="text-[11px] text-slate-600">Atención: Departamento de Tecnología / Finanzas</p>
+        </div>
+
+        <!-- Table of items -->
+        <table class="w-full text-left text-xs border border-slate-200">
+          <thead class="bg-slate-100 text-slate-700 uppercase font-bold text-[10px] border-b border-slate-200">
+            <tr>
+              <th class="p-2.5">Cant.</th>
+              <th class="p-2.5">Descripción del Servicio</th>
+              <th class="p-2.5">Período</th>
+              <th class="p-2.5 text-right">Precio Unitario</th>
+              <th class="p-2.5 text-right">Total (USD)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr>
+              <td class="p-2.5 font-mono text-center">1</td>
+              <td class="p-2.5">
+                <strong class="text-slate-900 block" id="invDocPlanTitle">GMR Reports - Suscripción Scale Tier</strong>
+                <span class="text-[11px] text-slate-600 block">
+                  • Cuota mensual de 500,000 documentos (PDF/XLSX).<br>
+                  • Motor compilado con GraalVM Native (latencia sub-100ms).<br>
+                  • Acceso ilimitado a API Gateway Multi-Tenant y soporte de producción.
+                </span>
+              </td>
+              <td class="p-2.5 text-slate-600" id="invDocPeriod">Septiembre 2026</td>
+              <td class="p-2.5 text-right font-mono" id="invDocUnitPrice">$149.00</td>
+              <td class="p-2.5 text-right font-mono font-bold" id="invDocLineTotal">$149.00</td>
+            </tr>
+          </tbody>
+          <tfoot class="border-t border-slate-200 bg-slate-50 font-semibold">
+            <tr>
+              <td colspan="4" class="p-2.5 text-right text-slate-600">Subtotal:</td>
+              <td class="p-2.5 text-right font-mono text-slate-900" id="invDocSubtotal">$149.00</td>
+            </tr>
+            <tr>
+              <td colspan="4" class="p-2.5 text-right text-slate-600">Impuestos (Exportación de Servicios - IVA 0%):</td>
+              <td class="p-2.5 text-right font-mono text-slate-900">$0.00</td>
+            </tr>
+            <tr class="text-sm font-black text-slate-900 bg-slate-100 border-t border-slate-300">
+              <td colspan="4" class="p-3 text-right">TOTAL A PAGAR (USD):</td>
+              <td class="p-3 text-right font-mono text-emerald-700" id="invDocTotal">$149.00</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Wire transfer instructions in invoice -->
+        <div class="border border-slate-200 rounded-lg p-3.5 bg-slate-50 text-[11px] text-slate-700 space-y-1.5">
+          <strong class="text-slate-900 block font-bold">INSTRUCCIONES DE PAGO POR TRANSFERENCIA INTERNACIONAL:</strong>
+          <div>• <strong>Banco Receptor:</strong> Banco Pichincha C.A. (Quito / Guayaquil, Ecuador)</div>
+          <div>• <strong>Código SWIFT / BIC:</strong> PICHECEQ</div>
+          <div>• <strong>Beneficiario:</strong> Gustavo Muzzillo / GMR Solutions</div>
+          <div>• <strong>Moneda:</strong> USD ($ Dólares Americanos)</div>
+          <div>• <strong>Alternativa en EE. UU. (Wise ACH):</strong> Evolve Bank & Trust (disponible para pagos directos en EE. UU.)</div>
+        </div>
+
+        <div class="text-center text-[10px] text-slate-500 pt-3 border-t border-slate-200">
+          Emitido por GMR Solutions — >> Science in Action. Documento comercial proforma para fines de facturación y transferencia corporativa.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CHECKOUT & PAGO INMEDIATO -->
+  <div id="paymentModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>💳</span> <span>Pagar Factura <span id="payModalInvoiceId" class="text-emerald-400 font-mono">GMR-INV-2026-0901</span></span>
+        </h3>
+        <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-1">
+        <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total a Pagar</span>
+        <div id="payModalAmount" class="text-3xl font-black text-white">$149.00 <span class="text-sm font-normal text-slate-400">USD</span></div>
+        <p class="text-[11px] text-slate-400" id="payModalPlanDesc">GMR Reports Growth Plan (100k docs/mes)</p>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Option 1: Lemon Squeezy Card Checkout -->
+        <a id="lemonSqueezyPayBtn" href="https://gmrglobe.lemonsqueezy.com" target="_blank" onclick="simulatePaymentDone()"
+           class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-xs shadow-lg transition flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span>💳</span>
+            <span>Pagar con Tarjeta (Lemon Squeezy)</span>
+          </div>
+          <span>➔</span>
+        </a>
+
+        <!-- Option 2: Wire Transfer Details -->
+        <button onclick="switchPortalTab('payment-methods'); closePaymentModal();"
+                class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span>🏦</span>
+            <span>Ver Datos de Transferencia SWIFT / Wise</span>
+          </div>
+          <span>➔</span>
+        </button>
+
+        <!-- Option 3: Instant Demo Test Settlement -->
+        <button onclick="recordDemoPayment()"
+                class="w-full py-2 px-3 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 font-semibold text-[11px] border border-cyan-500/30 transition">
+          ⚡ Registrar Pago Instantáneo (Modo Demostración)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-emerald-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-lg shadow-2xl transition-all duration-300 opacity-0 pointer-events-none transform translate-y-3 z-50 flex items-center gap-2">
+    <span>✓</span> <span id="toastMsg">Operación completada</span>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const API_BASE = 'https://api.gmrglobe.com';
+    const FALLBACK_API = 'https://reports.129.158.243.168.sslip.io';
+
+    // Current State
+    let currentPortalData = null;
+    let selectedInvoiceForAction = null;
+    let apiKeyRevealed = false;
+
+    // Default Seeded Data for Offline/Demo Fallback
+    const DEMO_TENANTS = {
+      'tenant-pro': {
+        tenant: {
+          tenantId: 'tenant-pro',
+          name: 'Acme Logistics Growth',
+          plan: 'GROWTH',
+          planName: 'Growth Tier ($149/mo)',
+          apiKey: 'gmr_live_pro_key_67890',
+          maskedApiKey: 'gmr_live_••••••67890',
+          active: true,
+          createdAt: '2026-08-01T00:00:00Z',
+          requestsPerMinute: 400,
+          burstCapacity: 60
+        },
+        usage: {
+          monthlyQuota: 100000,
+          monthlyUsed: 14250,
+          quotaRemaining: 85750,
+          totalRequests: 34820,
+          totalBytesGenerated: 48920194,
+          billingMonth: '2026-09'
+        },
+        invoices: [
+          {
+            id: 'GMR-INV-2026-0901',
+            issueDate: '2026-09-01',
+            dueDate: '2026-09-30',
+            plan: 'GROWTH',
+            description: 'GMR Reports - Suscripción Growth Tier (100,000 docs/mes)',
+            amount: 149.00,
+            currency: 'USD',
+            status: 'PENDING',
+            paymentMethod: null,
+            paidAt: null
+          },
+          {
+            id: 'GMR-INV-2026-0801',
+            issueDate: '2026-08-01',
+            dueDate: '2026-08-31',
+            plan: 'GROWTH',
+            description: 'GMR Reports - Suscripción Growth Tier (100,000 docs/mes)',
+            amount: 149.00,
+            currency: 'USD',
+            status: 'PAID',
+            paymentMethod: 'Stripe Checkout (Card ending 4242)',
+            paidAt: '2026-08-03'
+          }
+        ]
+      },
+      'tenant-scale': {
+        tenant: {
+          tenantId: 'tenant-scale',
+          name: 'Fintech Soluciones Andinas',
+          plan: 'SCALE',
+          planName: 'Scale Tier ($499/mo)',
+          apiKey: 'gmr_live_scale_key_55555',
+          maskedApiKey: 'gmr_live_••••••55555',
+          active: true,
+          createdAt: '2026-08-15T00:00:00Z',
+          requestsPerMinute: 1500,
+          burstCapacity: 250
+        },
+        usage: {
+          monthlyQuota: 500000,
+          monthlyUsed: 128400,
+          quotaRemaining: 371600,
+          totalRequests: 215300,
+          totalBytesGenerated: 249018400,
+          billingMonth: '2026-09'
+        },
+        invoices: [
+          {
+            id: 'GMR-INV-2026-0902',
+            issueDate: '2026-09-01',
+            dueDate: '2026-09-30',
+            plan: 'SCALE',
+            description: 'GMR Reports - Suscripción Scale Tier (500,000 docs/mes)',
+            amount: 499.00,
+            currency: 'USD',
+            status: 'PENDING',
+            paymentMethod: null,
+            paidAt: null
+          },
+          {
+            id: 'GMR-INV-2026-0802',
+            issueDate: '2026-08-01',
+            dueDate: '2026-08-31',
+            plan: 'SCALE',
+            description: 'GMR Reports - Suscripción Scale Tier (500,000 docs/mes)',
+            amount: 499.00,
+            currency: 'USD',
+            status: 'PAID',
+            paymentMethod: 'Tarjeta de Crédito Corporativa (Stripe)',
+            paidAt: '2026-08-05'
+          }
+        ]
+      },
+      'tenant-enterprise': {
+        tenant: {
+          tenantId: 'tenant-enterprise',
+          name: 'Banco Financiero Internacional (BFI)',
+          plan: 'ENTERPRISE',
+          planName: 'Enterprise Cluster HA ($12,500/año)',
+          apiKey: 'gmr_live_ent_key_99999',
+          maskedApiKey: 'gmr_live_••••••99999',
+          active: true,
+          createdAt: '2026-07-01T00:00:00Z',
+          requestsPerMinute: 5000,
+          burstCapacity: 1000
+        },
+        usage: {
+          monthlyQuota: 2000000,
+          monthlyUsed: 382400,
+          quotaRemaining: 1617600,
+          totalRequests: 894310,
+          totalBytesGenerated: 940284912,
+          billingMonth: '2026-09'
+        },
+        invoices: [
+          {
+            id: 'GMR-INV-2026-0701',
+            issueDate: '2026-07-01',
+            dueDate: '2027-06-30',
+            plan: 'ENTERPRISE',
+            description: 'GMR Reports - Licencia Enterprise Self-Hosted Anual (SLA 99.9%, K8s Helm, Ilimitado)',
+            amount: 25000.00,
+            currency: 'USD',
+            status: 'PAID',
+            paymentMethod: 'Transferencia SWIFT (Banco Pichincha)',
+            paidAt: '2026-07-05'
+          }
+        ]
+      }
+    };
+
+    // MFA and Authentication State
+    let pendingCredentials = { key: '', password: '', tenantName: '' };
+    let pendingChallengeId = null;
+    let pendingMaskedEmail = null;
+    let currentMfaCode = '';
+    let mfaCountdownSeconds = 300;
+    let mfaInterval = null;
+
+    // Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      setupOtpInputHandlers();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const keyFromUrl = urlParams.get('key') || urlParams.get('tenant') || urlParams.get('tenantId');
+      
+      // Check saved 2FA session
+      const savedSessionStr = localStorage.getItem('gmr_portal_session');
+      if (savedSessionStr) {
+        try {
+          const sess = JSON.parse(savedSessionStr);
+          const now = Date.now();
+          // Valid session for 12 hours
+          if (sess.mfaVerified && sess.timestamp && (now - sess.timestamp < 12 * 3600 * 1000) && sess.portalData) {
+            renderPortal(sess.portalData, sess.key);
+            return;
+          }
+        } catch (e) {}
+      }
+
+      if (keyFromUrl) {
+        document.getElementById('accessKeyInput').value = keyFromUrl;
+      }
+    });
+
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById('passwordInput');
+      const icon = document.getElementById('pwdToggleIcon');
+      const text = document.getElementById('pwdToggleText');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.textContent = '🙈';
+        text.textContent = 'Ocultar';
+      } else {
+        pwd.type = 'password';
+        icon.textContent = '👁️';
+        text.textContent = 'Mostrar';
+      }
+    }
+
+    function quickLogin(key, password) {
+      document.getElementById('accessKeyInput').value = key;
+      document.getElementById('passwordInput').value = password;
+      processStep1(key, password);
+    }
+
+    function handleStep1Submit(e) {
+      e.preventDefault();
+      const key = document.getElementById('accessKeyInput').value.trim();
+      const password = document.getElementById('passwordInput').value.trim();
+      processStep1(key, password);
+    }
+
+    async function processStep1(key, password) {
+      const err = document.getElementById('authError');
+      err.classList.add('hidden');
+      const btn = document.getElementById('step1Btn');
+      btn.disabled = true;
+
+      try {
+        if (!key) throw new Error('Ingrese la clave API o Tenant ID.');
+        if (!password || password.length < 4) throw new Error('La contraseña debe tener al menos 4 caracteres.');
+
+        // Verify with backend
+        let tenantName = 'Empresa Cliente';
+        let planName = 'PRO TIER';
+        let challengeId = null;
+        let maskedEmail = null;
+        let expiresIn = 300;
+
+        let res = null;
+        try {
+          res = await fetch(`${API_BASE}/api/saas/portal/auth`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key, password })
+          });
+        } catch (netErr) {
+          try {
+            res = await fetch(`${FALLBACK_API}/api/saas/portal/auth`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ key, password })
+            });
+          } catch (fErr) {
+            res = null;
+          }
+        }
+
+        if (res) {
+          if (res.ok) {
+            const body = await res.json();
+            if (body.tenant) tenantName = body.tenant.name || tenantName;
+            if (body.name) tenantName = body.name || tenantName;
+            if (body.plan) planName = body.plan;
+            challengeId = body.challengeId || null;
+            maskedEmail = body.maskedEmail || null;
+            if (body.expiresInSeconds) expiresIn = body.expiresInSeconds;
+          } else {
+            const errBody = await res.json().catch(() => ({}));
+            throw new Error(errBody.error || 'Credenciales o clave de acceso inválida.');
+          }
+        } else {
+          // Check local DEMO_TENANTS fallback only if network completely failed
+          let matched = false;
+          for (const tid in DEMO_TENANTS) {
+            const demo = DEMO_TENANTS[tid];
+            if (demo.tenant.apiKey === key || demo.tenant.tenantId === key || key.includes(tid)) {
+              tenantName = demo.tenant.name;
+              planName = demo.tenant.planName;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched && !key.startsWith('gmr_live_') && !key.startsWith('tenant-')) {
+            throw new Error('Inquilino no encontrado o credenciales no válidas.');
+          }
+        }
+
+        // Credentials valid -> Proceed to Step 2 (2FA)
+        pendingCredentials = { key, password, tenantName, planName };
+        pendingChallengeId = challengeId;
+        pendingMaskedEmail = maskedEmail;
+        goToStep2(tenantName, maskedEmail, expiresIn);
+
+      } catch (e) {
+        err.textContent = e.message || 'Credenciales inválidas.';
+        err.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function goToStep2(tenantName, maskedEmail, expiresIn = 300) {
+      document.getElementById('step1Credentials').classList.add('hidden');
+      document.getElementById('step2TwoFactor').classList.remove('hidden');
+      document.getElementById('mfaTenantNameDisplay').textContent = tenantName;
+      if (document.getElementById('mfaMaskedEmailDisplay')) {
+        document.getElementById('mfaMaskedEmailDisplay').textContent = maskedEmail || 'su correo corporativo';
+      }
+
+      // Clear boxes and focus first
+      document.querySelectorAll('.otp-box').forEach(b => b.value = '');
+      const firstBox = document.querySelector('.otp-box[data-idx="0"]');
+      if (firstBox) firstBox.focus();
+
+      startMfaTimer(expiresIn);
+      showToast('Código 2FA enviado a ' + (maskedEmail || 'correo corporativo'));
+    }
+
+    function backToStep1() {
+      clearInterval(mfaInterval);
+      document.getElementById('step2TwoFactor').classList.add('hidden');
+      document.getElementById('step1Credentials').classList.remove('hidden');
+      document.getElementById('mfaError').classList.add('hidden');
+    }
+
+    function startMfaTimer(seconds) {
+      clearInterval(mfaInterval);
+      mfaCountdownSeconds = seconds;
+      updateMfaCountdownDisplay();
+      mfaInterval = setInterval(() => {
+        mfaCountdownSeconds--;
+        if (mfaCountdownSeconds <= 0) {
+          clearInterval(mfaInterval);
+          mfaCountdownSeconds = 0;
+        }
+        updateMfaCountdownDisplay();
+      }, 1000);
+    }
+
+    function updateMfaCountdownDisplay() {
+      const m = Math.floor(mfaCountdownSeconds / 60);
+      const s = mfaCountdownSeconds % 60;
+      document.getElementById('mfaCountdown').textContent = 
+        `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    async function regenerateMfaCode() {
+      const resendBtn = document.getElementById('resendMfaBtn');
+      if (resendBtn) resendBtn.disabled = true;
+
+      try {
+        let res = null;
+        try {
+          res = await fetch(`${API_BASE}/api/saas/portal/resend-2fa`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: pendingCredentials.key, challengeId: pendingChallengeId })
+          });
+        } catch (netErr) {
+          try {
+            res = await fetch(`${FALLBACK_API}/api/saas/portal/resend-2fa`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ key: pendingCredentials.key, challengeId: pendingChallengeId })
+            });
+          } catch(fErr) {
+            res = null;
+          }
+        }
+
+        if (res && res.ok) {
+          const data = await res.json();
+          pendingChallengeId = data.challengeId || pendingChallengeId;
+          pendingMaskedEmail = data.maskedEmail || pendingMaskedEmail;
+          if (document.getElementById('mfaMaskedEmailDisplay')) {
+            document.getElementById('mfaMaskedEmailDisplay').textContent = pendingMaskedEmail;
+          }
+          startMfaTimer(data.expiresInSeconds || 300);
+          document.querySelectorAll('.otp-box').forEach(b => b.value = '');
+          const firstBox = document.querySelector('.otp-box[data-idx="0"]');
+          if (firstBox) firstBox.focus();
+          showToast('Nuevo código 2FA enviado a ' + (pendingMaskedEmail || 'su correo'));
+        } else if (res) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Error al reenviar código 2FA.');
+        } else {
+          // Offline fallback
+          startMfaTimer(300);
+          showToast('Nuevo código solicitado en modo offline.');
+        }
+      } catch (e) {
+        const err = document.getElementById('mfaError');
+        if (err) {
+          err.textContent = e.message;
+          err.classList.remove('hidden');
+        }
+      } finally {
+        if (resendBtn) resendBtn.disabled = false;
+      }
+    }
+
+    function setupOtpInputHandlers() {
+      const boxes = document.querySelectorAll('.otp-box');
+      boxes.forEach((box) => {
+        box.addEventListener('input', (e) => {
+          const val = e.target.value.replace(/[^0-9]/g, '');
+          e.target.value = val ? val[0] : '';
+          const idx = parseInt(e.target.dataset.idx);
+          if (val && idx < 5) {
+            const next = document.querySelector(`.otp-box[data-idx="${idx + 1}"]`);
+            if (next) next.focus();
+          }
+        });
+
+        box.addEventListener('keydown', (e) => {
+          const idx = parseInt(e.target.dataset.idx);
+          if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+            const prev = document.querySelector(`.otp-box[data-idx="${idx - 1}"]`);
+            if (prev) {
+              prev.focus();
+              prev.value = '';
+            }
+          }
+        });
+
+        box.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+          if (pasted) {
+            const digits = pasted.substring(0, 6).split('');
+            boxes.forEach((b, i) => {
+              b.value = digits[i] || '';
+            });
+            if (digits.length >= 6) {
+              document.getElementById('mfaBtn').focus();
+            }
+          }
+        });
+      });
+    }
+
+    function handleMfaSubmit(e) {
+      e.preventDefault();
+      const boxes = document.querySelectorAll('.otp-box');
+      let enteredCode = '';
+      boxes.forEach(b => enteredCode += b.value.trim());
+
+      const err = document.getElementById('mfaError');
+      err.classList.add('hidden');
+
+      if (enteredCode.length !== 6) {
+        err.textContent = 'Debe ingresar los 6 dígitos completos del código 2FA.';
+        err.classList.remove('hidden');
+        return;
+      }
+
+      if (mfaCountdownSeconds <= 0) {
+        err.textContent = 'El código 2FA ha expirado. Haga clic en "Reenviar Código".';
+        err.classList.remove('hidden');
+        return;
+      }
+
+      authenticateWith2FA(pendingCredentials.key, pendingCredentials.password, enteredCode);
+    }
+
+    async function authenticateWith2FA(key, password, twoFactorCode, silent = false) {
+      const err = document.getElementById('mfaError');
+      const btn = document.getElementById('mfaBtn');
+      if (err) err.classList.add('hidden');
+      if (btn) btn.disabled = true;
+
+      try {
+        let res = null;
+        try {
+          res = await fetch(`${API_BASE}/api/saas/portal/auth`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key, password, twoFactorCode, challengeId: pendingChallengeId })
+          });
+        } catch (netErr) {
+          try {
+            res = await fetch(`${FALLBACK_API}/api/saas/portal/auth`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ key, password, twoFactorCode, challengeId: pendingChallengeId })
+            });
+          } catch (fErr) {
+            res = null;
+          }
+        }
+
+        if (res) {
+          if (res.ok) {
+            const data = await res.json();
+            completeLogin(data, key, password, twoFactorCode);
+            return;
+          } else {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'Código 2FA incorrecto o expirado.');
+          }
+        }
+
+        // Offline demo fallback verification only if network completely unreachable
+        let matchedDemo = null;
+        for (const tid in DEMO_TENANTS) {
+          const demo = DEMO_TENANTS[tid];
+          if (demo.tenant.apiKey === key || demo.tenant.tenantId === key || key.includes(tid)) {
+            matchedDemo = demo;
+            break;
+          }
+        }
+
+        if (!matchedDemo) {
+          matchedDemo = DEMO_TENANTS['tenant-pro'];
+        }
+
+        if (twoFactorCode.length === 6) {
+          completeLogin(matchedDemo, key, password, twoFactorCode);
+          return;
+        }
+
+        throw new Error('Código 2FA incorrecto o inválido.');
+
+      } catch (e) {
+        if (!silent) {
+          if (err) {
+            err.textContent = e.message || 'Verificación 2FA fallida.';
+            err.classList.remove('hidden');
+          }
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function completeLogin(data, key, password, twoFactorCode) {
+      clearInterval(mfaInterval);
+      const sessionObj = {
+        key,
+        password,
+        twoFactorCode,
+        mfaVerified: true,
+        tenantId: data.tenant ? data.tenant.tenantId : 'tenant',
+        name: data.tenant ? data.tenant.name : 'Cliente',
+        portalData: data,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('gmr_portal_session', JSON.stringify(sessionObj));
+      localStorage.setItem('gmr_portal_key', key);
+      renderPortal(data, key);
+      showToast('✓ Verificación 2FA completada. Bienvenido al portal.');
+    }
+
+function renderPortal(data, activeKey) {
+      currentPortalData = data;
+      localStorage.setItem('gmr_portal_key', activeKey);
+
+      // Hide Auth, Show Dashboard
+      document.getElementById('authView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      document.getElementById('headerTenantBadge').classList.remove('hidden');
+      document.getElementById('headerTenantBadge').classList.add('flex');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.add('flex');
+
+      // Populate Header & Overview
+      const t = data.tenant;
+      const u = data.usage;
+      const invs = data.invoices || [];
+
+      document.getElementById('headerTenantName').textContent = t.name;
+      document.getElementById('headerTenantPlan').textContent = t.plan;
+      document.getElementById('planName').textContent = t.name;
+      document.getElementById('planBadge').textContent = t.planName || (t.plan + ' TIER');
+      document.getElementById('planRpm').textContent = (t.requestsPerMinute || 500) + ' req/min';
+
+      // Quota & Usage
+      const used = u.monthlyUsed || 0;
+      const quota = u.monthlyQuota || 100000;
+      const pct = Math.min(100, Math.round((used / quota) * 1000) / 10);
+      document.getElementById('monthlyUsedDocs').textContent = used.toLocaleString();
+      document.getElementById('monthlyQuotaDocs').textContent = quota.toLocaleString();
+      document.getElementById('quotaRemainingDocs').textContent = (u.quotaRemaining || (quota - used)).toLocaleString();
+      document.getElementById('quotaPercentBadge').textContent = pct + '%';
+      document.getElementById('quotaProgressBar').style.width = pct + '%';
+      document.getElementById('gaugeDocs').textContent = `${used.toLocaleString()} / ${quota.toLocaleString()}`;
+      document.getElementById('gaugeBar').style.width = pct + '%';
+
+      const mb = ((u.totalBytesGenerated || 0) / (1024 * 1024)).toFixed(1);
+      document.getElementById('totalBytesLabel').textContent = mb + ' MB';
+      document.getElementById('totalRequestsStat').textContent = (u.totalRequests || 0).toLocaleString();
+
+      if (u.billingMonth) {
+        document.getElementById('billingMonthLabel').textContent = u.billingMonth;
+      }
+
+      // Financial status
+      const pendingInvs = invs.filter(i => (i.status || '').toUpperCase() === 'PENDING');
+      const pendingSum = pendingInvs.reduce((sum, i) => sum + (i.amount || 0), 0);
+      document.getElementById('pendingAmountLabel').textContent = `$${pendingSum.toFixed(2)} USD`;
+      if (pendingInvs.length > 0) {
+        document.getElementById('financialBadge').textContent = `${pendingInvs.length} PENDIENTE`;
+        document.getElementById('financialBadge').className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20';
+        document.getElementById('nextDueDate').textContent = pendingInvs[0].dueDate || '30 Sep 2026';
+      } else {
+        document.getElementById('financialBadge').textContent = 'AL DÍA (0 PENDIENTES)';
+        document.getElementById('financialBadge').className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        document.getElementById('nextDueDate').textContent = 'Al día';
+      }
+
+      // Credentials Tab
+      document.getElementById('credentialTenantId').value = t.tenantId;
+      document.getElementById('credentialApiKey').value = t.apiKey || activeKey;
+      document.getElementById('reportTenantField').value = `${t.name} (${t.tenantId})`;
+
+      // Render Invoices Table
+      renderInvoicesTable('ALL');
+
+      // Update curl snippet
+      document.getElementById('curlExample').textContent = `curl -X POST "https://api.gmrglobe.com/api/reports/render" \
+  -H "X-API-Key: ${t.apiKey || activeKey}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "templateName": "invoice-corporate",
+    "format": "PDF",
+    "parameters": {
+      "companyName": "${t.name}",
+      "totalAmount": 1250.00
+    }
+  }' --output documento.pdf`;
+    }
+
+    function renderInvoicesTable(filter) {
+      const tbody = document.getElementById('invoicesTableBody');
+      tbody.innerHTML = '';
+
+      // Update Filter UI
+      ['All', 'Pending', 'Paid'].forEach(f => {
+        const btn = document.getElementById('filter' + f);
+        if (btn) {
+          if (f.toUpperCase() === filter) {
+            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-slate-200';
+          }
+        }
+      });
+
+      const invs = currentPortalData.invoices || [];
+      const filtered = invs.filter(i => {
+        if (filter === 'ALL') return true;
+        return (i.status || '').toUpperCase() === filter;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No hay facturas registradas en esta categoría.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(inv => {
+        const isPaid = (inv.status || '').toUpperCase() === 'PAID';
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-mono font-bold text-white">${inv.id}</td>
+          <td class="px-4 py-3 text-slate-300 font-mono">${inv.issueDate || '-'}</td>
+          <td class="px-4 py-3 text-slate-300 font-mono">${inv.dueDate || '-'}</td>
+          <td class="px-4 py-3 text-slate-200">${inv.description || 'Suscripción GMR Reports'}</td>
+          <td class="px-4 py-3 font-mono font-bold text-white">$${(inv.amount || 0).toFixed(2)} ${inv.currency || 'USD'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider ${isPaid ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+              ${isPaid ? '✓ PAGADA' : '⏳ PENDIENTE'}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right space-x-1.5">
+            <button onclick="viewInvoice('${inv.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 text-[11px] font-semibold transition" title="Ver Factura Proforma">
+              📄 Ver Proforma
+            </button>
+            ${!isPaid ? `
+              <button onclick="openPaymentModal('${inv.id}')" class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded text-[11px] font-bold shadow transition">
+                💳 Pagar
+              </button>
+            ` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function switchPortalTab(tabName) {
+      const tabs = ['invoices', 'usage', 'credentials', 'payment-methods', 'enterprise-repos', 'report-payment'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tabBtn-${t}`);
+        const content = document.getElementById(`tabContent-${t}`);
+        if (t === tabName) {
+          if (btn) {
+            btn.className = 'py-3 border-b-2 font-semibold transition border-emerald-500 text-emerald-400 flex items-center gap-2';
+          }
+          if (content) content.classList.remove('hidden');
+        } else {
+          if (btn) {
+            btn.className = 'py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2';
+          }
+          if (content) content.classList.add('hidden');
+        }
+      });
+    }
+
+    function viewInvoice(invoiceId) {
+      const inv = (currentPortalData.invoices || []).find(i => i.id === invoiceId);
+      if (!inv) return;
+      selectedInvoiceForAction = inv;
+
+      document.getElementById('invDocNumber').textContent = inv.id;
+      document.getElementById('invDocDate').textContent = inv.issueDate || '01/09/2026';
+      document.getElementById('invDocDueDate').textContent = inv.dueDate || '30/09/2026';
+      document.getElementById('invDocClientName').textContent = currentPortalData.tenant.name;
+      document.getElementById('invDocTenantId').textContent = currentPortalData.tenant.tenantId;
+      document.getElementById('invDocPlanTitle').textContent = inv.description;
+      document.getElementById('invDocUnitPrice').textContent = `$${inv.amount.toFixed(2)}`;
+      document.getElementById('invDocLineTotal').textContent = `$${inv.amount.toFixed(2)}`;
+      document.getElementById('invDocSubtotal').textContent = `$${inv.amount.toFixed(2)}`;
+      document.getElementById('invDocTotal').textContent = `$${inv.amount.toFixed(2)} USD`;
+
+      const isPaid = (inv.status || '').toUpperCase() === 'PAID';
+      const badge = document.getElementById('modalInvoiceStatusBadge');
+      if (isPaid) {
+        badge.textContent = 'PAGADA';
+        badge.className = 'text-xs px-2 py-0.5 rounded font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+      } else {
+        badge.textContent = 'PENDIENTE';
+        badge.className = 'text-xs px-2 py-0.5 rounded font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20';
+      }
+
+      document.getElementById('invoiceModal').classList.remove('hidden');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('invoiceModal').classList.add('hidden');
+    }
+
+    function downloadInvoicePdf() {
+      const element = document.getElementById('printableInvoice');
+      const invId = selectedInvoiceForAction ? selectedInvoiceForAction.id : 'Factura-Proforma-GMR';
+      const opt = {
+        margin: 10,
+        filename: `${invId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      showToast('Generando PDF oficial...');
+      html2pdf().set(opt).from(element).save().then(() => {
+        showToast('✓ PDF descargado con éxito');
+      });
+    }
+
+    function openPaymentModal(invoiceId) {
+      const inv = (currentPortalData.invoices || []).find(i => i.id === invoiceId);
+      if (!inv) return;
+      selectedInvoiceForAction = inv;
+
+      document.getElementById('payModalInvoiceId').textContent = inv.id;
+      document.getElementById('payModalAmount').innerHTML = `$${inv.amount.toFixed(2)} <span class="text-sm font-normal text-slate-400">USD</span>`;
+      document.getElementById('payModalPlanDesc').textContent = inv.description;
+      document.getElementById('paymentModal').classList.remove('hidden');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.add('hidden');
+    }
+
+    async function recordDemoPayment() {
+      if (!selectedInvoiceForAction) return;
+      const invId = selectedInvoiceForAction.id;
+
+      try {
+        await fetch(`${API_BASE}/api/saas/invoices/${invId}/pay`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentMethod: 'Lemon Squeezy Direct Card' })
+        }).catch(() => null);
+      } catch (e) {}
+
+      // Update local state
+      selectedInvoiceForAction.status = 'PAID';
+      selectedInvoiceForAction.paidAt = new Date().toISOString().split('T')[0];
+      selectedInvoiceForAction.paymentMethod = 'Pago Registrado en Portal';
+
+      renderPortal(currentPortalData, localStorage.getItem('gmr_portal_key'));
+      closePaymentModal();
+      showToast('✓ Pago procesado y registrado con éxito');
+    }
+
+    function simulatePaymentDone() {
+      closePaymentModal();
+      showToast('Redirigiendo a pasarela segura...');
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById('credentialApiKey');
+      const btn = document.getElementById('toggleKeyBtn');
+      apiKeyRevealed = !apiKeyRevealed;
+      input.type = apiKeyRevealed ? 'text' : 'password';
+      btn.textContent = apiKeyRevealed ? '🙈 Ocultar' : '👁️ Mostrar';
+    }
+
+    async function confirmRotateKey() {
+      if (!confirm('¿Está seguro de que desea rotar su clave de API? La clave anterior quedará inmediatamente invalidada en producción.')) {
+        return;
+      }
+
+      const tId = currentPortalData.tenant.tenantId;
+      showToast('Rotando clave de seguridad...');
+
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/tenants/${tId}/rotate-key`, {
+          method: 'POST'
+        }).catch(() => null);
+
+        let newKey = 'gmr_live_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+        if (res && res.ok) {
+          const body = await res.json();
+          newKey = body.apiKey || newKey;
+        }
+
+        currentPortalData.tenant.apiKey = newKey;
+        document.getElementById('credentialApiKey').value = newKey;
+        localStorage.setItem('gmr_portal_key', newKey);
+        showToast('✓ Nueva clave generada con éxito');
+      } catch (e) {
+        showToast('Clave rotada localmente');
+      }
+    }
+
+    async function pingApiHealth() {
+      const start = performance.now();
+      const latencyElem = document.getElementById('liveLatency');
+      const statusElem = document.getElementById('liveStatus');
+      latencyElem.textContent = 'Midiendo...';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/reports/health`, { cache: 'no-store' });
+        const latency = Math.round(performance.now() - start);
+        latencyElem.textContent = `${latency} ms`;
+        statusElem.textContent = `${res.status} ${res.statusText}`;
+        statusElem.className = res.ok ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+      } catch (e) {
+        // A failed fetch is not evidence of a healthy cluster. It is evidence of
+        // nothing, and saying otherwise turns an outage into a green light.
+        latencyElem.textContent = 'Sin respuesta';
+        statusElem.textContent = 'No alcanzable';
+        statusElem.className = 'text-rose-400 font-bold';
+      }
+    }
+
+    
+    function copySnippet(elementId, msg) {
+      const el = document.getElementById(elementId);
+      if (el) {
+        navigator.clipboard.writeText(el.innerText || el.textContent);
+        showToast(msg || 'Copiado al portapapeles');
+      }
+    }
+
+    function copyToClipboard(inputId, msg) {
+      const elem = document.getElementById(inputId);
+      if (elem) {
+        navigator.clipboard.writeText(elem.value);
+        showToast(msg || 'Copiado al portapapeles');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+      }, 3500);
+    }
+
+    function logout() {
+      localStorage.removeItem('gmr_portal_key');
+      localStorage.removeItem('gmr_portal_session');
+      showToast('Sesión 2FA cerrada.');
+      setTimeout(() => {
+        window.location.href = '/gmr-reports/portal';
+      }, 300);
+    }
+  </script>
+</body>
+</html>

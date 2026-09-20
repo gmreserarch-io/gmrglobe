@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Marco de Licenciamiento On-Premise — GMR Reports</title>
+  <link rel="icon" type="image/svg+xml" href="/gmr-reports/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .gradient-purple {
+      background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+  <script src="/gmr-reports/assets/i18n.js"></script>
+</head>
+<body class="min-h-full flex flex-col font-sans selection:bg-purple-500 selection:text-white bg-slate-950">
+  <!-- Navbar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/gmr-reports/" class="flex items-center gap-3">
+        <div class="h-9 px-2 py-0.5 rounded-lg bg-white flex items-center justify-center border border-slate-700/40">
+          <img src="/gmr-reports/assets/logo-gmr.jpg" alt="GMR - Science in Action" class="h-6 w-auto object-contain" />
+        </div>
+        <div>
+          <span class="font-bold text-base text-white tracking-tight">GMR Reports</span>
+          <span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800/60 ml-1.5 hidden sm:inline">On-Premise</span>
+        </div>
+      </a>
+      
+      <div class="flex items-center gap-4">
+        <!-- Language Selector -->
+        <div class="inline-flex items-center rounded-lg bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs shadow-inner" role="group" aria-label="Language Selector">
+          <button type="button" onclick="GMR_I18N.setLanguage('es')" data-lang="es" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇪🇸</span> <span class="hidden sm:inline">ES</span>
+          </button>
+          <button type="button" onclick="GMR_I18N.setLanguage('en')" data-lang="en" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇺🇸</span> <span class="hidden sm:inline">EN</span>
+          </button>
+        </div>
+
+        <a href="/gmr-reports/" data-i18n="common.back_platform" class="text-xs text-slate-400 hover:text-purple-400 font-semibold flex items-center gap-1 transition">
+          ← Volver a la Plataforma
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Container -->
+  <main class="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    
+    <!-- SPANISH CONTENT -->
+    <div id="contentEs" class="space-y-10">
+      
+      <!-- Header Meta -->
+      <div class="border-b border-purple-900/40 pb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold uppercase tracking-wider mb-3 border border-purple-500/30">
+          <span>🏢 Marco Comercial & Técnico de Licenciamiento On-Premise</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-1">
+          Licenciamiento On-Premise, Self-Hosted & Air-Gapped
+        </h1>
+        <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-400 mt-4 font-mono">
+          <div><strong class="text-slate-200">Versión:</strong> 2.0</div>
+          <div><strong class="text-slate-200">Publicación:</strong> Septiembre 2026</div>
+          <div><strong class="text-slate-200">Entidad:</strong> GMR Solutions (<span class="text-purple-400">&gt;&gt; Science in Action</span>)</div>
+          <div><strong class="text-slate-200">Contacto:</strong> <a href="mailto:founders@gmresearch.io" class="text-purple-300 hover:underline">founders@gmresearch.io</a></div>
+        </div>
+      </div>
+
+      <!-- 1. Resumen Ejecutivo -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-4 border border-purple-500/20">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">1</span>
+          Resumen Ejecutivo
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          El licenciamiento <strong>On-Premise y Self-Hosted</strong> de GMR Reports está diseñado específicamente para instituciones bancarias, financieras, entidades gubernamentales y empresas reguladas que por mandato normativo (<span class="text-purple-300 font-medium">GDPR, PCI-DSS, regulaciones bancarias locales</span>) o políticas de seguridad interna no pueden transmitir datos de clientes o transacciones financieras fuera de su perímetro de red.
+        </p>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          A diferencia del modelo SaaS en la nube, el licenciamiento On-Premise otorga el derecho de ejecutar las librerías, motores de renderizado nativos y contenedores de GMR Reports directamente dentro de los centros de datos privados o nubes dedicadas del cliente, garantizando <strong>Cero Retención de Datos (ZDR)</strong> y <strong>operación 100% Air-Gapped (sin llamadas telefónicas ni telemetría externa)</strong>.
+        </p>
+      </section>
+
+      <!-- 2. Componentes de Software Licenciados -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">2</span>
+          Componentes de Software Licenciados
+        </h2>
+        <p class="text-sm text-slate-400">
+          El contrato de licenciamiento cubre los siguientes artefactos productivos:
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+            <thead class="bg-slate-900/90 text-slate-200 uppercase font-mono tracking-wider border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Componente</th>
+                <th class="py-3 px-4">Tipo de Entrega</th>
+                <th class="py-3 px-4">Descripción Técnica</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 font-sans">
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">gmr-reports-spring-boot-starter</td>
+                <td class="py-3 px-4 text-slate-400">Artefacto Maven / JAR</td>
+                <td class="py-3 px-4">Starter para Spring Boot 3.x que autoconfigura el motor de reportes en memoria, pooling de plantillas y serializadores de alta velocidad.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">gmr-reports-core</td>
+                <td class="py-3 px-4 text-slate-400">Librería Java pura</td>
+                <td class="py-3 px-4">Núcleo de renderizado que compila y procesa JRXML, XSL-FO y HTML hacia PDF/A, XLSX, CSV y JSON con consumo de memoria L1 ultra-bajo (&lt;35 MB).</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">gmr-reports-quarkus</td>
+                <td class="py-3 px-4 text-slate-400">Binario Nativo GraalVM</td>
+                <td class="py-3 px-4">Microservicio empaquetado en binario ELF nativo (Linux x86_64 y ARM64), arranque por debajo de 300 ms en frio y render de 1-3 ms con la plantilla compilada.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">Imágenes de Contenedor OCI</td>
+                <td class="py-3 px-4 text-slate-400">Contenedor Distroless</td>
+                <td class="py-3 px-4">Imágenes base distroless seguras sin shell ni utilidades innecesarias, con superficie de ataque mínima y CVEs cero.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">Helm Charts de Producción</td>
+                <td class="py-3 px-4 text-slate-400">Manifiestos K8s</td>
+                <td class="py-3 px-4">Despliegue automatizado para clústeres de alta disponibilidad con réplicas horizontales (HPA), sondas liveness/readiness y sincronización de caché distribuida.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. Tiers de Licenciamiento y Esquema de Precios -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">3</span>
+          Tiers de Licenciamiento y Esquema de Precios
+        </h2>
+        <p class="text-sm text-slate-400">
+          La plataforma ofrece tres niveles de licenciamiento On-Premise adaptados al volumen y criticidad de la arquitectura cliente:
+        </p>
+
+        <!-- Tier Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Starter On-Prem -->
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-bold text-slate-400">Microservicios / Servidor Único</div>
+              <h3 class="text-lg font-bold text-white mt-1">Starter On-Prem</h3>
+              <div class="text-2xl font-black text-purple-300 mt-2">$4,800 <span class="text-xs text-slate-400 font-normal">USD / año</span></div>
+              <div class="text-[11px] text-slate-400 mt-0.5">$400/mes facturado anualmente</div>
+              <div class="mt-2 text-xs font-semibold text-purple-400 bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-900/60 inline-block">
+                Hasta 4 Cores CPU
+              </div>
+              <ul class="mt-6 space-y-2 text-xs text-slate-300">
+                <li>✓ Uso comercial de starter Spring Boot y Quarkus nativo</li>
+                <li>✓ Generación de PDF/A y compresión nativa AES</li>
+                <li>✓ Soporte completo JRXML y XSL-FO dinámico</li>
+                <li>✓ Parches de seguridad y semver minor durante suscripción</li>
+                <li>✓ Soporte técnico estándar (L-V, SLA &lt; 8h)</li>
+              </ul>
+            </div>
+            <a href="/gmr-reports/#calculator" class="mt-8 block w-full py-2.5 text-center rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition border border-slate-700">
+              Evaluar ROI
+            </a>
+          </div>
+
+          <!-- Cluster Enterprise HA -->
+          <div class="rounded-2xl border-2 border-purple-500 bg-purple-950/20 p-6 flex flex-col justify-between relative shadow-xl shadow-purple-950/40">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-3 py-0.5 rounded-full">
+              Recomendado Banca
+            </div>
+            <div>
+              <div class="text-xs uppercase font-bold text-purple-300">Kubernetes & OpenShift Clúster</div>
+              <h3 class="text-lg font-bold text-white mt-1">Cluster Enterprise HA</h3>
+              <div class="text-2xl font-black text-purple-300 mt-2">$12,500 <span class="text-xs text-slate-400 font-normal">USD / año</span></div>
+              <div class="text-[11px] text-slate-400 mt-0.5">$1,040/mes facturado anualmente</div>
+              <div class="mt-2 text-xs font-semibold text-purple-300 bg-purple-900/60 px-2.5 py-1 rounded-lg border border-purple-700/60 inline-block">
+                Hasta 16 Cores CPU en Clúster
+              </div>
+              <ul class="mt-6 space-y-2 text-xs text-slate-200">
+                <li>✓ Todos los beneficios del Starter Tier</li>
+                <li>✓ Sincronización distribuida Redis / Hazelcast</li>
+                <li>✓ Conectores JDBC directos (Oracle, Postgres, SQL Server, DB2)</li>
+                <li>✓ Suite de cifrado mTLS inter-servicio</li>
+                <li>✓ Paquete de auditoría y certificación Zero-Data (ZDR)</li>
+                <li>✓ Soporte prioritario (L-V, SLA &lt; 4h)</li>
+              </ul>
+            </div>
+            <a href="mailto:sales@gmrglobe.com?subject=Solicitud%20Piloto%20Cluster%20Enterprise%20HA" class="mt-8 block w-full py-2.5 text-center rounded-lg bg-purple-500 hover:bg-purple-400 text-slate-950 font-extrabold text-xs shadow-lg shadow-purple-500/20 transition">
+              Solicitar Piloto Enterprise
+            </a>
+          </div>
+
+          <!-- Corporate Unlimited -->
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-bold text-slate-400">Misión Crítica & Core Banking</div>
+              <h3 class="text-lg font-bold text-white mt-1">Corporate Unlimited</h3>
+              <div class="text-2xl font-black text-white mt-2">$24,000 <span class="text-xs text-slate-400 font-normal">USD / año</span></div>
+              <div class="text-[11px] text-emerald-400 font-semibold mt-0.5">o $45,000 USD Licencia Perpetua</div>
+              <div class="mt-2 text-xs font-semibold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/60 inline-block">
+                Cores & Nodos Ilimitados
+              </div>
+              <ul class="mt-6 space-y-2 text-xs text-slate-300">
+                <li>✓ Todos los beneficios de Cluster Enterprise HA</li>
+                <li>✓ Módulo de Firma Digital PAdES con HSM FIPS 140-2 Level 3</li>
+                <li>✓ 100% Air-Gapped sin telemetría externa</li>
+                <li>✓ Código fuente de referencia & asistencia de arquitectura</li>
+                <li>✓ Soporte 24/7 de Severidad 1 (SLA &lt; 1h)</li>
+              </ul>
+            </div>
+            <a href="mailto:founders@gmresearch.io?subject=Contacto%20Ingenieria%20Corporate%20Unlimited" class="mt-8 block w-full py-2.5 text-center rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition border border-slate-700">
+              Contactar Ingeniería Corporativa
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 4. Garantías Técnicas y de Cumplimiento -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">4</span>
+          Garantías Técnicas y de Cumplimiento
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300">
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-2">
+            <div class="text-lg">🔒</div>
+            <h3 class="font-bold text-white text-sm">Operación Estrictamente Air-Gapped</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Las licencias on-premise no utilizan servidores de activación online ni envían métricas a la nube de GMR. La activación se formaliza mediante clave criptográfica RSA/Ed25519 embebida o archivo de licencia firmado digitalmente.
+            </p>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-2">
+            <div class="text-lg">⚡</div>
+            <h3 class="font-bold text-white text-sm">Cero Retención de Datos (ZDR)</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Todo el renderizado se efectúa en streaming en la memoria volátil (RAM L1/L2) del proceso. Ni los datos en tiempo de ejecución, ni los payloads JSON/XML, ni los PDFs generados se persisten en disco local salvo instrucción expresa.
+            </p>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-2">
+            <div class="text-lg">🛡️</div>
+            <h3 class="font-bold text-white text-sm">Cifrado Nativo BouncyCastle</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Criptografía integrada para emitir documentos con cifrado AES-128 / AES-256 bits, contraseñas diferenciadas de usuario y propietario, y control granular de permisos (impresión, copia de texto, formularios).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Acuerdos de Nivel de Servicio (SLA) de Soporte -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">5</span>
+          Acuerdos de Nivel de Servicio (SLA) de Soporte
+        </h2>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+            <thead class="bg-slate-900/90 text-slate-200 uppercase font-mono tracking-wider border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Nivel de Severidad</th>
+                <th class="py-3 px-4">Definición</th>
+                <th class="py-3 px-4 text-center">SLA Starter</th>
+                <th class="py-3 px-4 text-center">SLA Cluster HA</th>
+                <th class="py-3 px-4 text-center text-purple-300">SLA Corporate Unlimited</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 font-sans">
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-bold text-rose-400 whitespace-nowrap">Severidad 1 (Crítica)</td>
+                <td class="py-3 px-4 text-slate-400">Interrupción total del servicio en producción; pérdida de emisión de facturas o reportes críticos sin solución alternativa.</td>
+                <td class="py-3 px-4 text-center font-mono">8h hábiles</td>
+                <td class="py-3 px-4 text-center font-mono">4h hábiles</td>
+                <td class="py-3 px-4 text-center font-mono font-bold text-emerald-400 bg-emerald-950/20">&lt; 1h (24/7)</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-bold text-amber-400 whitespace-nowrap">Severidad 2 (Alta)</td>
+                <td class="py-3 px-4 text-slate-400">Degradación significativa del rendimiento o falla de componentes no críticos en producción.</td>
+                <td class="py-3 px-4 text-center font-mono">24h</td>
+                <td class="py-3 px-4 text-center font-mono">8h hábiles</td>
+                <td class="py-3 px-4 text-center font-mono font-semibold text-purple-300">&lt; 4h</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-bold text-sky-400 whitespace-nowrap">Severidad 3 (Media)</td>
+                <td class="py-3 px-4 text-slate-400">Problemas en ambientes de homologación/desarrollo o dudas sobre plantillas y configuración.</td>
+                <td class="py-3 px-4 text-center font-mono">48h</td>
+                <td class="py-3 px-4 text-center font-mono">24h</td>
+                <td class="py-3 px-4 text-center font-mono font-semibold text-purple-300">&lt; 12h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 6. Procedimiento de Adquisición y Piloto -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-4 border border-purple-500/20">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">6</span>
+          Procedimiento de Adquisición y Piloto de Evaluación
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+            <span class="text-purple-400 font-mono font-bold text-sm">Paso 01</span>
+            <h3 class="font-bold text-white">Solicitud de Piloto</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Las organizaciones interesadas pueden solicitar una licencia de evaluación de 30 días sin costo contactando a <a href="mailto:founders@gmresearch.io" class="text-purple-300 underline">founders@gmresearch.io</a>.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+            <span class="text-purple-400 font-mono font-bold text-sm">Paso 02</span>
+            <h3 class="font-bold text-white">Homologación Técnica</h3>
+            <p class="text-slate-400 leading-relaxed">
+              El equipo de GMR entrega acceso al registro de artefactos privado (Maven / Docker Registry) y plantilla Helm de referencia para su infraestructura.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+            <span class="text-purple-400 font-mono font-bold text-sm">Paso 03</span>
+            <h3 class="font-bold text-white">Formalización Contractual</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Se formaliza la orden de compra y se entrega el paquete de licencia junto con los acuerdos de confidencialidad (NDA) y SLA correspondientes.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ENGLISH CONTENT -->
+    <div id="contentEn" class="space-y-10 hidden">
+      
+      <!-- Header Meta -->
+      <div class="border-b border-purple-900/40 pb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold uppercase tracking-wider mb-3 border border-purple-500/30">
+          <span>🏢 On-Premise Commercial & Technical Licensing Framework</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-1">
+          On-Premise, Self-Hosted & Air-Gapped Licensing
+        </h1>
+        <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-400 mt-4 font-mono">
+          <div><strong class="text-slate-200">Version:</strong> 2.0</div>
+          <div><strong class="text-slate-200">Published:</strong> September 2026</div>
+          <div><strong class="text-slate-200">Issuer:</strong> GMR Solutions (<span class="text-purple-400">&gt;&gt; Science in Action</span>)</div>
+          <div><strong class="text-slate-200">Contact:</strong> <a href="mailto:founders@gmresearch.io" class="text-purple-300 hover:underline">founders@gmresearch.io</a></div>
+        </div>
+      </div>
+
+      <!-- 1. Executive Summary -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-4 border border-purple-500/20">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">1</span>
+          Executive Summary
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          GMR Reports <strong>On-Premise and Self-Hosted</strong> licensing is explicitly engineered for banking institutions, financial entities, government agencies, and regulated enterprises that, due to regulatory mandates (<span class="text-purple-300 font-medium">GDPR, PCI-DSS, local banking regulations</span>) or internal cybersecurity policies, cannot transmit customer data or financial transactions outside their secure network perimeter.
+        </p>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Unlike the public cloud SaaS model, On-Premise licensing grants the full right to execute GMR Reports libraries, native rendering engines, and containers directly within customer private data centers or dedicated sovereign clouds, guaranteeing <strong>Zero-Data Retention (ZDR)</strong> and <strong>100% Air-Gapped operation (zero phone-home, zero external telemetry)</strong>.
+        </p>
+      </section>
+
+      <!-- 2. Licensed Software Components -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">2</span>
+          Licensed Software Components
+        </h2>
+        <p class="text-sm text-slate-400">
+          The commercial licensing agreement covers the following production-grade software artifacts:
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+            <thead class="bg-slate-900/90 text-slate-200 uppercase font-mono tracking-wider border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Component</th>
+                <th class="py-3 px-4">Delivery Format</th>
+                <th class="py-3 px-4">Technical Description</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 font-sans">
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">gmr-reports-spring-boot-starter</td>
+                <td class="py-3 px-4 text-slate-400">Maven Artifact / JAR</td>
+                <td class="py-3 px-4">Spring Boot 3.x starter providing automatic bean configuration, template pooling, and high-throughput serialization in memory.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">gmr-reports-core</td>
+                <td class="py-3 px-4 text-slate-400">Pure Java Library</td>
+                <td class="py-3 px-4">Ahead-Of-Time compilation kernel converting JRXML, XSL-FO, and HTML into PDF/A, XLSX, CSV, and JSON with ultra-low L1 RAM footprint (&lt;35 MB).</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">gmr-reports-quarkus</td>
+                <td class="py-3 px-4 text-slate-400">GraalVM Native Binary</td>
+                <td class="py-3 px-4">Microservice packaged as a native ELF binary (Linux x86_64 & ARM64), with cold starts under 300 ms and 1-3 ms rendering from a compiled template.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">OCI Container Images</td>
+                <td class="py-3 px-4 text-slate-400">Distroless Container</td>
+                <td class="py-3 px-4">Hardened distroless base images with zero shell, zero unnecessary utilities, minimal attack surface, and zero CVEs.</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-mono font-semibold text-purple-300 whitespace-nowrap">Production Helm Charts</td>
+                <td class="py-3 px-4 text-slate-400">K8s Manifests</td>
+                <td class="py-3 px-4">Automated deployment package for high-availability clusters with horizontal autoscaling (HPA), liveness probes, and distributed cache synchronization.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. Licensing Tiers & Pricing Schedule -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">3</span>
+          Licensing Tiers & Pricing Schedule
+        </h2>
+        <p class="text-sm text-slate-400">
+          We offer three On-Premise tiers aligned with corporate infrastructure scale and criticality:
+        </p>
+
+        <!-- Tier Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Starter On-Prem -->
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-bold text-slate-400">Microservices / Single Server</div>
+              <h3 class="text-lg font-bold text-white mt-1">Starter On-Prem</h3>
+              <div class="text-2xl font-black text-purple-300 mt-2">$4,800 <span class="text-xs text-slate-400 font-normal">USD / year</span></div>
+              <div class="text-[11px] text-slate-400 mt-0.5">$400/mo billed annually</div>
+              <div class="mt-2 text-xs font-semibold text-purple-400 bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-900/60 inline-block">
+                Up to 4 CPU Cores
+              </div>
+              <ul class="mt-6 space-y-2 text-xs text-slate-300">
+                <li>✓ Commercial license for Spring Boot starter and Quarkus native binary</li>
+                <li>✓ PDF/A compliance, native document compression and AES encryption</li>
+                <li>✓ Full support for dynamic JRXML and XSL-FO layouts</li>
+                <li>✓ Security patches and semver minor updates during subscription</li>
+                <li>✓ Standard technical support (Mon-Fri, SLA &lt; 8h)</li>
+              </ul>
+            </div>
+            <a href="/gmr-reports/#calculator" class="mt-8 block w-full py-2.5 text-center rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition border border-slate-700">
+              Calculate Cloud ROI
+            </a>
+          </div>
+
+          <!-- Cluster Enterprise HA -->
+          <div class="rounded-2xl border-2 border-purple-500 bg-purple-950/20 p-6 flex flex-col justify-between relative shadow-xl shadow-purple-950/40">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-3 py-0.5 rounded-full">
+              Recommended for Banking
+            </div>
+            <div>
+              <div class="text-xs uppercase font-bold text-purple-300">Kubernetes & OpenShift Cluster</div>
+              <h3 class="text-lg font-bold text-white mt-1">Cluster Enterprise HA</h3>
+              <div class="text-2xl font-black text-purple-300 mt-2">$12,500 <span class="text-xs text-slate-400 font-normal">USD / year</span></div>
+              <div class="text-[11px] text-slate-400 mt-0.5">$1,040/mo billed annually</div>
+              <div class="mt-2 text-xs font-semibold text-purple-300 bg-purple-900/60 px-2.5 py-1 rounded-lg border border-purple-700/60 inline-block">
+                Up to 16 CPU Cores in Cluster
+              </div>
+              <ul class="mt-6 space-y-2 text-xs text-slate-200">
+                <li>✓ All Starter Tier benefits included</li>
+                <li>✓ Distributed cluster cache synchronization (Redis Sentinel/Cluster or Hazelcast)</li>
+                <li>✓ Direct JDBC high-throughput connectors (Oracle, Postgres, SQL Server, DB2)</li>
+                <li>✓ Internal mTLS communication suite</li>
+                <li>✓ Zero-Data Retention (ZDR) verification & audit package</li>
+                <li>✓ Priority technical support (Mon-Fri, SLA &lt; 4h)</li>
+              </ul>
+            </div>
+            <a href="mailto:sales@gmrglobe.com?subject=Enterprise%20Cluster%20Pilot%20Request" class="mt-8 block w-full py-2.5 text-center rounded-lg bg-purple-500 hover:bg-purple-400 text-slate-950 font-extrabold text-xs shadow-lg shadow-purple-500/20 transition">
+              Request Enterprise Pilot
+            </a>
+          </div>
+
+          <!-- Corporate Unlimited -->
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase font-bold text-slate-400">Mission-Critical & Core Banking</div>
+              <h3 class="text-lg font-bold text-white mt-1">Corporate Unlimited</h3>
+              <div class="text-2xl font-black text-white mt-2">$24,000 <span class="text-xs text-slate-400 font-normal">USD / year</span></div>
+              <div class="text-[11px] text-emerald-400 font-semibold mt-0.5">or $45,000 USD Perpetual License</div>
+              <div class="mt-2 text-xs font-semibold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/60 inline-block">
+                Unlimited CPU Cores & Nodes
+              </div>
+              <ul class="mt-6 space-y-2 text-xs text-slate-300">
+                <li>✓ All Cluster Enterprise HA benefits included</li>
+                <li>✓ PAdES Digital Signature module with HSM FIPS 140-2 Level 3 integration</li>
+                <li>✓ Strict 100% Air-Gapped architecture without external telemetry</li>
+                <li>✓ Reference source code access & architecture review</li>
+                <li>✓ 24/7 Severity 1 SLA with response in under 1 hour</li>
+              </ul>
+            </div>
+            <a href="mailto:founders@gmresearch.io?subject=Corporate%20Unlimited%20Engineering%20Inquiry" class="mt-8 block w-full py-2.5 text-center rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition border border-slate-700">
+              Contact Corporate Engineering
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 4. Technical & Compliance Guarantees -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">4</span>
+          Technical & Compliance Guarantees
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300">
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-2">
+            <div class="text-lg">🔒</div>
+            <h3 class="font-bold text-white text-sm">Strictly Air-Gapped Operation</h3>
+            <p class="text-slate-400 leading-relaxed">
+              On-premise licenses do not require online license servers or report telemetry back to GMR. Activation is handled via embedded cryptographic RSA/Ed25519 license keys or signed license payloads for total network isolation.
+            </p>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-2">
+            <div class="text-lg">⚡</div>
+            <h3 class="font-bold text-white text-sm">Zero-Data Retention (ZDR)</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Document compilation and rendering occur strictly in volatile RAM (L1/L2 cache). Runtime data payloads, JSON structures, and rendered PDFs are never persisted to local disk unless commanded by your application.
+            </p>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-2">
+            <div class="text-lg">🛡️</div>
+            <h3 class="font-bold text-white text-sm">BouncyCastle Native Security</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Built-in document encryption supporting AES-128 / AES-256 bits, separate user and owner passwords, and granular access flags (disabling printing, text copy, or form modification per corporate policy).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Service Level Agreement (SLA) Matrix -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">5</span>
+          Service Level Agreement (SLA) Support Matrix
+        </h2>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+            <thead class="bg-slate-900/90 text-slate-200 uppercase font-mono tracking-wider border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Severity Level</th>
+                <th class="py-3 px-4">Definition</th>
+                <th class="py-3 px-4 text-center">Starter SLA</th>
+                <th class="py-3 px-4 text-center">Cluster HA SLA</th>
+                <th class="py-3 px-4 text-center text-purple-300">Corporate Unlimited SLA</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 font-sans">
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-bold text-rose-400 whitespace-nowrap">Severity 1 (Critical)</td>
+                <td class="py-3 px-4 text-slate-400">Total production outage; inability to issue invoices or critical statements with no reasonable workaround.</td>
+                <td class="py-3 px-4 text-center font-mono">8 business hours</td>
+                <td class="py-3 px-4 text-center font-mono">4 business hours</td>
+                <td class="py-3 px-4 text-center font-mono font-bold text-emerald-400 bg-emerald-950/20">&lt; 1 hour (24/7)</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-bold text-amber-400 whitespace-nowrap">Severity 2 (High)</td>
+                <td class="py-3 px-4 text-slate-400">Significant performance degradation or failure of non-critical components in production.</td>
+                <td class="py-3 px-4 text-center font-mono">24 hours</td>
+                <td class="py-3 px-4 text-center font-mono">8 business hours</td>
+                <td class="py-3 px-4 text-center font-mono font-semibold text-purple-300">&lt; 4 hours</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-bold text-sky-400 whitespace-nowrap">Severity 3 (Medium)</td>
+                <td class="py-3 px-4 text-slate-400">Issues in staging/QA environments or general technical queries regarding template configuration.</td>
+                <td class="py-3 px-4 text-center font-mono">48 hours</td>
+                <td class="py-3 px-4 text-center font-mono">24 hours</td>
+                <td class="py-3 px-4 text-center font-mono font-semibold text-purple-300">&lt; 12 hours</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 6. Procurement & Evaluation Pilot Workflow -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-4 border border-purple-500/20">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 text-xs flex items-center justify-center font-mono font-bold">6</span>
+          Procurement & Evaluation Pilot Workflow
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+            <span class="text-purple-400 font-mono font-bold text-sm">Step 01</span>
+            <h3 class="font-bold text-white">Pilot Request</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Qualified organizations can request a 30-day zero-cost evaluation license by emailing <a href="mailto:founders@gmresearch.io" class="text-purple-300 underline">founders@gmresearch.io</a>.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+            <span class="text-purple-400 font-mono font-bold text-sm">Step 02</span>
+            <h3 class="font-bold text-white">Technical Homologation</h3>
+            <p class="text-slate-400 leading-relaxed">
+              GMR engineers provide access to private artifact registries (Maven & Docker) along with reference Helm templates for your architecture.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+            <span class="text-purple-400 font-mono font-bold text-sm">Step 03</span>
+            <h3 class="font-bold text-white">Contract Execution</h3>
+            <p class="text-slate-400 leading-relaxed">
+              Following technical validation, purchase orders and signed NDAs/SLAs are executed, issuing production license files and direct support credentials.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+    © 2026 GMR Solutions. <span class="text-purple-400 font-semibold">&gt;&gt; Science in Action</span>. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
+  </footer>
+
+  <script>
+    function syncPageLanguage(lang) {
+      const isEn = lang === 'en';
+      document.getElementById('contentEs').classList.toggle('hidden', isEn);
+      document.getElementById('contentEn').classList.toggle('hidden', !isEn);
+      document.getElementById('pageTitle').textContent = isEn 
+        ? "On-Premise Commercial Licensing Framework — GMR Reports" 
+        : "Marco de Licenciamiento On-Premise — GMR Reports";
+    }
+
+    window.addEventListener('gmr:languageChanged', function(e) {
+      syncPageLanguage(e.detail.lang);
+    });
+
+    if (window.GMR_I18N) {
+      syncPageLanguage(GMR_I18N.getCurrentLanguage());
+    }
+  </script>
+</body>
+</html>

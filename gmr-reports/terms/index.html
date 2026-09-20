@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Términos de Servicio — GMR Reports</title>
+  <link rel="icon" type="image/svg+xml" href="/gmr-reports/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <script src="/gmr-reports/assets/i18n.js"></script>
+</head>
+<body class="min-h-full flex flex-col font-sans selection:bg-emerald-500 selection:text-white bg-slate-950">
+  <!-- Navbar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/gmr-reports/" class="flex items-center gap-3">
+        <div class="h-9 px-2 py-0.5 rounded-lg bg-white flex items-center justify-center border border-slate-700/40">
+          <img src="/gmr-reports/assets/logo-gmr.jpg" alt="GMR - Science in Action" class="h-6 w-auto object-contain" />
+        </div>
+        <span class="font-bold text-base text-white tracking-tight">GMR Reports</span>
+      </a>
+      
+      <div class="flex items-center gap-4">
+        <div class="inline-flex items-center rounded-lg bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs shadow-inner" role="group" aria-label="Language Selector">
+          <button type="button" onclick="GMR_I18N.setLanguage('es')" data-lang="es" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇪🇸</span> <span class="hidden sm:inline">ES</span>
+          </button>
+          <button type="button" onclick="GMR_I18N.setLanguage('en')" data-lang="en" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇺🇸</span> <span class="hidden sm:inline">EN</span>
+          </button>
+        </div>
+
+        <a href="/gmr-reports/" data-i18n="common.back_platform" class="text-xs text-slate-400 hover:text-emerald-400 font-semibold flex items-center gap-1 transition">
+          ← Volver a la Plataforma
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Container -->
+  <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div id="contentEs" class="space-y-8">
+      
+      <div class="mb-8">
+        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Legal & Gobernanza</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Términos de Servicio</h1>
+        <p class="text-xs text-slate-400 mt-2">Fecha de Entrada en Vigor: 8 de Septiembre de 2026 • Versión: v1.3 GA</p>
+      </div>
+
+      <div class="space-y-8 text-sm text-slate-300 leading-relaxed">
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">1</span>
+            Aceptación de los Términos
+          </h2>
+          <p>
+            Estos Términos de Servicio ("Términos") regulan su acceso y uso del motor de reportes Ahead-Of-Time (AOT), servicios API, Developer Console y documentación de GMR Reports (colectivamente, el "Servicio") operado por GMR Solutions ("GMR", "nosotros"). Al suscribirse, acceder o integrar el Servicio en su software, usted acepta cumplir con estos Términos.
+          </p>
+        </section>
+
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">2</span>
+            Licencia y Uso Permitido
+          </h2>
+          <p class="mb-3">
+            Sujeto al cumplimiento de estos Términos y al abono de las tarifas del plan contratado:
+          </p>
+          <ul class="list-disc pl-5 space-y-2 text-slate-400">
+            <li><strong class="text-slate-200">Plan Developer ($0):</strong> Licencia revocable y no exclusiva para desarrollo, pruebas de rendimiento y microservicios locales hasta 1,500 documentos mensuales.</li>
+            <li><strong class="text-slate-200">Planes Comerciales SaaS (Launch $49 / Growth $149 / Scale $499):</strong> Licencia de producción comercial para facturación electrónica, extractos bancarios y reportes corporativos dentro de las cuotas contratadas.</li>
+            <li><strong class="text-slate-200">Licencias On-Premise & Nube Soberana:</strong> Despliegues autohospedados en redes aisladas (air-gapped) o nubes privadas bajo el Acuerdo Comercial On-Premise de GMR con soporte para Operador Kubernetes y Helm.</li>
+          </ul>
+        </section>
+
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">3</span>
+            Seguridad de Cuentas y Claves API
+          </h2>
+          <p>
+            Usted es responsable exclusivo de mantener la confidencialidad de sus claves API (<code class="text-emerald-400 bg-slate-950 px-1.5 py-0.5 rounded font-mono text-xs">gmr_live_...</code>). Toda solicitud autenticada con su clave se considerará debidamente autorizada por su organización. GMR se reserva el derecho de revocar claves con indicios de filtración o uso malintencionado.
+          </p>
+        </section>
+
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">4</span>
+            Disponibilidad y Cuotas
+          </h2>
+          <p>
+            El consumo que supere las cuotas estipuladas será limitado o facturado según la tarifa de exceso vigente. Los Acuerdos de Nivel de Servicio (SLA) aplican exclusivamente a los planes Scale y Enterprise según se detalla en nuestro acuerdo de SLA.
+          </p>
+        </section>
+      </div>
+
+    </div>
+    <div id="contentEn" class="space-y-8 hidden">
+      
+      <div class="mb-8">
+        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Legal & Governance</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Terms of Service</h1>
+        <p class="text-xs text-slate-400 mt-2">Effective Date: September 8, 2026 • Version: v1.3 GA</p>
+      </div>
+
+      <div class="space-y-8 text-sm text-slate-300 leading-relaxed">
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">1</span>
+            Agreement to Terms
+          </h2>
+          <p>
+            These Terms of Service ("Terms") govern your access to and use of the GMR Reports Ahead-Of-Time (AOT) reporting engine, API services, Developer Console, and documentation (collectively, the "Service") operated by GMR Solutions ("GMR", "we", "our"). By subscribing to, accessing, or integrating the Service into your software, you agree to be bound by these Terms.
+          </p>
+        </section>
+
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">2</span>
+            License & Permitted Usage
+          </h2>
+          <p class="mb-3">
+            Subject to your compliance with these Terms and payment of applicable tier fees:
+          </p>
+          <ul class="list-disc pl-5 space-y-2 text-slate-400">
+            <li><strong class="text-slate-200">Developer Tier ($0):</strong> Non-exclusive, revocable license for development, benchmarking, and local microservices up to 1,500 document renders per month.</li>
+            <li><strong class="text-slate-200">Commercial SaaS Tiers (Launch $49 / Growth $149 / Scale $499):</strong> Commercial production license for electronic invoicing, statement rendering, and business reporting within stated monthly quotas.</li>
+            <li><strong class="text-slate-200">Enterprise Cloud & On-Premises Licensing:</strong> Self-hosted, air-gapped, or dedicated cloud deployment for core banking and enterprise clusters under the GMR On-Premise Commercial Agreement with Kubernetes Operator & Helm support.</li>
+          </ul>
+        </section>
+
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">3</span>
+            API Keys & Account Security
+          </h2>
+          <p>
+            You are solely responsible for maintaining the confidentiality of your API keys (<code class="text-emerald-400 bg-slate-950 px-1.5 py-0.5 rounded font-mono text-xs">gmr_live_...</code>). All requests authenticated with your API key are deemed authorized by your organization. GMR reserves the right to rotate or revoke keys that show signs of public exposure or malicious compromise.
+          </p>
+        </section>
+
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">4</span>
+            Service Availability & Quotas
+          </h2>
+          <p>
+            Usage exceeding plan quotas will be throttled or billed at the published overage rates. Service Level Agreements (SLA) apply solely to paid Scale and Enterprise subscriptions as detailed in our Service Level Agreement.
+          </p>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+    © 2026 GMR Solutions. <span class="text-purple-400 font-semibold">&gt;&gt; Science in Action</span>. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
+  </footer>
+
+  <script>
+    function syncPageLanguage(lang) {
+      const isEn = lang === 'en';
+      document.getElementById('contentEs').classList.toggle('hidden', isEn);
+      document.getElementById('contentEn').classList.toggle('hidden', !isEn);
+      document.getElementById('pageTitle').textContent = isEn ? "Terms of Service — GMR Reports" : "Términos de Servicio — GMR Reports";
+    }
+
+    window.addEventListener('gmr:languageChanged', function(e) {
+      syncPageLanguage(e.detail.lang);
+    });
+
+    // Initial sync
+    if (window.GMR_I18N) {
+      syncPageLanguage(GMR_I18N.getCurrentLanguage());
+    }
+  </script>
+</body>
+</html>

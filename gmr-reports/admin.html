@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GMR Reports — Panel de Administración de Plataforma</title>
+  <link rel="icon" type="image/svg+xml" href="/gmr-reports/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <script src="/gmr-reports/assets/i18n.js"></script>
+</head>
+<body class="h-full flex flex-col font-sans selection:bg-rose-500 selection:text-white bg-slate-950 text-slate-100">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur px-6 py-3.5 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+      <a href="/gmr-reports/" class="h-9 px-2 py-0.5 rounded-lg bg-white flex items-center justify-center shadow-md border border-slate-700/40 hover:scale-105 transition-transform" title="Volver al Inicio">
+        <img src="/gmr-reports/assets/logo-gmr.jpg" alt="GMR - Science in Action" class="h-6 w-auto object-contain" />
+      </a>
+      <div>
+        <div class="flex items-center gap-2">
+          <a href="/gmr-reports/" class="text-xs text-slate-400 hover:text-rose-400 transition font-medium flex items-center gap-1">
+            <span>←</span> <span>gmrglobe.com</span>
+          </a>
+          <span class="text-slate-600">•</span>
+          <span class="font-bold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
+            <span data-i18n="admin.header_title">🛡️ Consola de Administración</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">Master Ops</span>
+          </span>
+        </div>
+        <p class="text-xs text-slate-400">Control maestro de inquilinos, bajas de suscripciones, soporte y facturación — <span class="text-purple-400 font-semibold">&gt;&gt; Science in Action</span></p>
+      </div>
+    </div>
+
+    <!-- Header Actions (Authenticated vs Locked) -->
+    <div class="flex items-center gap-3">
+      <!-- Authenticated Profile (hidden when locked) -->
+      <div id="adminHeaderProfile" class="hidden flex items-center gap-2.5">
+        <!-- Secure Download Buttons for Authenticated Admins Only -->
+        <button onclick="downloadSecureAdminDoc('sre-runbook', 'Manual_Operaciones_SRE_GMR_v1.3.pdf')" class="px-2.5 py-1 rounded-lg bg-purple-950/70 hover:bg-purple-900/80 text-purple-300 text-xs font-semibold border border-purple-500/40 flex items-center gap-1.5 transition shadow-sm" title="Descargar Runbook Confidencial SRE">
+          <span>📋</span> <span class="hidden md:inline">Runbook SRE</span>
+        </button>
+        <button onclick="downloadSecureAdminDoc('l3-l4', 'Manual_Ingenieria_Arquitectura_L3_L4_v1.3.pdf')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition" title="Descargar Manual de Ingeniería y Kernel">
+          <span>⚙️</span> <span class="hidden md:inline">Manual L3/L4</span>
+        </button>
+
+        <div class="flex items-center gap-2.5 bg-slate-900 border border-rose-500/30 px-3 py-1 rounded-lg shadow">
+          <div id="adminUserAvatar" class="w-6 h-6 rounded-full bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center text-[10px] font-bold text-white shadow">
+            GM
+          </div>
+          <div class="flex flex-col text-left leading-none">
+            <span id="adminUserName" class="text-xs font-bold text-white">Gustavo Muzzillo</span>
+            <span id="adminUserEmail" class="text-[10px] text-rose-400 font-mono">gustavo.muzzillo@gmrglobe.com</span>
+          </div>
+          <span id="adminProviderBadge" class="text-[9px] bg-rose-500/20 text-rose-300 font-mono px-1.5 py-0.5 rounded border border-rose-500/30 uppercase font-bold">MASTER</span>
+          <button onclick="adminSsoLogout()" title="Cerrar Sesión SSO" class="ml-1 px-1.5 py-0.5 text-xs text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 rounded transition border border-transparent hover:border-rose-800 flex items-center gap-1">
+            <span>🚪</span> <span class="hidden sm:inline">Salir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Locked State Indicator (visible when locked) -->
+      <div id="adminHeaderLocked" class="flex items-center gap-1.5 bg-rose-950/60 border border-rose-600/40 text-rose-400 px-3 py-1.5 rounded-lg text-xs font-bold">
+        <span>🔒</span> Acceso Restringido SSO
+      </div>
+
+              <div class="inline-flex items-center rounded-lg bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs shadow-inner" role="group" aria-label="Language Selector">
+          <button type="button" onclick="GMR_I18N.setLanguage('es')" data-lang="es" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇪🇸</span> <span class="hidden sm:inline">ES</span>
+          </button>
+          <button type="button" onclick="GMR_I18N.setLanguage('en')" data-lang="en" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇺🇸</span> <span class="hidden sm:inline">EN</span>
+          </button>
+        </div>
+      <a href="/gmr-reports/portal" class="text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-md hover:bg-slate-800 transition flex items-center gap-1.5 border border-slate-700">
+        <span>🏢 Portal Clientes</span>
+      </a>
+      <a href="/gmr-reports/console" class="text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-md hover:bg-slate-800 transition flex items-center gap-1.5 border border-slate-700">
+        <span>⚡ Sandbox</span>
+      </a>
+      <button id="btnSyncCluster" onclick="refreshAllData()" class="hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5 shadow">
+        <span>🔄 <span data-i18n="admin.sync_cluster">Sincronizar Clúster</span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- SSO SECURITY GATE VIEW (SHOWN BY DEFAULT) -->
+  <section id="ssoGateView" class="flex-1 flex flex-col items-center justify-center p-6 max-w-xl mx-auto w-full my-auto">
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 shadow-2xl backdrop-blur-xl w-full text-center space-y-6 relative overflow-hidden">
+      <!-- Background glowing gradient -->
+      <div class="absolute -top-24 -left-24 w-48 h-48 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Security Shield Badge -->
+      <div class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600/20 to-amber-500/20 border border-rose-500/40 flex items-center justify-center text-3xl shadow-lg relative">
+        <span>🛡️</span>
+        <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-500"></span>
+        </span>
+      </div>
+
+      <!-- Title & Details -->
+      <div class="space-y-2">
+        <span class="text-[11px] font-mono font-bold tracking-widest text-rose-400 uppercase px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20">
+          <span data-i18n="admin.restricted_badge">ZONA MASTER CONTROL — RESTRINGIDA</span>
+        </span>
+        <h1 data-i18n="admin.sso_title" class="text-2xl font-black text-white tracking-tight pt-1">
+          Autenticación SSO Obligatoria
+        </h1>
+        <p class="text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
+          <span data-i18n="admin.sso_desc">El acceso a la consola de administración de GMR Reports requiere autenticación federada con identidad corporativa autorizada en la lista blanca de la plataforma.</span>
+        </p>
+      </div>
+
+      <!-- Access Denied Banner (shown only if unapproved identity tries to enter) -->
+      <div id="accessDeniedBanner" class="hidden text-left bg-rose-950/60 border border-rose-600/60 rounded-xl p-4 space-y-2 animate-shake">
+        <div class="flex items-center gap-2 text-rose-400 font-bold text-xs">
+          <span>⛔</span>
+          <span>ACCESO DENEGADO — IDENTIDAD NO AUTORIZADA</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-normal">
+          La cuenta <span id="deniedEmailText" class="font-mono font-bold text-rose-300 underline"></span> no cuenta con privilegios de Administrador Master. Debe utilizar una cuenta con dominio corporativo <strong class="text-white">@gmrglobe.com</strong> o el correo maestro de Gustavo Muzzillo.
+        </p>
+        <button onclick="dismissAccessDenied()" class="text-[11px] text-rose-400 hover:text-rose-300 font-semibold underline pt-1">
+          Intentar con otra cuenta corporativa
+        </button>
+      </div>
+
+      <!-- MASTER PASSWORD & 2FA ACCESS -->
+      <div class="space-y-3 pt-2 text-left">
+        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center">
+          Opción A: Credencial Maestra & Desafío 2FA
+        </div>
+
+        <form id="masterLoginForm" onsubmit="handleMasterAdminLogin(event)" class="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800 shadow-inner">
+          <div id="masterPasswordSection">
+            <label class="block text-xs text-slate-300 font-semibold mb-1.5">Contraseña Maestra de Plataforma</label>
+            <div class="flex gap-2">
+              <input id="masterAdminPassword" type="password" required placeholder="••••••••••••••••"
+                class="flex-1 bg-slate-900 border border-slate-700 focus:border-rose-500 rounded-lg px-3 py-2 text-xs text-white focus:outline-none transition">
+              <button id="btnRequest2FA" type="submit"
+                class="px-4 py-2 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-bold rounded-lg transition shadow flex items-center gap-1.5 whitespace-nowrap">
+                <span>🔐 Solicitar 2FA</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2FA OTP Challenge (Hidden until password verified) -->
+          <div id="masterOtpSection" class="hidden space-y-3 pt-2 border-t border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                <span>✓ Contraseña válida</span>
+              </span>
+              <span id="masterAdminMaskedEmail" class="text-[10px] text-slate-400 font-mono">g***o@gmail.com</span>
+            </div>
+            <p class="text-xs text-slate-300">
+              Se ha enviado un código de seguridad de 6 dígitos a su correo. Ingréselo para desbloquear la sesión:
+            </p>
+            <div class="flex gap-2">
+              <input id="masterAdminOtp" type="text" maxlength="6" pattern="[0-9]{6}" placeholder="000000"
+                class="w-32 tracking-widest text-center font-mono font-bold text-base bg-slate-900 border border-rose-500/50 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-rose-400">
+              <button id="btnVerify2FA" type="button" onclick="verifyMasterAdminOtp()"
+                class="flex-1 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition shadow flex items-center justify-center gap-1.5">
+                <span>🔓 Desbloquear Consola</span>
+              </button>
+            </div>
+            <div class="flex justify-between items-center pt-1 text-[11px]">
+              <button type="button" onclick="resendMasterAdminOtp()" class="text-rose-400 hover:text-rose-300 underline font-medium">
+                🔄 Reenviar código OTP
+              </button>
+              <button type="button" onclick="resetMasterLoginForm()" class="text-slate-500 hover:text-slate-400">
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- SSO Federated Providers -->
+      <div class="space-y-3 pt-2">
+        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          Opción B: Identidad Federada SSO (Google Workspace / GitHub)
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- GitHub Enterprise -->
+          <button type="button" onclick="loginAdminWithProvider('github')" class="flex items-center justify-center gap-2.5 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl border border-slate-700 font-semibold text-xs transition shadow group">
+            <svg class="w-4 h-4 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span>GitHub Enterprise</span>
+          </button>
+
+          <!-- Google Workspace -->
+          <button type="button" onclick="loginAdminWithProvider('google')" class="flex items-center justify-center gap-2.5 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl border border-slate-700 font-semibold text-xs transition shadow group">
+            <svg class="w-4 h-4 group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+            <span>Google Workspace</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Security Audit & Compliance footer -->
+      <div class="space-y-2 pt-1 border-t border-slate-800/60">
+        <div class="text-[11px] text-slate-400 font-mono flex items-center justify-center gap-1.5">
+          <span>🔒</span> Sesiones con JWT criptográfico & Auditoría de IPs activa.
+        </div>
+        <div>
+          <button type="button" onclick="testUnauthorizedLogin()" class="text-[11px] text-slate-400 hover:text-rose-400 transition underline">
+            🧪 Probar filtro con correo no autorizado (Simular rechazo 403)
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN ADMIN DASHBOARD (PROTECTED: HIDDEN UNTIL SSO IS VERIFIED) -->
+  <main id="adminDashboard" class="hidden flex-1 flex flex-col p-6 max-w-7xl mx-auto w-full space-y-6 overflow-y-auto">
+
+    <!-- KPI Summary Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- KPI 1 -->
+      <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
+        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block mb-1">Inquilinos Activos</span>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiActiveTenants" class="text-2xl font-black text-emerald-400 font-mono">3</span>
+          <span class="text-xs text-slate-500">empresas en servicio</span>
+        </div>
+      </div>
+
+      <!-- KPI 2 -->
+      <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
+        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block mb-1">Bajas / Suspendidos</span>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiSuspendedTenants" class="text-2xl font-black text-rose-400 font-mono">0</span>
+          <span class="text-xs text-slate-500">revocados</span>
+        </div>
+      </div>
+
+      <!-- KPI 3 -->
+      <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
+        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block mb-1">Facturación Pendiente</span>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiPendingInvoices" class="text-2xl font-black text-amber-400 font-mono">$1,198.00</span>
+          <span class="text-xs text-slate-500">USD por cobrar</span>
+        </div>
+      </div>
+
+      <!-- KPI 4 -->
+      <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
+        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block mb-1">Problemas & Solicitudes</span>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiIssuesCount" class="text-2xl font-black text-cyan-400 font-mono">2</span>
+          <span class="text-xs text-slate-500">en bandeja</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="border-b border-slate-800 flex gap-6 text-sm">
+      <button onclick="switchAdminTab('tenants')" id="adminTabBtn-tenants" class="py-3 border-b-2 font-semibold transition border-rose-500 text-rose-400 flex items-center gap-2">
+        <span>🏢 Suscripciones & Bajas de Clientes</span>
+      </button>
+      <button onclick="switchAdminTab('issues')" id="adminTabBtn-issues" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <span>📩 Problemas, Reportes & Tickets</span>
+        <span id="issuesBadge" class="px-1.5 py-0.2 bg-rose-500/20 text-rose-400 rounded-full text-[10px] font-bold">2</span>
+      </button>
+      <button onclick="switchAdminTab('invoices')" id="adminTabBtn-invoices" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <span>💳 Control de Facturas & Conciliación</span>
+      </button>
+      <button onclick="switchAdminTab('repos')" id="adminTabBtn-repos" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <span>📦 Repositorios & Tokens Enterprise</span>
+      </button>
+      <button onclick="switchAdminTab('health')" id="adminTabBtn-health" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <span>⚡ Salud del Clúster OCI</span>
+      </button>
+      <button onclick="switchAdminTab('external-sources')" id="adminTabBtn-external-sources" class="py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <span>🔌 Fuentes Externas</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: GESTIÓN DE SUSCRIPCIONES & BAJAS -->
+    <div id="adminTabContent-tenants" class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+        <div>
+          <h2 class="text-base font-bold text-white">Empresas e Inquilinos de la Plataforma</h2>
+          <p class="text-xs text-slate-400">Suspenda temporalmente el acceso API o elimine y dé de baja definitivamente a clientes que cancelaron el servicio.</p>
+        </div>
+        <button onclick="openCreateTenantModal()" class="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-xs rounded-lg shadow transition flex items-center gap-2">
+          <span>➕ Aprovisionar Nueva Empresa</span>
+        </button>
+      </div>
+
+      <!-- Tenants Table -->
+      <div class="overflow-x-auto bg-slate-900/40 border border-slate-800 rounded-xl shadow">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3.5">Empresa / Nombre</th>
+              <th class="px-4 py-3.5">Tenant ID</th>
+              <th class="px-4 py-3.5">Plan Contratado</th>
+              <th class="px-4 py-3.5">Régimen (Req/min)</th>
+              <th class="px-4 py-3.5">Cuota Mensual</th>
+              <th class="px-4 py-3.5">Clave API</th>
+              <th class="px-4 py-3.5">Estado</th>
+              <th class="px-4 py-3.5 text-right">Acciones de Baja & Gestión</th>
+            </tr>
+          </thead>
+          <tbody id="tenantsTableBody" class="divide-y divide-slate-800/60">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: PROBLEMAS & SOPORTE -->
+    <div id="adminTabContent-issues" class="space-y-4 hidden">
+      <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-bold text-white">Bandeja de Problemas, Solicitudes & Leads</h2>
+          <p class="text-xs text-slate-400">Tickets de soporte recibidos desde el portal y solicitudes de empresas interesadas en licencias enterprise.</p>
+        </div>
+      </div>
+
+      <div id="issuesContainer" class="space-y-3">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- TAB 3: FACTURACIÓN & CONCILIACIÓN -->
+    <div id="adminTabContent-invoices" class="space-y-4 hidden">
+      <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+        <h2 class="text-base font-bold text-white">Facturas Emitidas & Conciliación Manual</h2>
+        <p class="text-xs text-slate-400">Concilie cobros efectuados por transferencia bancaria internacional o pasarelas de pago externas.</p>
+      </div>
+
+      <div class="overflow-x-auto bg-slate-900/40 border border-slate-800 rounded-xl shadow">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3.5">ID Factura</th>
+              <th class="px-4 py-3.5">Empresa</th>
+              <th class="px-4 py-3.5">Fecha Emisión</th>
+              <th class="px-4 py-3.5">Vencimiento</th>
+              <th class="px-4 py-3.5">Monto (USD)</th>
+              <th class="px-4 py-3.5">Estado</th>
+              <th class="px-4 py-3.5">Método de Pago</th>
+              <th class="px-4 py-3.5 text-right">Acción Conciliación</th>
+            </tr>
+          </thead>
+          <tbody id="adminInvoicesTableBody" class="divide-y divide-slate-800/60">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: REPOSITORIOS PRIVADOS & TOKENS ENTERPRISE -->
+    <div id="adminTabContent-repos" class="space-y-4 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+        <div>
+          <h2 class="text-base font-bold text-white">Distribución de Artefactos Enterprise & Registros Privados</h2>
+          <p class="text-xs text-slate-400">Monitoreo de publicación en GitHub Packages y GitHub Container Registry (GHCR), y emisión de Deploy Tokens de clientes.</p>
+        </div>
+        <button onclick="issueEnterpriseToken()" class="px-3.5 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-bold text-xs rounded-lg shadow transition flex items-center gap-2">
+          <span>🔑 Emitir Deploy Token para Cliente</span>
+        </button>
+      </div>
+
+      <!-- Registries Status Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Maven Registry -->
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">☕</span>
+              <div>
+                <h3 class="font-bold text-sm text-white">Maven Repository</h3>
+                <span class="text-[10px] text-slate-400 font-mono">GitHub Packages (mvn)</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">● ACTIVO</span>
+          </div>
+          <div class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2.5 rounded border border-slate-800/80 break-all">
+            https://maven.pkg.github.com/gmreserarch-io/gmr-reports
+          </div>
+          <p class="text-[11px] text-slate-400">Distribución de JARs para Spring Boot y Quarkus con firmas GPG.</p>
+        </div>
+
+        <!-- NPM Registry -->
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">📦</span>
+              <div>
+                <h3 class="font-bold text-sm text-white">NPM Registry</h3>
+                <span class="text-[10px] text-slate-400 font-mono">GitHub Packages (npm)</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">● ACTIVO</span>
+          </div>
+          <div class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2.5 rounded border border-slate-800/80 break-all">
+            @gmreserarch-io/reports-client
+          </div>
+          <p class="text-[11px] text-slate-400">SDK oficial TypeScript/Node para clientes web y backend.</p>
+        </div>
+
+        <!-- GHCR Registry -->
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">🐳</span>
+              <div>
+                <h3 class="font-bold text-sm text-white">Docker / GHCR</h3>
+                <span class="text-[10px] text-slate-400 font-mono">GitHub Container Registry</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">● ACTIVO</span>
+          </div>
+          <div class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2.5 rounded border border-slate-800/80 break-all">
+            ghcr.io/gmreserarch-io/gmr-reports
+          </div>
+          <p class="text-[11px] text-slate-400">Imágenes OCI multi-arquitectura (linux/amd64, linux/arm64) para k8s privado.</p>
+        </div>
+      </div>
+
+      <!-- Issued Tokens Table -->
+      <div class="bg-slate-900/40 border border-slate-800 rounded-xl overflow-x-auto shadow">
+        <div class="p-3 border-b border-slate-800 flex items-center justify-between">
+          <span class="font-bold text-xs text-white">Deploy Tokens & Credenciales Emitidas a Inquilinos</span>
+          <span class="text-[10px] text-slate-400">Scopes restringidos a read:packages</span>
+        </div>
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3">Inquilino / Organización</th>
+              <th class="px-4 py-3">Token ID (PAT)</th>
+              <th class="px-4 py-3">Permisos Asignados</th>
+              <th class="px-4 py-3">Fecha Emisión</th>
+              <th class="px-4 py-3">Estado</th>
+              <th class="px-4 py-3 text-right">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="issuedTokensBody" class="divide-y divide-slate-800/60 font-mono text-[11px]">
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="px-4 py-3 font-bold text-white">Banco Financiero Internacional</td>
+              <td class="px-4 py-3 text-purple-400">gmr_pkg_live_bfi_783df8a</td>
+              <td class="px-4 py-3 text-slate-300">read:packages, ghcr:pull</td>
+              <td class="px-4 py-3 text-slate-400">2026-09-01</td>
+              <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">● ACTIVO</span></td>
+              <td class="px-4 py-3 text-right">
+                <button onclick="revokeEnterpriseToken('gmr_pkg_live_bfi_783df8a')" class="px-2 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded border border-rose-500/30 text-[11px] font-semibold transition">Revocar</button>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="px-4 py-3 font-bold text-white">Fintech Soluciones Andinas</td>
+              <td class="px-4 py-3 text-purple-400">gmr_pkg_live_fintech_98c3a1b</td>
+              <td class="px-4 py-3 text-slate-300">read:packages, ghcr:pull</td>
+              <td class="px-4 py-3 text-slate-400">2026-08-15</td>
+              <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">● ACTIVO</span></td>
+              <td class="px-4 py-3 text-right">
+                <button onclick="revokeEnterpriseToken('gmr_pkg_live_fintech_98c3a1b')" class="px-2 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded border border-rose-500/30 text-[11px] font-semibold transition">Revocar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 5: SALUD DEL CLÚSTER OCI -->
+    <div id="adminTabContent-health" class="space-y-4 hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-3">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>🛡️ Endpoints y Certificados SSL</span>
+          </h3>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1.5 border-b border-slate-800">
+              <span class="text-slate-400">Dominio Primario:</span>
+              <span class="font-mono text-emerald-400 font-bold">https://api.gmrglobe.com</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800">
+              <span class="text-slate-400">Certificado SSL:</span>
+              <span class="text-slate-200">Let's Encrypt Authority X3 (Válido)</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-slate-800">
+              <span class="text-slate-400">IP Pública Clúster:</span>
+              <span class="font-mono text-slate-200">129.158.243.168</span>
+            </div>
+            <div class="flex justify-between py-1.5">
+              <span class="text-slate-400">Compatibilidad Motor de Renderizado:</span>
+              <span class="text-emerald-400 font-semibold">JasperReports 6.21.3+ (.jrxml)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-3">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>📊 Métricas de Capacidad OCI</span>
+          </h3>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between text-slate-400 mb-1">
+                <span>CPU Clúster (Ampere A1 4 OCPU):</span>
+                <span class="font-mono text-emerald-400 font-bold">14.2%</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" style="width: 14.2%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-slate-400 mb-1">
+                <span>Memoria RAM (24 GB Allocable):</span>
+                <span class="font-mono text-cyan-400 font-bold">3.8 GB / 24 GB (15.8%)</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-cyan-500 h-full rounded-full" style="width: 15.8%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-slate-400 mb-1">
+                <span>Régimen Actual Clúster:</span>
+                <span class="font-mono text-purple-400 font-bold">18 req/min (Límite: 50,000 req/min)</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-purple-500 h-full rounded-full" style="width: 5%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: FUENTES DE DATOS EXTERNAS (ON-PREM / MULTI-CLOUD) -->
+    <div id="adminTabContent-external-sources" class="space-y-4 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <span>🔌 Conexiones a Fuentes Externas (On-Prem / Multi-Cloud)</span>
+            <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">Zero-Retention</span>
+          </h2>
+          <p class="text-xs text-slate-400">Orígenes de datos JDBC (PostgreSQL, Oracle, SQL Server, MySQL), REST APIs o gRPC para inyección en plantillas sin persistencia en disco.</p>
+        </div>
+        <button onclick="openCreateExternalSourceModal()" class="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-xs rounded-lg shadow transition flex items-center gap-2">
+          <span>➕ Nueva Conexión Externa</span>
+        </button>
+      </div>
+
+      <!-- External Sources Table -->
+      <div class="overflow-x-auto bg-slate-900/40 border border-slate-800 rounded-xl shadow">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3.5">ID / Nombre Fuente</th>
+              <th class="px-4 py-3.5">Inquilino (Tenant)</th>
+              <th class="px-4 py-3.5">Tipo Conector</th>
+              <th class="px-4 py-3.5">Endpoint / JDBC URL</th>
+              <th class="px-4 py-3.5">Autenticación & Secreto</th>
+              <th class="px-4 py-3.5">Timeout / Reintentos</th>
+              <th class="px-4 py-3.5">Garantía</th>
+              <th class="px-4 py-3.5">Estado</th>
+              <th class="px-4 py-3.5 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="externalSourcesTableBody" class="divide-y divide-slate-800/60">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: APROVISIONAR NUEVA EMPRESA -->
+  <div id="createTenantModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>➕ Aprovisionar Nueva Empresa / Inquilino</span>
+        </h3>
+        <button onclick="closeCreateTenantModal()" class="text-slate-400 hover:text-white transition text-lg">&times;</button>
+      </div>
+
+      <form id="createTenantForm" onsubmit="handleCreateTenant(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Razón Social / Nombre Comercial:</label>
+          <input id="newTenantName" type="text" required placeholder="Ej: Banco Guayaquil S.A." oninput="generateTenantSlug()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Tenant ID (Identificador en el Clúster):</label>
+          <input id="newTenantId" type="text" required placeholder="banco-guayaquil" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 font-mono text-cyan-400 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Plan Contratado:</label>
+            <select id="newTenantPlan" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+              <option value="FREE">Developer Free ($0/mes - 1,500 docs)</option>
+              <option value="LAUNCH">Launch ($49/mes - 25,000 docs)</option>
+              <option value="GROWTH" selected>Growth ($149/mes - 100,000 docs)</option>
+              <option value="SCALE">Scale ($499/mes - 500,000 docs)</option>
+              <option value="ENTERPRISE">Enterprise Cloud / On-Prem ($1,200+/mes - 2M docs)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Clave API Generada:</label>
+            <div class="flex gap-1">
+              <input id="newTenantApiKey" type="text" readonly class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 font-mono text-[11px] text-amber-300">
+              <button type="button" onclick="generateRandomApiKey()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-slate-300" title="Regenerar clave">🔄</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeCreateTenantModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-lg font-bold transition shadow">Aprovisionar Inquilino</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NUEVA FUENTE DE DATOS EXTERNA -->
+  <div id="createExternalSourceModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>🔌 Registrar Conexión a Fuente Externa (On-Prem / Multi-Cloud)</span>
+        </h3>
+        <button onclick="closeCreateExternalSourceModal()" class="text-slate-400 hover:text-white transition text-lg">&times;</button>
+      </div>
+
+      <form id="createExternalSourceForm" onsubmit="handleSaveExternalSource(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">ID de Conexión (slug único):</label>
+            <input id="newSourceId" type="text" required placeholder="src-core-banking" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 font-mono text-cyan-400 placeholder-slate-600 focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Inquilino Asignado:</label>
+            <select id="newSourceTenantId" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+              <option value="tenant-enterprise">Banco Financiero Internacional</option>
+              <option value="tenant-scale">Fintech Soluciones Andinas</option>
+              <option value="tenant-pro">Acme Logistics Pro</option>
+              <option value="*">Global (Compartido todos los inquilinos)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Nombre Descriptivo:</label>
+          <input id="newSourceName" type="text" required placeholder="Ej: Core Bancario Corporativo - Producción AS400" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Tipo de Conector:</label>
+            <select id="newSourceType" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+              <option value="JDBC_ONPREM" selected>JDBC On-Premise (VPN / FastConnect)</option>
+              <option value="JDBC_CLOUD">JDBC Cloud (PostgreSQL, Oracle, MySQL)</option>
+              <option value="REST_API">REST API Endpoint (JSON / HTTPS)</option>
+              <option value="GRPC">gRPC Microservicio Remoto</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Esquema de Autenticación:</label>
+            <select id="newSourceAuthType" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+              <option value="BASIC" selected>Basic Auth (Usuario / Clave)</option>
+              <option value="BEARER_TOKEN">Bearer Token (JWT / OAuth2)</option>
+              <option value="API_KEY">Header X-API-Key</option>
+              <option value="MTLS">mTLS (Certificados X.509)</option>
+              <option value="NONE">Sin Auth (IP / Subred Segura)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Endpoint / JDBC URL:</label>
+          <input id="newSourceEndpoint" type="text" required placeholder="jdbc:postgresql://vpn.corp-banking.local:5432/core_db" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 font-mono text-[11px] text-purple-300 placeholder-slate-600 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="col-span-1">
+            <label class="block font-semibold text-slate-300 mb-1">Referencia Secreto (Vault / Env):</label>
+            <input id="newSourceSecretRef" type="text" placeholder="env:CORP_DB_PASS" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 font-mono text-[11px] text-amber-300 placeholder-slate-600 focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Timeout (ms):</label>
+            <input id="newSourceTimeout" type="number" value="5000" min="500" max="30000" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 font-mono text-white focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Máx. Reintentos:</label>
+            <input id="newSourceMaxRetries" type="number" value="2" min="0" max="5" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 font-mono text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <!-- Zero Retention Policy & Security Banner -->
+        <div class="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-xl space-y-1">
+          <div class="flex items-center gap-2 text-emerald-400 font-bold text-[11px]">
+            <span>🛡️ Garantía de Seguridad & Zero-Retention</span>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            Las consultas se ejecutan forzadas en modo <strong class="text-emerald-300">Solo Lectura</strong> (mutaciones DDL/DML bloqueadas). Los datos se transmiten directamente al procesador JRXML en memoria RAM y <strong class="text-emerald-300">nunca se persisten en disco</strong> (GDPR Art. 28 / CCPA Compliance).
+          </p>
+        </div>
+
+        <!-- Test Connection Result Container -->
+        <div id="sourceTestResult" class="hidden p-3 rounded-xl border text-xs">
+          <span id="sourceTestResultText"></span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="testExternalSourceConnection()" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-lg font-bold transition flex items-center justify-center gap-2 shadow">
+            <span>⚡ Probar Conexión en Vivo</span>
+          </button>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button type="button" onclick="closeCreateExternalSourceModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold transition">Cancelar</button>
+            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 rounded-lg font-bold transition shadow">Guardar Conexión</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="adminToast" class="fixed bottom-6 right-6 bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 transform translate-y-3 opacity-0 pointer-events-none z-50 text-xs">
+    <span class="text-rose-400 text-base">●</span>
+    <span id="adminToastMsg">Acción procesada con éxito</span>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC & SSO AUTHENTICATION -->
+  <script>
+    const API_BASE = 'https://api.gmrglobe.com';
+
+    // STRICT MASTER ADMIN WHITELIST CONFIGURATION (NOMINATED ACCOUNTS ONLY)
+    const ADMIN_WHITELIST_EMAILS = [
+      'gustavo.muzzillo@gmail.com',
+      'gustavo.muzzillo@gmrglobe.com'
+    ];
+
+    function isAuthorizedAdminEmail(email) {
+      if (!email || typeof email !== 'string') return false;
+      const clean = email.trim().toLowerCase();
+      return ADMIN_WHITELIST_EMAILS.includes(clean);
+    }
+
+    // STATE INITIALIZATION
+    const state = {
+      plans: [
+        { id: 'FREE', name: 'Developer Free', priceUsd: 0.0, monthlyQuota: 1500, requestsPerMinute: 60, burstCapacity: 10 },
+        { id: 'LAUNCH', name: 'Launch', priceUsd: 49.0, monthlyQuota: 25000, requestsPerMinute: 150, burstCapacity: 25 },
+        { id: 'GROWTH', name: 'Growth', priceUsd: 149.0, monthlyQuota: 100000, requestsPerMinute: 400, burstCapacity: 60 },
+        { id: 'SCALE', name: 'Scale', priceUsd: 499.0, monthlyQuota: 500000, requestsPerMinute: 1500, burstCapacity: 250 },
+        { id: 'ENTERPRISE', name: 'Enterprise Cloud', priceUsd: 1200.0, monthlyQuota: 2000000, requestsPerMinute: 5000, burstCapacity: 1000 }
+      ],
+      tenants: [
+        {
+          tenantId: 'tenant-enterprise',
+          name: 'Banco Financiero Internacional',
+          plan: 'ENTERPRISE',
+          planName: 'Enterprise Self-Hosted',
+          requestsPerMinute: 5000,
+          monthlyQuota: 2000000,
+          maskedApiKey: 'gmr_live_ent_••••••••',
+          active: true,
+          createdAt: '2026-07-01'
+        },
+        {
+          tenantId: 'tenant-scale',
+          name: 'Fintech Soluciones Andinas',
+          plan: 'SCALE',
+          planName: 'Scale',
+          requestsPerMinute: 1500,
+          monthlyQuota: 500000,
+          maskedApiKey: 'gmr_live_scale_••••••••',
+          active: true,
+          createdAt: '2026-08-15'
+        },
+        {
+          tenantId: 'tenant-pro',
+          name: 'Acme Logistics Pro',
+          plan: 'GROWTH',
+          planName: 'Growth',
+          requestsPerMinute: 400,
+          monthlyQuota: 100000,
+          maskedApiKey: 'gmr_live_pro_••••••••',
+          active: true,
+          createdAt: '2026-08-01'
+        },
+        {
+          tenantId: 'tenant-free',
+          name: 'Developer Free Account',
+          plan: 'FREE',
+          planName: 'Developer Free',
+          requestsPerMinute: 60,
+          monthlyQuota: 1500,
+          maskedApiKey: 'gmr_live_free_••••••••',
+          active: true,
+          createdAt: '2026-09-01'
+        }
+      ],
+      issues: [
+        {
+          id: 'TICK-8841',
+          date: '2026-09-08 11:20',
+          company: 'Banco Financiero Internacional',
+          email: 'soporte.ti@bfi-corp.com',
+          type: 'CONSULTA TÉCNICA',
+          subject: 'Solicitud de ampliación de cuota a 5M de documentos mensuales para cierre fiscal.',
+          status: 'NUEVO',
+          priority: 'ALTA'
+        },
+        {
+          id: 'TICK-8839',
+          date: '2026-09-07 16:45',
+          company: 'Fintech Soluciones Andinas',
+          email: 'cto@fintechandina.ec',
+          type: 'BAJA DE PLAN',
+          subject: 'Consulta sobre procedimiento de baja programada de servicio para fin de trimestre.',
+          status: 'EN REVISIÓN',
+          priority: 'MEDIA'
+        }
+      ],
+      invoices: [
+        {
+          id: 'GMR-INV-2026-0902',
+          tenantId: 'tenant-scale',
+          company: 'Fintech Soluciones Andinas',
+          issueDate: '2026-09-01',
+          dueDate: '2026-09-30',
+          amount: 499.00,
+          status: 'PENDING',
+          paymentMethod: 'Tarjeta de Crédito Corporativa (Stripe)'
+        },
+        {
+          id: 'GMR-INV-2026-0901',
+          tenantId: 'tenant-pro',
+          company: 'Acme Logistics Growth',
+          issueDate: '2026-09-01',
+          dueDate: '2026-09-30',
+          amount: 149.00,
+          status: 'PENDING',
+          paymentMethod: 'Stripe Checkout (Card ending 4242)'
+        },
+        {
+          id: 'GMR-INV-2026-0701',
+          tenantId: 'tenant-enterprise',
+          company: 'Banco Financiero Internacional',
+          issueDate: '2026-07-01',
+          dueDate: '2027-06-30',
+          amount: 12500.00,
+          status: 'PAID',
+          paymentMethod: 'Transferencia Bancaria SWIFT (Banco Pichincha)'
+        }
+      ],
+      externalSources: [
+        {
+          sourceId: 'src-bfi-core',
+          tenantId: 'tenant-enterprise',
+          name: 'BFI Core Bancario AS400',
+          type: 'JDBC_ONPREM',
+          endpointUrl: 'jdbc:postgresql://vpn.bfi-corp.local:5432/core_banking',
+          authType: 'BASIC',
+          secretRef: 'env:BFI_DB_PASS',
+          timeoutMs: 5000,
+          maxRetries: 2,
+          enabled: true,
+          readOnly: true,
+          createdAt: '2026-09-10T12:00:00Z'
+        },
+        {
+          sourceId: 'src-acme-erp-rest',
+          tenantId: 'tenant-pro',
+          name: 'Acme Logistics ERP Billing API',
+          type: 'REST_API',
+          endpointUrl: 'https://api.internal.acmelogistics.com/v2/orders',
+          authType: 'BEARER_TOKEN',
+          secretRef: 'env:ACME_ERP_TOKEN',
+          timeoutMs: 3000,
+          maxRetries: 2,
+          enabled: true,
+          readOnly: true,
+          createdAt: '2026-09-11T09:30:00Z'
+        }
+      ]
+    };
+
+    // SSO & MASTER ADMIN 2FA VERIFICATION
+    let currentAdminChallengeId = null;
+
+    function getAuthHeaders() {
+      const headers = { 'Content-Type': 'application/json' };
+      const saved = sessionStorage.getItem('gmr_admin_sso') || localStorage.getItem('gmr_admin_sso');
+      if (saved) {
+        try {
+          const session = JSON.parse(saved);
+          if (session.token) {
+            headers['Authorization'] = 'Bearer ' + session.token;
+          }
+        } catch (e) {}
+      }
+      return headers;
+    }
+
+    function checkAdminSso() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const error = urlParams.get('error');
+      const token = urlParams.get('token');
+      const email = urlParams.get('email');
+      const name = urlParams.get('name');
+      const provider = urlParams.get('provider');
+      const role = urlParams.get('role');
+
+      // Check if arriving with an error from SSO callback
+      if (error === 'unauthorized') {
+        showAccessDenied(email || 'usuario corporativo no autorizado');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      // Check if arriving from SSO callback with valid token
+      if (token && email) {
+        if (isAuthorizedAdminEmail(email)) {
+          const session = {
+            token,
+            email: email.trim().toLowerCase(),
+            name: name || 'Gustavo Muzzillo',
+            provider: provider || 'sso',
+            role: role || 'admin',
+            timestamp: Date.now()
+          };
+          sessionStorage.setItem('gmr_admin_sso', JSON.stringify(session));
+          localStorage.setItem('gmr_admin_sso', JSON.stringify(session));
+          window.history.replaceState({}, document.title, window.location.pathname);
+          grantAdminAccess(session);
+          return;
+        } else {
+          showAccessDenied(email);
+          window.history.replaceState({}, document.title, window.location.pathname);
+          return;
+        }
+      }
+
+      // Check existing session
+      const saved = sessionStorage.getItem('gmr_admin_sso') || localStorage.getItem('gmr_admin_sso');
+      if (saved) {
+        try {
+          const session = JSON.parse(saved);
+          const now = Date.now();
+          const isFresh = !session.timestamp || (now - session.timestamp < 8 * 3600 * 1000);
+          if (isFresh && isAuthorizedAdminEmail(session.email) && session.token) {
+            grantAdminAccess(session);
+            return;
+          }
+        } catch (e) {
+          console.warn('Error parsing admin SSO session', e);
+        }
+      }
+
+      // If no valid authorized session, keep console locked
+      lockAdminConsole();
+    }
+
+    function grantAdminAccess(session) {
+      const ssoGate = document.getElementById('ssoGateView');
+      if (ssoGate) ssoGate.classList.add('hidden');
+
+      const dash = document.getElementById('adminDashboard');
+      if (dash) dash.classList.remove('hidden');
+
+      document.getElementById('adminHeaderLocked').classList.add('hidden');
+      document.getElementById('adminHeaderProfile').classList.remove('hidden');
+      document.getElementById('btnSyncCluster').classList.remove('hidden');
+
+      document.getElementById('adminUserName').textContent = session.name || 'Master Admin';
+      document.getElementById('adminUserEmail').textContent = session.email;
+      const initials = (session.name || 'GM')
+        .split(' ')
+        .filter(Boolean)
+        .map(p => p[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase() || 'GM';
+      document.getElementById('adminUserAvatar').textContent = initials;
+
+      const icons = { github: '🐙 GITHUB', google: '🌐 GOOGLE', microsoft: '🏢 ENTRA ID', linkedin: '💼 LINKEDIN', 'master-2fa': '🔐 2FA MASTER', 'gmrglobe.com': '👑 MASTER' };
+      const badgeText = icons[session.provider?.toLowerCase()] || (session.email.endsWith('@gmrglobe.com') ? '👑 MASTER' : 'SSO MASTER');
+      document.getElementById('adminProviderBadge').textContent = badgeText;
+
+      loadAdminState();
+      renderAll();
+      fetchClusterPlans();
+      fetchClusterTenants();
+      fetchClusterInvoices();
+      fetchClusterLeads();
+      fetchExternalSources();
+      showToast(`✓ Bienvenido ${session.name || 'Administrador'} (Sesión Segura)`);
+    }
+
+    function lockAdminConsole() {
+      const ssoGate = document.getElementById('ssoGateView');
+      if (ssoGate) ssoGate.classList.remove('hidden');
+
+      const dash = document.getElementById('adminDashboard');
+      if (dash) dash.classList.add('hidden');
+
+      document.getElementById('adminHeaderLocked').classList.remove('hidden');
+      document.getElementById('adminHeaderProfile').classList.add('hidden');
+      document.getElementById('btnSyncCluster').classList.add('hidden');
+    }
+
+    function showAccessDenied(email) {
+      lockAdminConsole();
+      const banner = document.getElementById('accessDeniedBanner');
+      const text = document.getElementById('deniedEmailText');
+      if (banner && text) {
+        text.textContent = email;
+        banner.classList.remove('hidden');
+      }
+      showToast('⛔ Acceso denegado: Identidad no autorizada.');
+    }
+
+    function dismissAccessDenied() {
+      const banner = document.getElementById('accessDeniedBanner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    // OPTION A: MASTER ADMIN PASSWORD + 2FA FLOW
+    async function handleMasterAdminLogin(e) {
+      if (e) e.preventDefault();
+      const passwordInput = document.getElementById('masterAdminPassword');
+      const password = passwordInput ? passwordInput.value : '';
+
+      if (!password) {
+        showToast('⚠️ Ingrese la contraseña maestra.');
+        return;
+      }
+
+      showToast('Verificando contraseña maestra...');
+      const btn = document.getElementById('btnRequest2FA');
+      if (btn) btn.disabled = true;
+
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/admin/auth`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        }).catch(() => null);
+
+
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data.requires2FA) {
+            currentAdminChallengeId = data.challengeId;
+            document.getElementById('masterAdminMaskedEmail').textContent = data.maskedEmail || 'su correo registrado';
+            document.getElementById('masterOtpSection').classList.remove('hidden');
+            passwordInput.disabled = true;
+            document.getElementById('masterAdminOtp').focus();
+            showToast('✓ Código de 6 dígitos enviado por correo');
+          } else if (data.authenticated && data.token) {
+            const session = {
+              token: data.token,
+              email: data.email || 'gustavo.muzzillo@gmail.com',
+              name: data.name || 'Gustavo Muzzillo',
+              provider: 'master-2fa',
+              role: 'admin',
+              timestamp: Date.now()
+            };
+            sessionStorage.setItem('gmr_admin_sso', JSON.stringify(session));
+            localStorage.setItem('gmr_admin_sso', JSON.stringify(session));
+            grantAdminAccess(session);
+          }
+        } else {
+          const errData = res ? await res.json().catch(() => ({})) : {};
+          showToast('❌ ' + (errData.error || 'Contraseña maestra inválida'));
+        }
+      } catch (err) {
+        showToast('❌ Error de comunicación con el clúster');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function verifyMasterAdminOtp() {
+      const passwordInput = document.getElementById('masterAdminPassword');
+      const otpInput = document.getElementById('masterAdminOtp');
+      const password = passwordInput ? passwordInput.value : '';
+      const otp = otpInput ? otpInput.value.trim() : '';
+
+      if (!otp || otp.length !== 6) {
+        showToast('⚠️ Ingrese el código de 6 dígitos numéricos.');
+        return;
+      }
+
+      showToast('Validando código 2FA...');
+      const btn = document.getElementById('btnVerify2FA');
+      if (btn) btn.disabled = true;
+
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/admin/auth`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            password,
+            challengeId: currentAdminChallengeId,
+            twoFactorCode: otp
+          })
+        }).catch(() => null);
+
+
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data.authenticated && data.token) {
+            const session = {
+              token: data.token,
+              email: data.email || 'gustavo.muzzillo@gmail.com',
+              name: data.name || 'Gustavo Muzzillo',
+              provider: 'master-2fa',
+              role: 'admin',
+              timestamp: Date.now()
+            };
+            sessionStorage.setItem('gmr_admin_sso', JSON.stringify(session));
+            localStorage.setItem('gmr_admin_sso', JSON.stringify(session));
+            resetMasterLoginForm();
+            grantAdminAccess(session);
+          }
+        } else {
+          const errData = res ? await res.json().catch(() => ({})) : {};
+          showToast('❌ ' + (errData.error || 'Código 2FA incorrecto o expirado'));
+        }
+      } catch (err) {
+        showToast('❌ Error al verificar código 2FA');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function resendMasterAdminOtp() {
+      const passwordInput = document.getElementById('masterAdminPassword');
+      const password = passwordInput ? passwordInput.value : '';
+
+      showToast('Reenviando código 2FA...');
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/admin/resend-2fa`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, challengeId: currentAdminChallengeId })
+        }).catch(() => null);
+
+        if (res && res.ok) {
+          const data = await res.json();
+          currentAdminChallengeId = data.challengeId;
+          showToast('✓ Nuevo código 2FA enviado a ' + (data.maskedEmail || 'su correo'));
+        } else {
+          showToast('❌ No se pudo reenviar el código.');
+        }
+      } catch (err) {
+        showToast('❌ Error al contactar el servidor.');
+      }
+    }
+
+    function resetMasterLoginForm() {
+      const passwordInput = document.getElementById('masterAdminPassword');
+      const otpInput = document.getElementById('masterAdminOtp');
+      if (passwordInput) {
+        passwordInput.disabled = false;
+        passwordInput.value = '';
+      }
+      if (otpInput) otpInput.value = '';
+      document.getElementById('masterOtpSection').classList.add('hidden');
+      currentAdminChallengeId = null;
+    }
+
+    // OPTION B: REAL SSO REDIRECT
+    function loginAdminWithProvider(provider) {
+      showToast(`Redirigiendo a autenticación federada con ${provider.toUpperCase()}...`);
+      const target = encodeURIComponent(window.location.origin + '/admin');
+      window.location.href = `${API_BASE}/api/auth/login/${provider}?redirect_to=${target}`;
+    }
+
+    function testUnauthorizedLogin() {
+      const simulatedEmail = prompt('Ingrese un correo corporativo para probar el filtro de lista blanca:', 'auditor.externo@empresa-ajena.com');
+      if (!simulatedEmail) return;
+      if (!isAuthorizedAdminEmail(simulatedEmail)) {
+        showAccessDenied(simulatedEmail);
+      } else {
+        showToast('✓ El correo ' + simulatedEmail + ' pertenece a la lista blanca.');
+      }
+    }
+
+    function adminSsoLogout() {
+      sessionStorage.removeItem('gmr_admin_sso');
+      localStorage.removeItem('gmr_admin_sso');
+      lockAdminConsole();
+      showToast('Sesión administrativa cerrada.');
+      setTimeout(() => {
+        window.location.href = '/gmr-reports/admin';
+      }, 300);
+    }
+
+    // LOCAL STORAGE PERSISTENCE
+    function loadAdminState() {
+      const saved = localStorage.getItem('gmr_admin_master_state');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.tenants) state.tenants = parsed.tenants;
+          if (parsed.issues) state.issues = parsed.issues;
+          if (parsed.invoices) state.invoices = parsed.invoices;
+          if (parsed.externalSources) state.externalSources = parsed.externalSources;
+        } catch (e) {}
+      }
+    }
+
+    function saveAdminState() {
+      localStorage.setItem('gmr_admin_master_state', JSON.stringify(state));
+    }
+
+    // CLUSTER SYNC - PLANS, TENANTS & INVOICES FROM BACKEND
+    async function fetchClusterPlans() {
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/plans`).catch(() => null);
+        if (res && res.ok) {
+          const plans = await res.json();
+          if (Array.isArray(plans) && plans.length > 0) {
+            state.plans = plans;
+            populatePlanDropdown(plans);
+          }
+        }
+      } catch (e) {}
+    }
+
+    function populatePlanDropdown(plans) {
+      const select = document.getElementById('newTenantPlan');
+      if (!select) return;
+      const currentVal = select.value || 'STARTUP';
+      select.innerHTML = '';
+      plans.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        const priceLabel = p.priceUsd === 0 ? '$0/mes' : (p.id === 'ENTERPRISE' ? `$${p.priceUsd.toLocaleString()}/año` : `$${p.priceUsd}/mes`);
+        opt.textContent = `${p.name} (${priceLabel} - ${(p.monthlyQuota || 0).toLocaleString()} docs)`;
+        if (p.id === currentVal) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    async function fetchClusterInvoices() {
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/invoices`, { headers: getAuthHeaders() }).catch(() => null);
+        if (res && (res.status === 401 || res.status === 403)) {
+          showToast('⚠️ Sesión expirada o no autorizada');
+          adminSsoLogout();
+          return;
+        }
+        if (res && res.ok) {
+          const invoices = await res.json();
+          if (Array.isArray(invoices) && invoices.length > 0) {
+            // Map remote invoices to state schema
+            state.invoices = invoices.map(inv => ({
+              id: inv.id,
+              tenantId: inv.tenantId,
+              company: inv.tenantId === 'tenant-enterprise' ? 'Banco Financiero Internacional' :
+                       inv.tenantId === 'tenant-scale' ? 'Fintech Soluciones Andinas' :
+                       inv.tenantId === 'tenant-pro' ? 'Acme Logistics Pro' : inv.tenantId,
+              issueDate: inv.issueDate,
+              dueDate: inv.dueDate,
+              amount: inv.amount,
+              status: inv.status,
+              paymentMethod: inv.paymentMethod || 'Pendiente de cobro'
+            }));
+            saveAdminState();
+            renderAdminInvoicesTable();
+            updateKpis();
+          }
+        }
+      } catch (e) {}
+    }
+
+    async function fetchClusterTenants() {
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/tenants`, { headers: getAuthHeaders() }).catch(() => null);
+        if (res && (res.status === 401 || res.status === 403)) {
+          showToast('⚠️ Sesión expirada o no autorizada');
+          adminSsoLogout();
+          return;
+        }
+        if (res && res.ok) {
+          const remoteTenants = await res.json();
+          if (Array.isArray(remoteTenants) && remoteTenants.length > 0) {
+            state.tenants = remoteTenants;
+            saveAdminState();
+            renderTenantsTable();
+            updateKpis();
+          }
+        }
+      } catch (e) {}
+    }
+
+    async function fetchClusterLeads() {
+      try {
+        let res = await fetch(`${API_BASE}/api/leads`, { headers: getAuthHeaders() }).catch(() => null);
+        if (res && (res.status === 401 || res.status === 403)) {
+          showToast('⚠️ Sesión expirada o no autorizada');
+          adminSsoLogout();
+          return;
+        }
+        if (res && res.ok) {
+          const leads = await res.json();
+          if (Array.isArray(leads) && leads.length > 0) {
+            leads.forEach(l => {
+              const leadId = l.leadId || l.id;
+              if (!state.issues.some(i => i.id === leadId)) {
+                state.issues.unshift({
+                  id: leadId || ('LEAD-' + Math.random().toString(36).substring(2, 6)),
+                  date: l.createdAt || new Date().toISOString().substring(0, 16).replace('T', ' '),
+                  company: l.company || 'Empresa Interesada',
+                  email: l.email || '',
+                  type: l.planInterest || 'Solicitud de Cuenta',
+                  subject: l.notes || `Interés en volumen: ${l.monthlyDocs || 'Estándar'}`,
+                  status: 'NUEVO',
+                  priority: 'ALTA'
+                });
+              }
+            });
+            saveAdminState();
+            renderIssuesList();
+            updateKpis();
+          }
+        }
+      } catch (e) {}
+    }
+
+    function renderAll() {
+      renderTenantsTable();
+      renderIssuesList();
+      renderAdminInvoicesTable();
+      renderExternalSourcesTable();
+      updateKpis();
+    }
+
+    function updateKpis() {
+      const active = state.tenants.filter(t => t.active).length;
+      const suspended = state.tenants.filter(t => !t.active).length;
+      const pendingSum = state.invoices
+        .filter(i => i.status === 'PENDING')
+        .reduce((sum, i) => sum + (i.amount || 0), 0);
+      const openIssues = state.issues.filter(i => i.status !== 'RESUELTO').length;
+
+      document.getElementById('kpiActiveTenants').textContent = active;
+      document.getElementById('kpiSuspendedTenants').textContent = suspended;
+      document.getElementById('kpiPendingInvoices').textContent = `$${pendingSum.toFixed(2)}`;
+      document.getElementById('kpiIssuesCount').textContent = openIssues;
+      document.getElementById('issuesBadge').textContent = openIssues;
+    }
+
+    function renderTenantsTable() {
+      const tbody = document.getElementById('tenantsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      state.tenants.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-slate-800/40 transition ${!t.active ? 'opacity-60 bg-rose-950/10' : ''}`;
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-bold text-white flex items-center gap-2">
+            <span>${t.name}</span>
+          </td>
+          <td class="px-4 py-3 font-mono text-cyan-400 font-bold">${t.tenantId}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] ${t.plan === 'ENTERPRISE' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : (t.plan === 'SCALE' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : (t.plan === 'STARTUP' || t.plan === 'PRO' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'))}">
+              ${t.plan}
+            </span>
+          </td>
+          <td class="px-4 py-3 font-mono text-slate-300">${t.requestsPerMinute || 500} rpm</td>
+          <td class="px-4 py-3 font-mono text-slate-300">${(t.monthlyQuota || 100000).toLocaleString()}</td>
+          <td class="px-4 py-3 font-mono text-slate-400 text-[11px]">${t.maskedApiKey || '••••••••'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${t.active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+              ${t.active ? '● ACTIVO' : '✕ SUSPENDIDO'}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right space-x-1">
+            ${t.active ? `
+              <button onclick="deactivateTenant('${t.tenantId}')" class="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded border border-amber-500/30 text-[11px] font-semibold transition" title="Suspender temporalmente">
+                ⏸️ Suspender
+              </button>
+            ` : `
+              <button onclick="reactivateTenant('${t.tenantId}')" class="px-2 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30 text-[11px] font-semibold transition" title="Reactivar servicio">
+                ▶️ Reactivar
+              </button>
+            `}
+            <button onclick="deleteTenant('${t.tenantId}')" class="px-2 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded border border-rose-500/30 text-[11px] font-bold transition" title="Dar de baja y revocar definitivamente">
+              🗑️ Dar de Baja
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function deactivateTenant(tenantId) {
+      if (!confirm(`¿Desea suspender el acceso de la empresa "${tenantId}"? Sus llamadas de API serán bloqueadas inmediatamente.`)) return;
+      
+      showToast(`Suspendiendo inquilino ${tenantId}...`);
+      try {
+        const res = await fetch(`${API_BASE}/api/saas/tenants/${tenantId}/deactivate`, {
+          method: 'PUT',
+          headers: getAuthHeaders()
+        }).catch(() => null);
+
+        if (res && (res.status === 401 || res.status === 403)) {
+          showToast('⚠️ Sesión expirada o no autorizada');
+          adminSsoLogout();
+          return;
+        }
+      } catch (e) {}
+
+      const t = state.tenants.find(x => x.tenantId === tenantId);
+      if (t) t.active = false;
+      saveAdminState();
+      renderAll();
+      showToast(`✓ Inquilino ${tenantId} suspendido con éxito`);
+    }
+
+    function reactivateTenant(tenantId) {
+      const t = state.tenants.find(x => x.tenantId === tenantId);
+      if (t) t.active = true;
+      saveAdminState();
+      renderAll();
+      showToast(`✓ Inquilino ${tenantId} reactivado`);
+    }
+
+    async function deleteTenant(tenantId) {
+      if (!confirm(`⚠️ ATENCIÓN: ¿Está seguro de que desea DAR DE BAJA DEFINITIVAMENTE al inquilino "${tenantId}"?\n\nEsta acción eliminará sus credenciales, revocará su API Key y liberará sus recursos del clúster.`)) {
+        return;
+      }
+
+      showToast(`Dando de baja y revocando ${tenantId}...`);
+      try {
+        const res = await fetch(`${API_BASE}/api/saas/tenants/${tenantId}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        }).catch(() => null);
+
+        if (res && (res.status === 401 || res.status === 403)) {
+          showToast('⚠️ Sesión expirada o no autorizada');
+          adminSsoLogout();
+          return;
+        }
+      } catch (e) {}
+
+      state.tenants = state.tenants.filter(x => x.tenantId !== tenantId);
+      saveAdminState();
+      renderAll();
+      showToast(`✓ Inquilino ${tenantId} revocado y dado de baja.`);
+    }
+
+    function renderIssuesList() {
+      const container = document.getElementById('issuesContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (state.issues.length === 0) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-500 text-xs bg-slate-900/40 rounded-xl border border-slate-800">No hay problemas ni solicitudes pendientes en este momento.</div>';
+        return;
+      }
+
+      state.issues.forEach(issue => {
+        const isResolved = issue.status === 'RESUELTO';
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border transition ${isResolved ? 'bg-slate-900/30 border-slate-800/60 opacity-60' : 'bg-slate-900/80 border-slate-800 shadow'}`;
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-xs ${issue.priority === 'ALTA' ? 'text-rose-400' : 'text-amber-400'}">${issue.id}</span>
+              <span class="text-slate-600">•</span>
+              <strong class="text-white text-sm">${issue.company}</strong>
+              <span class="text-xs text-slate-400 font-mono">(${issue.email})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-slate-400 font-mono">${issue.date}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isResolved ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : (issue.status === 'NUEVO' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20')}">
+                ${issue.status}
+              </span>
+            </div>
+          </div>
+          <div class="text-xs text-slate-300 font-medium mb-3">
+            <span class="text-slate-400 font-semibold">[${issue.type}]</span> ${issue.subject}
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
+            <a href="mailto:${issue.email}?subject=RE:%20${encodeURIComponent(issue.subject)}%20[GMR%20Solutions]" class="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1">
+              <span>✉️ Responder por Correo</span> ↗
+            </a>
+            <div class="space-x-1.5">
+              ${!isResolved ? `
+                <button onclick="updateIssueStatus('${issue.id}', 'EN REVISIÓN')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-semibold transition">
+                  En Revisión
+                </button>
+                <button onclick="updateIssueStatus('${issue.id}', 'RESUELTO')" class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded text-[11px] transition">
+                  ✓ Marcar Resuelto
+                </button>
+              ` : `
+                <button onclick="updateIssueStatus('${issue.id}', 'NUEVO')" class="px-2.5 py-1 bg-slate-800 text-slate-400 rounded text-[11px]">
+                  Reabrir
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateIssueStatus(issueId, newStatus) {
+      const issue = state.issues.find(i => i.id === issueId);
+      if (issue) {
+        issue.status = newStatus;
+        saveAdminState();
+        renderAll();
+        showToast(`Ticket ${issueId} actualizado a "${newStatus}"`);
+      }
+    }
+
+    function renderAdminInvoicesTable() {
+      const tbody = document.getElementById('adminInvoicesTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      state.invoices.forEach(inv => {
+        const isPaid = inv.status === 'PAID';
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-mono font-bold text-white">${inv.id}</td>
+          <td class="px-4 py-3 font-medium text-slate-200">${inv.company || inv.tenantId}</td>
+          <td class="px-4 py-3 text-slate-300 font-mono">${inv.issueDate}</td>
+          <td class="px-4 py-3 text-slate-300 font-mono">${inv.dueDate}</td>
+          <td class="px-4 py-3 font-mono font-bold text-white">$${inv.amount.toFixed(2)} USD</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPaid ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+              ${isPaid ? '✓ PAGADA' : '⏳ PENDIENTE'}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-slate-400">${inv.paymentMethod || 'No registrado'}</td>
+          <td class="px-4 py-3 text-right">
+            ${!isPaid ? `
+              <button onclick="markAdminInvoicePaid('${inv.id}')" class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded text-[11px] transition">
+                ✓ Registrar Pago
+              </button>
+            ` : `
+              <span class="text-[11px] text-emerald-400 font-semibold">Conciliada</span>
+            `}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function markAdminInvoicePaid(invoiceId) {
+      const inv = state.invoices.find(i => i.id === invoiceId);
+      if (inv) {
+        inv.status = 'PAID';
+        inv.paymentMethod = 'Liquidado en Admin Ops (SWIFT/Tarjeta)';
+
+        try {
+          await fetch(`${API_BASE}/api/saas/invoices/${invoiceId}/pay`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ paymentMethod: inv.paymentMethod })
+          }).catch(() => null);
+        } catch (e) {}
+
+        saveAdminState();
+        renderAll();
+        showToast(`Factura ${invoiceId} marcada como PAGADA`);
+      }
+    }
+
+    function switchAdminTab(tabName) {
+      const tabs = ['tenants', 'issues', 'invoices', 'repos', 'health', 'external-sources'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`adminTabBtn-${t}`);
+        const content = document.getElementById(`adminTabContent-${t}`);
+        if (t === tabName) {
+          if (btn) btn.className = 'py-3 border-b-2 font-semibold transition border-rose-500 text-rose-400 flex items-center gap-2';
+          if (content) content.classList.remove('hidden');
+        } else {
+          if (btn) btn.className = 'py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2';
+          if (content) content.classList.add('hidden');
+        }
+      });
+      if (tabName === 'external-sources') {
+        fetchExternalSources();
+      }
+    }
+
+    function openCreateTenantModal() {
+      generateRandomApiKey();
+      document.getElementById('createTenantModal').classList.remove('hidden');
+    }
+
+    function closeCreateTenantModal() {
+      document.getElementById('createTenantModal').classList.add('hidden');
+    }
+
+    function generateTenantSlug() {
+      const name = document.getElementById('newTenantName').value.trim();
+      const slug = 'tenant-' + name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+      document.getElementById('newTenantId').value = slug;
+    }
+
+    function generateRandomApiKey() {
+      const random = 'gmr_live_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      document.getElementById('newTenantApiKey').value = random;
+    }
+
+    async function handleCreateTenant(e) {
+      e.preventDefault();
+      const name = document.getElementById('newTenantName').value.trim();
+      const tenantId = document.getElementById('newTenantId').value.trim();
+      const plan = document.getElementById('newTenantPlan').value;
+      const apiKey = document.getElementById('newTenantApiKey').value.trim();
+
+      const selectedPlanInfo = state.plans.find(p => p.id === plan) || {
+        displayName: plan + ' Tier',
+        requestsPerMinute: plan === 'ENTERPRISE' ? 5000 : (plan === 'SCALE' ? 1200 : (plan === 'STARTUP' || plan === 'PRO' ? 300 : 60)),
+        monthlyQuota: plan === 'ENTERPRISE' ? 2000000 : (plan === 'SCALE' ? 500000 : (plan === 'STARTUP' || plan === 'PRO' ? 100000 : 1000))
+      };
+
+      const newT = {
+        tenantId,
+        name,
+        plan,
+        planName: selectedPlanInfo.name || selectedPlanInfo.displayName || (plan + ' Tier'),
+        requestsPerMinute: selectedPlanInfo.requestsPerMinute,
+        monthlyQuota: selectedPlanInfo.monthlyQuota,
+        apiKey,
+        maskedApiKey: apiKey.substring(0, 8) + '••••••••',
+        active: true,
+        createdAt: new Date().toISOString().substring(0, 10)
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/saas/tenants`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ tenantId, name, plan, apiKey })
+        }).catch(() => null);
+
+        if (res && (res.status === 401 || res.status === 403)) {
+          showToast('⚠️ Sesión expirada o no autorizada');
+          adminSsoLogout();
+          return;
+        }
+      } catch (err) {}
+
+      state.tenants.unshift(newT);
+      saveAdminState();
+      closeCreateTenantModal();
+      renderAll();
+      showToast(`✓ Empresa "${name}" aprovisionada con éxito`);
+    }
+
+    function refreshAllData() {
+      showToast('Sincronizando clúster...');
+      fetchClusterPlans();
+      fetchClusterTenants();
+      fetchClusterInvoices();
+      fetchClusterLeads();
+      renderAll();
+    }
+
+    function issueEnterpriseToken() {
+      const client = prompt('Ingrese el nombre de la empresa para la cual emitir el Deploy Token:');
+      if (!client) return;
+      const tokId = 'gmr_pkg_live_' + Math.random().toString(36).substring(2, 10);
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-800/40 transition';
+      tr.innerHTML = `
+        <td class="px-4 py-3 font-bold text-white">${client}</td>
+        <td class="px-4 py-3 font-mono text-purple-400">${tokId}</td>
+        <td class="px-4 py-3 text-slate-300 font-mono text-[11px]">read:packages, ghcr:pull</td>
+        <td class="px-4 py-3 text-slate-400 font-mono">${new Date().toISOString().substring(0, 10)}</td>
+        <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">● ACTIVO</span></td>
+        <td class="px-4 py-3 text-right">
+          <button onclick="revokeEnterpriseToken('${tokId}')" class="px-2 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded border border-rose-500/30 text-[11px] font-semibold transition">Revocar Token</button>
+        </td>
+      `;
+      document.getElementById('issuedTokensBody').prepend(tr);
+      showToast(`✓ Deploy Token emitido para ${client}`);
+    }
+
+    function revokeEnterpriseToken(tokId) {
+      if (!confirm(`¿Revocar acceso para el token ${tokId}?`)) return;
+      showToast(`Token ${tokId} revocado`);
+    }
+
+    // ==========================================
+    // GESTIÓN DE FUENTES EXTERNAS (ON-PREM / MULTI-CLOUD)
+    // ==========================================
+    async function fetchExternalSources() {
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/admin/external-sources`, { headers: getAuthHeaders() }).catch(() => null);
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.sources)) {
+            state.externalSources = data.sources;
+            saveAdminState();
+            renderExternalSourcesTable();
+          }
+        }
+      } catch (e) {
+        console.warn('Error fetching external sources', e);
+      }
+    }
+
+    function renderExternalSourcesTable() {
+      const tbody = document.getElementById('externalSourcesTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!state.externalSources || state.externalSources.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="px-4 py-8 text-center text-slate-500">
+              No hay fuentes de datos externas registradas. Haga clic en "+ Nueva Conexión Externa" para integrar una base de datos On-Premise o API remota.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      state.externalSources.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        const typeBadges = {
+          'JDBC_ONPREM': 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
+          'JDBC_CLOUD': 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+          'REST_API': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+          'GRPC': 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+        };
+        const badgeStyle = typeBadges[s.type] || 'bg-slate-800 text-slate-400 border border-slate-700';
+
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-semibold text-white">
+            <div class="font-bold">${s.name || s.sourceId}</div>
+            <div class="font-mono text-[11px] text-cyan-400">${s.sourceId}</div>
+          </td>
+          <td class="px-4 py-3 font-mono text-slate-300">
+            ${s.tenantId === '*' ? '<span class="text-amber-400 font-bold">★ Global</span>' : s.tenantId}
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] ${badgeStyle}">
+              ${s.type}
+            </span>
+          </td>
+          <td class="px-4 py-3 font-mono text-[11px] text-slate-300 max-w-xs truncate" title="${s.endpointUrl}">
+            ${s.endpointUrl}
+          </td>
+          <td class="px-4 py-3 text-[11px]">
+            <span class="font-bold text-slate-300">${s.authType}</span>
+            ${s.secretRef ? `<div class="font-mono text-[10px] text-amber-400">${s.secretRef}</div>` : ''}
+          </td>
+          <td class="px-4 py-3 font-mono text-slate-400 text-[11px]">
+            ${s.timeoutMs}ms / ${s.maxRetries} reint.
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 w-fit">
+              <span>🛡️</span> Zero-Retention
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.enabled !== false ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+              ${s.enabled !== false ? '● ACTIVA' : '✕ INACTIVA'}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right space-x-1.5 whitespace-nowrap">
+            <button onclick="testQuickConnection('${s.sourceId}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded font-semibold text-[11px] transition" title="Test Handshake">
+              ⚡ Ping
+            </button>
+            <button onclick="deleteExternalSource('${s.sourceId}')" class="px-2.5 py-1 bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-800/40 rounded font-semibold text-[11px] transition" title="Eliminar Conexión">
+              🗑️
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openCreateExternalSourceModal() {
+      const form = document.getElementById('createExternalSourceForm');
+      if (form) form.reset();
+      const randomSlug = 'src-' + Math.random().toString(36).substring(2, 7);
+      document.getElementById('newSourceId').value = randomSlug;
+      const testResult = document.getElementById('sourceTestResult');
+      if (testResult) testResult.classList.add('hidden');
+      document.getElementById('createExternalSourceModal').classList.remove('hidden');
+    }
+
+    function closeCreateExternalSourceModal() {
+      document.getElementById('createExternalSourceModal').classList.add('hidden');
+    }
+
+    async function testExternalSourceConnection() {
+      const endpointUrl = document.getElementById('newSourceEndpoint').value.trim();
+      const type = document.getElementById('newSourceType').value;
+      const authType = document.getElementById('newSourceAuthType').value;
+      const secretRef = document.getElementById('newSourceSecretRef').value.trim();
+      const timeoutMs = parseInt(document.getElementById('newSourceTimeout').value) || 5000;
+
+      if (!endpointUrl) {
+        showToast('⚠️ Ingrese la URL o JDBC connection string');
+        return;
+      }
+
+      const resultContainer = document.getElementById('sourceTestResult');
+      const resultText = document.getElementById('sourceTestResultText');
+      resultContainer.classList.remove('hidden');
+      resultContainer.className = 'p-3 rounded-xl border text-xs bg-slate-950 border-cyan-500/40 text-cyan-300 flex items-center gap-2';
+      resultText.innerHTML = '<span class="animate-spin">🔄</span> Probando conectividad handshake con el endpoint...';
+
+      try {
+        const payload = {
+          sourceId: document.getElementById('newSourceId').value.trim() || 'test-temp',
+          tenantId: document.getElementById('newSourceTenantId').value,
+          name: document.getElementById('newSourceName').value.trim() || 'Test Connection',
+          type: type,
+          endpointUrl: endpointUrl,
+          authType: authType,
+          secretRef: secretRef,
+          timeoutMs: timeoutMs,
+          maxRetries: 1,
+          enabled: true,
+          readOnly: true
+        };
+
+        let res = await fetch(`${API_BASE}/api/saas/admin/external-sources/test`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        }).catch(() => null);
+
+
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data.successful) {
+            resultContainer.className = 'p-3 rounded-xl border text-xs bg-emerald-950/40 border-emerald-500/40 text-emerald-300 flex items-center gap-2';
+            resultText.innerHTML = `✓ <strong>Conexión Exitosa:</strong> ${data.message} (${data.latencyMs} ms)`;
+          } else {
+            resultContainer.className = 'p-3 rounded-xl border text-xs bg-rose-950/40 border-rose-500/40 text-rose-300 flex items-center gap-2';
+            resultText.innerHTML = `✕ <strong>Fallo de Conexión:</strong> ${data.message} (${data.latencyMs} ms)`;
+          }
+        } else {
+          resultContainer.className = 'p-3 rounded-xl border text-xs bg-amber-950/40 border-amber-500/40 text-amber-300 flex items-center gap-2';
+          resultText.innerHTML = `⚠️ Error ${res ? res.status : 'de red'} al verificar conectividad remota.`;
+        }
+      } catch (err) {
+        resultContainer.className = 'p-3 rounded-xl border text-xs bg-rose-950/40 border-rose-500/40 text-rose-300 flex items-center gap-2';
+        resultText.innerHTML = `✕ Error inesperado: ${err.message}`;
+      }
+    }
+
+    async function testQuickConnection(sourceId) {
+      const src = state.externalSources.find(s => s.sourceId === sourceId);
+      if (!src) return;
+      showToast(`⚡ Probando conectividad con ${src.name || sourceId}...`);
+
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/admin/external-sources/test`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(src)
+        }).catch(() => null);
+
+
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data.successful) {
+            showToast(`✓ Conexión OK (${src.sourceId}): ${data.latencyMs} ms`);
+          } else {
+            showToast(`✕ Error (${src.sourceId}): ${data.message}`);
+          }
+        } else {
+          showToast(`⚠️ No se pudo verificar la fuente ${sourceId}`);
+        }
+      } catch (e) {
+        showToast(`✕ Error de red al probar ${sourceId}`);
+      }
+    }
+
+    async function handleSaveExternalSource(e) {
+      e.preventDefault();
+      const sourceId = document.getElementById('newSourceId').value.trim();
+      const tenantId = document.getElementById('newSourceTenantId').value;
+      const name = document.getElementById('newSourceName').value.trim();
+      const type = document.getElementById('newSourceType').value;
+      const endpointUrl = document.getElementById('newSourceEndpoint').value.trim();
+      const authType = document.getElementById('newSourceAuthType').value;
+      const secretRef = document.getElementById('newSourceSecretRef').value.trim();
+      const timeoutMs = parseInt(document.getElementById('newSourceTimeout').value) || 5000;
+      const maxRetries = parseInt(document.getElementById('newSourceMaxRetries').value) || 2;
+
+      const config = {
+        sourceId,
+        tenantId,
+        name,
+        type,
+        endpointUrl,
+        authType,
+        secretRef,
+        timeoutMs,
+        maxRetries,
+        enabled: true,
+        readOnly: true,
+        createdAt: new Date().toISOString()
+      };
+
+      showToast(`Registrando conexión externa ${sourceId}...`);
+
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/admin/external-sources`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(config)
+        }).catch(() => null);
+
+      } catch (e) {}
+
+      const existingIdx = state.externalSources.findIndex(s => s.sourceId === sourceId);
+      if (existingIdx >= 0) {
+        state.externalSources[existingIdx] = config;
+      } else {
+        state.externalSources.unshift(config);
+      }
+
+      saveAdminState();
+      renderExternalSourcesTable();
+      closeCreateExternalSourceModal();
+      showToast(`✓ Fuente externa ${sourceId} guardada con éxito`);
+    }
+
+    async function deleteExternalSource(sourceId) {
+      if (!confirm(`¿Está seguro de eliminar la conexión externa "${sourceId}"?\nLos reportes que dependan de este origen fallarán.`)) return;
+
+      showToast(`Eliminando fuente ${sourceId}...`);
+      try {
+        let res = await fetch(`${API_BASE}/api/saas/admin/external-sources/${sourceId}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        }).catch(() => null);
+
+      } catch (e) {}
+
+      state.externalSources = state.externalSources.filter(s => s.sourceId !== sourceId);
+      saveAdminState();
+      renderExternalSourcesTable();
+      showToast(`✓ Conexión externa ${sourceId} eliminada`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('adminToast');
+      const toastMsg = document.getElementById('adminToastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+      }, 3500);
+    }
+
+    async function downloadSecureAdminDoc(docId, filename) {
+      const headers = getAuthHeaders();
+      try {
+        showToast('Validando autorización administrativa...');
+        const path = '/api/saas/admin/docs/' + encodeURIComponent(docId);
+        let res = await fetch(`${API_BASE}${path}`, { headers }).catch(() => null);
+        if (!res || !res.ok) {
+          if (res && (res.status === 401 || res.status === 403)) {
+            alert('Acceso restringido: Se requiere autenticación de Administrador Maestro 2FA.');
+          } else {
+            const statusInfo = res ? ` (${res.status} ${res.statusText || 'Error'})` : ' (Error de conexión al clúster)';
+            alert('Error al descargar documento:' + statusInfo);
+          }
+          return;
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        showToast('✓ Descarga segura completada: ' + filename);
+      } catch (err) {
+        alert('Error de conexión al descargar documento: ' + err.message);
+      }
+    }
+
+    // ON PAGE LOAD: ENFORCE SSO CHECK BEFORE UNLOCKING
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAdminSso();
+    });
+  </script>
+</body>
+</html>

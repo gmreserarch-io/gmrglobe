@@ -1,0 +1,1101 @@
+<!doctype html>
+<!--
+  The corporate home. Built by build/build.mjs from this template and products.json:
+  the product cards, the services, the AI layer, the case studies, the partner wall, the
+  platform lists, the footer links and sitemap.xml all come from that one file.
+
+  Do not edit index.html at the repository root -- it is generated and overwritten.
+-->
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GMResearch &mdash; Science in Action</title>
+  <meta name="description" content="GMResearch-US LLC builds and runs production software, and puts the same engineers to work on other companies' systems: engineering, consulting, audit, DevSecOps, software factory and applied research.">
+  <link rel="canonical" href="https://gmrglobe.com/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GMResearch">
+  <meta property="og:title" content="GMResearch &mdash; Science in Action">
+  <meta property="og:description" content="We build and run production software, and put the same engineers to work on our customers' systems.">
+  <meta property="og:url" content="https://gmrglobe.com/">
+  <meta property="og:image" content="https://gmrglobe.com/assets/logo-gmr.jpg">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap">
+
+  <style>
+    /* The palette is the logo's own: near-black ground, violet mark. The product sites
+       keep their own accent -- GMR Reports is emerald -- so a visitor can tell the
+       company apart from the things it makes. */
+    :root {
+      --ink: #030712;
+      --ink-1: #080e1c;
+      --ink-2: #0c1425;
+      --line: #1c2537;
+      --line-soft: #151d2c;
+      --text: #e8edf5;
+      --muted: #9aa8bd;
+      --faint: #64748b;
+      --violet: #a78bfa;
+      --violet-mid: #8b5cf6;
+      --violet-deep: #7c3aed;
+      --measure: 62ch;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; }
+    img { max-width: 100%; }
+    :focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; border-radius: 5px; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding-left: 22px; padding-right: 22px; }
+
+    /* A faint grid with a violet bloom behind the top of the page. Depth without an
+       image nobody chose, and it costs one element. */
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        linear-gradient(rgba(124,58,237,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,.055) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 52% at 50% 0%, #000 28%, transparent 76%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 52% at 50% 0%, #000 28%, transparent 76%);
+    }
+    body > * { position: relative; z-index: 1; }
+
+    /* ── header ─────────────────────────────────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 30;
+      background: rgba(3, 7, 18, .78);
+      backdrop-filter: saturate(150%) blur(12px);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-block: 15px; }
+    .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .brand img { height: 27px; width: auto; display: block; }
+    .brand span { font-size: 11px; color: var(--faint); letter-spacing: .16em; text-transform: uppercase; font-weight: 600; }
+    nav.top { display: none; gap: 26px; font-size: .88rem; font-weight: 500; }
+    @media (min-width: 900px) { nav.top { display: flex; } }
+    nav.top a { color: var(--muted); text-decoration: none; transition: color .15s; }
+    nav.top a:hover { color: var(--text); }
+    .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+    .lang button {
+      background: transparent; border: 0; color: var(--faint); cursor: pointer;
+      font: inherit; font-size: 11px; font-weight: 700; padding: 6px 11px; transition: .15s;
+    }
+    .lang button[aria-pressed="true"] { background: var(--violet-deep); color: #fff; }
+
+    /* ── hero ───────────────────────────────────────────────────────────────────── */
+    /* Split rather than padding-block: the section below brings its own top padding, so a
+       symmetric hero stacked ~240px of nothing between the headline and the first card. */
+    .hero { padding-top: clamp(44px, 6vw, 78px); padding-bottom: clamp(38px, 5vw, 62px); }
+    .hero + section { padding-top: clamp(38px, 5vw, 62px); border-top: 0; }
+    .hero-grid { display: grid; gap: 48px; align-items: center; grid-template-columns: 1fr; }
+    @media (min-width: 940px) { .hero-grid { grid-template-columns: 1.08fr .92fr; gap: 56px; } }
+    .kicker {
+      display: inline-flex; align-items: center; gap: 9px; margin-bottom: 26px;
+      border: 1px solid rgba(167,139,250,.28); background: rgba(124,58,237,.1);
+      color: var(--violet); border-radius: 999px; padding: 6px 15px;
+      font-size: 12px; font-weight: 600;
+    }
+    .kicker i { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); font-style: normal; }
+    h1 {
+      font-size: clamp(2.4rem, 6.2vw, 4.3rem); font-weight: 800; line-height: 1.06;
+      letter-spacing: -.03em; margin: 0 0 24px; text-wrap: balance;
+    }
+    h1 .mark {
+      background: linear-gradient(120deg, var(--violet), var(--violet-deep));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .lede { font-size: clamp(1.06rem, 1.9vw, 1.26rem); color: var(--muted); max-width: var(--measure); margin: 0 0 32px; }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 13px; }
+    .hero-art { width: 100%; height: auto; }
+
+    /* ── assistant ──────────────────────────────────────────────────────────────── */
+    /* A launcher that stays out of the way and a panel that behaves like a sheet on a
+       phone and a card on a desktop. It answers from the same engine the console uses. */
+    .ai-launch {
+      position: fixed; z-index: 60;
+      right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 12px 18px 12px 15px; border: 0; border-radius: 999px;
+      background: linear-gradient(120deg, var(--violet), var(--violet-deep));
+      color: #fff; font: inherit; font-size: .9rem; font-weight: 650; cursor: pointer;
+      box-shadow: 0 10px 34px rgba(124,58,237,.42);
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .ai-launch:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(124,58,237,.52); }
+    .ai-launch svg { width: 19px; height: 19px; flex: none; }
+    .ai-launch[hidden] { display: none !important; }
+
+    .ai-panel {
+      position: fixed; z-index: 61;
+      right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      width: min(400px, calc(100vw - 40px));
+      height: min(560px, calc(100vh - 120px));
+      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--panel, #0b1120); border: 1px solid var(--line);
+      border-radius: 18px; box-shadow: 0 26px 70px rgba(0,0,0,.55);
+    }
+    .ai-panel[hidden] { display: none !important; }
+    @media (max-width: 560px) {
+      .ai-panel {
+        right: 0; left: 0; bottom: 0; width: 100%;
+        height: min(80vh, 620px); border-radius: 18px 18px 0 0;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+    }
+    .ai-head {
+      display: flex; align-items: center; gap: 10px; flex: none;
+      padding: 14px 15px; border-bottom: 1px solid var(--line-soft);
+    }
+    .ai-head .dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; flex: none; }
+    .ai-head b { font-size: .92rem; font-weight: 700; }
+    .ai-head span { font-size: 11px; color: var(--faint); }
+    .ai-close {
+      margin-left: auto; background: transparent; border: 0; color: var(--faint);
+      font: inherit; font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 6px; border-radius: 7px;
+    }
+    .ai-close:hover { color: var(--text); }
+
+    .ai-log { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+    .ai-msg { max-width: 88%; font-size: .89rem; line-height: 1.55; }
+    .ai-msg.me {
+      align-self: flex-end; background: var(--violet-deep); color: #fff;
+      padding: 9px 13px; border-radius: 13px 13px 3px 13px;
+    }
+    .ai-msg.bot {
+      align-self: flex-start; color: var(--text);
+      background: rgba(148,163,184,.08); border: 1px solid var(--line-soft);
+      padding: 10px 13px; border-radius: 13px 13px 13px 3px;
+    }
+    .ai-msg.bot p { margin: 0 0 8px; }
+    .ai-msg.bot p:last-child { margin-bottom: 0; }
+    .ai-msg.bot ul { margin: 6px 0; padding-left: 18px; }
+    .ai-msg.bot li { margin: 3px 0; }
+    .ai-msg.bot code {
+      background: rgba(124,58,237,.16); color: var(--violet);
+      padding: 1px 5px; border-radius: 5px; font-size: .86em;
+    }
+    .ai-msg.bot a { color: var(--violet); }
+    .ai-msg.err { color: #fca5a5; border-color: rgba(248,113,113,.3); background: rgba(248,113,113,.07); }
+
+    .ai-dots { display: inline-flex; gap: 4px; }
+    .ai-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--faint); animation: aiBlink 1.2s infinite; }
+    .ai-dots i:nth-child(2) { animation-delay: .18s; }
+    .ai-dots i:nth-child(3) { animation-delay: .36s; }
+    @keyframes aiBlink { 0%, 60%, 100% { opacity: .25; } 30% { opacity: 1; } }
+
+    .ai-suggest { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 15px 12px; flex: none; }
+    .ai-suggest button {
+      background: rgba(124,58,237,.1); border: 1px solid rgba(167,139,250,.26);
+      color: var(--violet); font: inherit; font-size: 11.5px; font-weight: 600;
+      padding: 6px 11px; border-radius: 999px; cursor: pointer; transition: .15s;
+    }
+    .ai-suggest button:hover { background: rgba(124,58,237,.2); }
+
+    .ai-form { display: flex; gap: 8px; padding: 12px 15px; border-top: 1px solid var(--line-soft); flex: none; }
+    .ai-form input {
+      flex: 1; min-width: 0; background: rgba(148,163,184,.08);
+      border: 1px solid var(--line); border-radius: 10px; color: var(--text);
+      font: inherit; font-size: .88rem; padding: 10px 12px;
+    }
+    .ai-form input::placeholder { color: var(--faint); }
+    .ai-form button {
+      background: var(--violet-deep); border: 0; border-radius: 10px; color: #fff;
+      font: inherit; font-weight: 650; font-size: .85rem; padding: 0 15px; cursor: pointer;
+    }
+    .ai-form button:disabled { opacity: .5; cursor: default; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ai-launch { transition: none; }
+      .ai-dots i { animation: none; opacity: .6; }
+    }
+
+    /* ── section furniture ──────────────────────────────────────────────────────── */
+    section { padding-block: clamp(56px, 8.5vw, 100px); border-top: 1px solid var(--line-soft); }
+    .eyebrow {
+      display: flex; align-items: center; gap: 12px; margin: 0 0 14px;
+      font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--faint); font-weight: 700;
+    }
+    .eyebrow b { color: var(--violet-mid); }
+    .eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--line); max-width: 90px; }
+    h2 { font-size: clamp(1.7rem, 3.5vw, 2.45rem); font-weight: 800; letter-spacing: -.02em; margin: 0 0 12px; text-wrap: balance; }
+    .section-lede { color: var(--muted); margin: 0 0 40px; max-width: var(--measure); font-size: 1.02rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 9px; text-decoration: none;
+      font-weight: 700; font-size: .93rem; padding: 14px 24px; border-radius: 12px;
+      border: 1px solid var(--line); background: var(--ink-2); color: var(--text);
+      transition: border-color .16s, transform .16s;
+    }
+    .btn:hover { border-color: var(--violet-mid); transform: translateY(-1px); }
+    .btn.primary {
+      background: linear-gradient(120deg, var(--violet-mid), var(--violet-deep));
+      border-color: transparent; color: #fff;
+      box-shadow: 0 10px 30px -12px rgba(124,58,237,.75);
+    }
+
+    /* ── results ────────────────────────────────────────────────────────────────── */
+    .results { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; grid-template-columns: 1fr; }
+    @media (min-width: 760px) { .results { grid-template-columns: repeat(3, 1fr); } }
+    .result { background: var(--ink-1); padding: 32px 28px; }
+    .result .v {
+      font-size: clamp(2.4rem, 5.2vw, 3.3rem); font-weight: 800; line-height: 1; letter-spacing: -.035em;
+      background: linear-gradient(120deg, var(--violet), var(--violet-deep));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .result p { color: var(--muted); margin: 14px 0 0; font-size: .95rem; }
+    .results-note { color: var(--faint); font-size: .87rem; margin: 26px 0 0; }
+
+    /* ── product cards ──────────────────────────────────────────────────────────── */
+    .products { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); }
+    .product {
+      position: relative; overflow: hidden;
+      border: 1px solid var(--line); border-radius: 18px; background: var(--ink-1);
+      padding: 30px; display: flex; flex-direction: column; text-decoration: none;
+      transition: border-color .18s, transform .18s;
+    }
+    .product::before {
+      content: ""; position: absolute; inset: 0 0 auto 0; height: 2px;
+      background: linear-gradient(90deg, var(--violet-mid), transparent);
+    }
+    a.product:hover { border-color: rgba(167,139,250,.5); transform: translateY(-3px); }
+    .product .eyebrow-sm { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); font-weight: 700; }
+    .product h3 { font-size: 1.45rem; font-weight: 800; margin: 14px 0 6px; letter-spacing: -.01em; }
+    .product .tag { color: var(--violet); font-weight: 600; margin: 0 0 16px; }
+    .product p { color: var(--muted); margin: 0; flex: 1; font-size: .97rem; }
+    .product .go { margin-top: 22px; font-weight: 700; color: var(--violet); font-size: .93rem; }
+    .product[data-status="coming"] { opacity: .68; }
+    .product[data-status="coming"]::before { background: linear-gradient(90deg, var(--faint), transparent); }
+    .product[data-status="coming"] .go { color: var(--faint); }
+
+    /* ── services ───────────────────────────────────────────────────────────────── */
+    .services { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); }
+    .service { border: 1px solid var(--line); border-radius: 15px; background: var(--ink-1); padding: 24px; transition: border-color .16s; }
+    .service:hover { border-color: rgba(167,139,250,.38); }
+    .service svg { width: 30px; height: 30px; margin-bottom: 14px; color: var(--violet-mid); }
+    .service h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 8px; }
+    .service p { color: var(--muted); margin: 0; font-size: .93rem; }
+
+    .points { display: grid; gap: 30px; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); }
+    .point h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 9px; }
+    .point p { color: var(--muted); margin: 0; font-size: .95rem; }
+
+    /* ── case studies ───────────────────────────────────────────────────────────── */
+    .case { border: 1px solid var(--line); border-radius: 18px; background: var(--ink-1); padding: 32px; }
+    .case + .case { margin-top: 18px; }
+    .case .who { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--violet); font-weight: 700; }
+    .case h3 { font-size: clamp(1.25rem, 2.3vw, 1.58rem); font-weight: 800; margin: 12px 0 24px; text-wrap: balance; letter-spacing: -.015em; }
+    .case dl { display: grid; gap: 22px; margin: 0; grid-template-columns: 1fr; }
+    @media (min-width: 800px) { .case dl { grid-template-columns: repeat(3, 1fr); } }
+    .case dt { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); font-weight: 700; margin-bottom: 8px; }
+    .case dd { margin: 0; color: var(--muted); font-size: .94rem; }
+    .case .more { display: inline-block; margin-top: 26px; color: var(--violet); font-weight: 700; text-decoration: none; font-size: .93rem; }
+    .case .more:hover { text-decoration: underline; }
+
+    /* ── AI ─────────────────────────────────────────────────────────────────────── */
+    .models { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; grid-template-columns: 1fr; margin-bottom: 42px; }
+    @media (min-width: 680px) { .models { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1000px) { .models { grid-template-columns: repeat(3, 1fr); } }
+    .model { background: var(--ink-1); padding: 20px 22px; }
+    .model b { display: block; font-size: .97rem; font-weight: 700; }
+    .model span { display: block; color: var(--faint); font-size: .86rem; margin-top: 4px; }
+
+    /* ── partners ───────────────────────────────────────────────────────────────── */
+    .logos { display: flex; flex-wrap: wrap; gap: 22px 40px; align-items: center; }
+    .logos img { height: 32px; width: auto; opacity: .66; filter: grayscale(1) brightness(1.85); transition: .18s; }
+    .logos img:hover { opacity: 1; filter: none; }
+    .logos .tech-name { color: var(--muted); font-weight: 700; font-size: 1.1rem; opacity: .7; }
+
+    /* ── platforms ──────────────────────────────────────────────────────────────── */
+    .platforms { display: grid; gap: 20px; grid-template-columns: 1fr; }
+    @media (min-width: 760px) { .platforms { grid-template-columns: repeat(2, 1fr); } }
+    .platform { border: 1px solid var(--line); border-radius: 16px; background: var(--ink-1); padding: 26px; }
+    .platform h3 { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); font-weight: 700; margin: 0 0 18px; }
+    .platform ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 9px; }
+    .platform li {
+      border: 1px solid var(--line); background: var(--ink-2); color: var(--muted);
+      border-radius: 9px; padding: 8px 14px; font-size: .89rem; font-weight: 600;
+    }
+
+    /* ── the group ──────────────────────────────────────────────────────────────── */
+    .group { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; grid-template-columns: 1fr; }
+    @media (min-width: 700px) { .group { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1000px) { .group { grid-template-columns: repeat(4, 1fr); } }
+    .entity { background: var(--ink-1); padding: 24px 22px; }
+    .entity .city { font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--violet); font-weight: 700; }
+    .entity b { display: block; font-size: 1rem; font-weight: 700; margin: 11px 0 5px; }
+    .entity span { color: var(--faint); font-size: .87rem; }
+    .entity[data-status="coming"] { opacity: .6; }
+    .entity[data-status="coming"] .city { color: var(--faint); }
+
+    /* ── contact and footer ─────────────────────────────────────────────────────── */
+    .contact-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+    footer { border-top: 1px solid var(--line-soft); padding-block: 46px; color: var(--faint); font-size: 14px; }
+    .foot { display: flex; flex-wrap: wrap; gap: 34px; justify-content: space-between; }
+    .foot a { color: var(--muted); text-decoration: none; display: block; padding: 4px 0; }
+    .foot a:hover { color: var(--violet); }
+    .foot h4 { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin: 0 0 10px; font-weight: 700; }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+      a.product:hover, .btn:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap bar">
+      <a class="brand" href="/">
+        <img src="/assets/logo-gmr.jpg" alt="GMResearch">
+        <span data-i18n="brand.tagline">Science in Action</span>
+      </a>
+      <nav class="top">
+        <a href="#productos" data-i18n="nav.products">Productos</a>
+        <a href="#servicios" data-i18n="nav.services">Servicios</a>
+        <a href="#ia" data-i18n="nav.ai">IA e I+D</a>
+        <a href="#casos" data-i18n="nav.cases">Casos</a>
+        <a href="#contacto" data-i18n="nav.contact">Contacto</a>
+      </nav>
+      <div class="lang" role="group" aria-label="Idioma">
+        <button type="button" data-lang="es" aria-pressed="true">ES</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <div class="hero-grid">
+        <div>
+          <span class="kicker"><i></i><span data-i18n="hero.kicker">GMResearch-US LLC &mdash; Science in Action</span></span>
+          <h1><span data-i18n="hero.line1">Construimos software</span> <span class="mark" data-i18n="hero.line2">que est&aacute; en producci&oacute;n.</span></h1>
+          <p class="lede" data-i18n="hero.lede">Hacemos productos y los operamos, y ponemos el mismo equipo a trabajar en los sistemas de nuestros clientes.</p>
+          <div class="hero-cta">
+            <a class="btn primary" href="#productos"><span data-i18n="hero.cta_products">Ver los productos</span><span>&rarr;</span></a>
+            <a class="btn" href="#contacto" data-i18n="hero.cta_talk">Hablar con nosotros</a>
+          </div>
+        </div>
+        <svg class="hero-art" viewBox="0 0 340 250" role="img" aria-labelledby="artTitle">
+          <title id="artTitle" data-i18n="hero.art_alt">Datos entrando por un lado y documentos terminados saliendo por el otro</title>
+          <defs>
+            <linearGradient id="vg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#7c3aed"/>
+            </linearGradient>
+            <radialGradient id="glow" cx="50%" cy="50%">
+              <stop offset="0" stop-color="#7c3aed" stop-opacity=".42"/>
+              <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="170" cy="122" rx="128" ry="106" fill="url(#glow)"/>
+          <g fill="none" stroke="#1c2537" stroke-width="1.4">
+            <rect x="8" y="58" width="78" height="14" rx="4"/>
+            <rect x="8" y="84" width="78" height="14" rx="4"/>
+            <rect x="8" y="110" width="78" height="14" rx="4"/>
+            <rect x="8" y="136" width="78" height="14" rx="4"/>
+            <rect x="8" y="162" width="78" height="14" rx="4"/>
+          </g>
+          <g fill="#334155">
+            <rect x="15" y="63" width="42" height="4" rx="2"/>
+            <rect x="15" y="89" width="56" height="4" rx="2"/>
+            <rect x="15" y="115" width="34" height="4" rx="2"/>
+            <rect x="15" y="141" width="48" height="4" rx="2"/>
+            <rect x="15" y="167" width="40" height="4" rx="2"/>
+          </g>
+          <g stroke="url(#vg)" stroke-width="1.4" fill="none" opacity=".72">
+            <path d="M88 65 C124 65 126 118 148 118"/>
+            <path d="M88 91 C120 91 126 118 148 118"/>
+            <path d="M88 117 C118 117 126 118 148 118"/>
+            <path d="M88 143 C120 143 126 118 148 118"/>
+            <path d="M88 169 C124 169 126 118 148 118"/>
+          </g>
+          <rect x="148" y="95" width="46" height="46" rx="13" fill="#0c1425" stroke="url(#vg)" stroke-width="2"/>
+          <circle cx="171" cy="118" r="7" fill="url(#vg)"/>
+          <circle cx="171" cy="118" r="14" fill="none" stroke="url(#vg)" stroke-width="1" opacity=".4"/>
+          <g stroke="url(#vg)" stroke-width="1.4" fill="none" opacity=".72">
+            <path d="M194 118 C220 118 222 72 248 72"/>
+            <path d="M194 118 C220 118 222 118 248 118"/>
+            <path d="M194 118 C220 118 222 164 248 164"/>
+          </g>
+          <g>
+            <rect x="248" y="50" width="62" height="44" rx="6" fill="#0c1425" stroke="#8b5cf6" stroke-width="1.4"/>
+            <rect x="248" y="96" width="62" height="44" rx="6" fill="#0c1425" stroke="#8b5cf6" stroke-width="1.4"/>
+            <rect x="248" y="142" width="62" height="44" rx="6" fill="#0c1425" stroke="#8b5cf6" stroke-width="1.4"/>
+          </g>
+          <g fill="#475569">
+            <rect x="257" y="61" width="32" height="3" rx="1.5"/><rect x="257" y="70" width="44" height="3" rx="1.5"/><rect x="257" y="79" width="26" height="3" rx="1.5"/>
+            <rect x="257" y="107" width="38" height="3" rx="1.5"/><rect x="257" y="116" width="44" height="3" rx="1.5"/><rect x="257" y="125" width="22" height="3" rx="1.5"/>
+            <rect x="257" y="153" width="30" height="3" rx="1.5"/><rect x="257" y="162" width="44" height="3" rx="1.5"/><rect x="257" y="171" width="35" height="3" rx="1.5"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <section id="resultados">
+      <div class="wrap">
+        <p class="eyebrow"><b>01</b> <span data-i18n="results.eyebrow">Medido</span></p>
+        <h2 data-i18n="results.title">N&uacute;meros que puedes comprobar</h2>
+        <p class="section-lede" data-i18n="results.lede">De nuestro propio producto, no de un estudio de mercado.</p>
+        <div class="results">
+        <div class="result">
+          <div class="v">44/44</div>
+          <p data-es="informes reales de SAP Crystal convertidos y renderizados" data-en="real SAP Crystal reports converted and rendered">informes reales de SAP Crystal convertidos y renderizados</p>
+        </div>
+        <div class="result">
+          <div class="v">96%</div>
+          <p data-es="de construcciones de Eclipse BIRT con su texto intacto" data-en="of Eclipse BIRT constructs render with their text intact">de construcciones de Eclipse BIRT con su texto intacto</p>
+        </div>
+        <div class="result">
+          <div class="v">81%</div>
+          <p data-es="de Crystal Reports — la cifra baja, y la publicamos igual" data-en="of Crystal Reports — the lower figure, published anyway">de Crystal Reports — la cifra baja, y la publicamos igual</p>
+        </div>
+        </div>
+        <p class="results-note" data-i18n="results.note">Cada una se publica con el comando que la reproduce. Incluida la que no nos favorece.</p>
+      </div>
+    </section>
+
+    <section id="productos">
+      <div class="wrap">
+        <p class="eyebrow"><b>02</b> <span data-i18n="products.eyebrow">Productos</span></p>
+        <h2 data-i18n="products.title">Lo que hacemos</h2>
+        <p class="section-lede" data-i18n="products.lede">Cada producto resuelve un problema concreto de una empresa concreta, y se puede probar hoy.</p>
+        <div class="products">
+        <a class="product" data-status="live" href="/gmr-reports/">
+          <span class="eyebrow" data-es="Facturación, extractos bancarios, informes regulatorios" data-en="Invoicing, bank statements, regulatory reporting">Facturación, extractos bancarios, informes regulatorios</span>
+          <h3>GMR Reports</h3>
+          <p class="tag" data-es="Tus facturas e informes, generados solos" data-en="Your invoices and reports, produced for you">Tus facturas e informes, generados solos</p>
+          <p data-es="Conecta las plantillas de informes que ya usas —JasperReports, Crystal Reports o BIRT— y recibe el documento terminado en PDF, Excel o Word. Como servicio en la nube o instalado en tus propias máquinas." data-en="Connect the report templates you already use — JasperReports, Crystal Reports or BIRT — and get the finished document back as PDF, Excel or Word. As a hosted service, or installed on your own machines.">Conecta las plantillas de informes que ya usas —JasperReports, Crystal Reports o BIRT— y recibe el documento terminado en PDF, Excel o Word. Como servicio en la nube o instalado en tus propias máquinas.</p>
+          <span class="go" data-i18n="products.open">Ver el producto &rarr;</span>
+        </a>
+        <div class="product" data-status="coming">
+          <span class="eyebrow" data-es="Equipos de desarrollo" data-en="Development teams">Equipos de desarrollo</span>
+          <h3>GMR Friday</h3>
+          <p class="tag" data-es="Un programador sénior más, y le puedes hablar" data-en="One more senior developer, and you can talk to them">Un programador sénior más, y le puedes hablar</p>
+          <p data-es="Un entorno de desarrollo que entiende el proyecto entero y no solo el archivo abierto, y al que se le habla en voz alta. Corre en tu máquina —también sin conexión ninguna— y el código no se queda en ningún servidor. No solo escribe: también audita seguridad, prepara infraestructura, ordena datos y documenta." data-en="A development environment that understands the whole project rather than the open file, and that you talk to out loud. It runs on your machine — including with no connection at all — and your code stays off everyone&#39;s servers. It does more than write: it audits security, prepares infrastructure, organises data and documents.">Un entorno de desarrollo que entiende el proyecto entero y no solo el archivo abierto, y al que se le habla en voz alta. Corre en tu máquina —también sin conexión ninguna— y el código no se queda en ningún servidor. No solo escribe: también audita seguridad, prepara infraestructura, ordena datos y documenta.</p>
+          <span class="go" data-i18n="products.soon">Pr&oacute;ximamente</span>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section id="servicios">
+      <div class="wrap">
+        <p class="eyebrow"><b>03</b> <span data-i18n="services.eyebrow">Servicios</span></p>
+        <h2 data-i18n="services.title">Y lo que hacemos para otros</h2>
+        <p class="section-lede" data-i18n="services.lede">El mismo equipo que construye nuestros productos trabaja en los sistemas de nuestros clientes.</p>
+        <div class="services">
+        <div class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5"/></svg>
+          <h3 data-es="Ingeniería IT" data-en="IT engineering">Ingeniería IT</h3>
+          <p data-es="Diseñamos y construimos los sistemas que sostienen la operación, y nos quedamos hasta que funcionan en producción." data-en="We design and build the systems a business runs on, and we stay until they work in production.">Diseñamos y construimos los sistemas que sostienen la operación, y nos quedamos hasta que funcionan en producción.</p>
+        </div>
+        <div class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <h3 data-es="Consultoría" data-en="Consulting">Consultoría</h3>
+          <p data-es="Decidir qué construir, qué comprar y qué retirar. Con criterio técnico y el coste real encima de la mesa." data-en="Deciding what to build, what to buy and what to retire, on technical merit and with the real cost on the table.">Decidir qué construir, qué comprar y qué retirar. Con criterio técnico y el coste real encima de la mesa.</p>
+        </div>
+        <div class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3M8.5 11l2 2 4-4"/></svg>
+          <h3 data-es="Auditoría" data-en="Audit">Auditoría</h3>
+          <p data-es="Revisamos código, arquitectura e infraestructura ajenos y entregamos lo que encontramos, no lo que resulta cómodo de leer." data-en="We review somebody else&#39;s code, architecture and infrastructure, and report what we find rather than what is comfortable to read.">Revisamos código, arquitectura e infraestructura ajenos y entregamos lo que encontramos, no lo que resulta cómodo de leer.</p>
+        </div>
+        <div class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 9-4-0.8-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+          <h3 data-es="DevSecOps" data-en="DevSecOps">DevSecOps</h3>
+          <p data-es="Que desplegar sea aburrido: automatización, secretos donde deben estar y comprobaciones que fallan antes de llegar al cliente." data-en="Making deployment boring: automation, secrets where they belong, and checks that fail before a customer sees anything.">Que desplegar sea aburrido: automatización, secretos donde deben estar y comprobaciones que fallan antes de llegar al cliente.</p>
+        </div>
+        <div class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M5 20V10l5 3V10l5 3V7l4 2v11"/></svg>
+          <h3 data-es="Software factory" data-en="Software factory">Software factory</h3>
+          <p data-es="Equipos que se incorporan a tu desarrollo con nuestra forma de trabajar y responden por lo que entregan." data-en="Teams that join your development with our way of working, and answer for what they ship.">Equipos que se incorporan a tu desarrollo con nuestra forma de trabajar y responden por lo que entregan.</p>
+        </div>
+        <div class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3v6l-5 9a2 2 0 001.7 3h12.6a2 2 0 001.7-3l-5-9V3"/><path d="M8 3h8M8.5 14h7"/></svg>
+          <h3 data-es="I+D" data-en="R&amp;D">I+D</h3>
+          <p data-es="Investigación aplicada sobre problemas que aún no tienen solución comprada. De ahí salen nuestros productos." data-en="Applied research on problems with no off-the-shelf answer yet. It is where our own products come from.">Investigación aplicada sobre problemas que aún no tienen solución comprada. De ahí salen nuestros productos.</p>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ia">
+      <div class="wrap">
+        <p class="eyebrow"><b>04</b> <span data-i18n="ai.eyebrow">Inteligencia artificial e I+D</span></p>
+        <h2 data-i18n="ai.title">Investigaci&oacute;n que acaba en producto</h2>
+        <p class="section-lede" data-i18n="ai.lede">Trabajamos con muchos modelos y con ninguno en exclusiva. Estos corren hoy dentro de cosas que hemos construido.</p>
+        <div class="models">
+          <div class="model">
+            <b>Gemini 2.5 / 2.0 Flash</b>
+            <span data-es="asistente de plantillas en producción" data-en="template assistant, in production">asistente de plantillas en producción</span>
+          </div>
+          <div class="model">
+            <b>Llama</b>
+            <span data-es="modelos abiertos ejecutados en local" data-en="open models run locally">modelos abiertos ejecutados en local</span>
+          </div>
+          <div class="model">
+            <b>Whisper</b>
+            <span data-es="dictado y voz a texto sin salir del equipo" data-en="dictation and speech to text without leaving the machine">dictado y voz a texto sin salir del equipo</span>
+          </div>
+          <div class="model">
+            <b>Silero VAD</b>
+            <span data-es="detección de voz en tiempo real" data-en="real-time voice activity detection">detección de voz en tiempo real</span>
+          </div>
+          <div class="model">
+            <b>ECAPA-TDNN</b>
+            <span data-es="identificación biométrica por voz" data-en="biometric speaker identification">identificación biométrica por voz</span>
+          </div>
+          <div class="model">
+            <b>LanceDB / SQLite-vec</b>
+            <span data-es="búsqueda semántica dentro del propio equipo" data-en="semantic search inside the machine itself">búsqueda semántica dentro del propio equipo</span>
+          </div>
+        </div>
+        <div class="points">
+          <div class="point">
+            <h3 data-es="El modelo se elige por problema, no por moda" data-en="The model is chosen per problem, not per fashion">El modelo se elige por problema, no por moda</h3>
+            <p data-es="Uno pequeño y local resuelve la mayoría de las tareas por una fracción del coste y sin que el dato salga. Los grandes se reservan para lo que de verdad los necesita." data-en="A small local one handles most tasks for a fraction of the cost and without the data leaving. The large ones are kept for what actually needs them.">Uno pequeño y local resuelve la mayoría de las tareas por una fracción del coste y sin que el dato salga. Los grandes se reservan para lo que de verdad los necesita.</p>
+          </div>
+          <div class="point">
+            <h3 data-es="Ejecución local con aceleración por GPU" data-en="Local execution with GPU acceleration">Ejecución local con aceleración por GPU</h3>
+            <p data-es="CUDA, DirectML o Metal según la máquina, con ONNX por debajo. Funciona también sin conexión ninguna al exterior." data-en="CUDA, DirectML or Metal depending on the machine, with ONNX underneath. It works with no connection to the outside world at all.">CUDA, DirectML o Metal según la máquina, con ONNX por debajo. Funciona también sin conexión ninguna al exterior.</p>
+          </div>
+          <div class="point">
+            <h3 data-es="Cero retención de datos cuando hay que salir" data-en="Zero data retention when going out is necessary">Cero retención de datos cuando hay que salir</h3>
+            <p data-es="Lo que sale a un modelo alojado va bajo acuerdo de no retención, y lo que no tiene por qué salir no sale." data-en="What does go to a hosted model goes under a no-retention agreement, and what has no reason to leave does not.">Lo que sale a un modelo alojado va bajo acuerdo de no retención, y lo que no tiene por qué salir no sale.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+        <section id="casos">
+      <div class="wrap">
+        <p class="eyebrow"><b>05</b> <span data-i18n="cases.eyebrow">Casos</span></p>
+        <h2 data-i18n="cases.title">Lo que ha salido de aqu&iacute;</h2>
+        <p class="section-lede" data-i18n="cases.lede">Problemas reales, con el resultado medido y no redondeado.</p>
+        <article class="case">
+          <span class="who">GMR Reports</span>
+          <h3 data-es="Salir de Crystal Reports sin rehacer un solo informe" data-en="Leaving Crystal Reports without rewriting a single report">Salir de Crystal Reports sin rehacer un solo informe</h3>
+          <dl>
+            <div>
+              <dt data-i18n="cases.problem">El problema</dt>
+              <dd data-es="Una empresa con años de informes en Crystal Reports queda atada a licencias de SAP y a una máquina Windows encendida solo para imprimir. Rehacer esos informes cuesta meses y nadie quiere tocarlos." data-en="A business with years of Crystal Reports is tied to SAP licences and a Windows machine kept alive just to print. Rewriting those reports takes months, and nobody wants to touch them.">Una empresa con años de informes en Crystal Reports queda atada a licencias de SAP y a una máquina Windows encendida solo para imprimir. Rehacer esos informes cuesta meses y nadie quiere tocarlos.</dd>
+            </div>
+            <div>
+              <dt data-i18n="cases.approach">Qu&eacute; hicimos</dt>
+              <dd data-es="Interpretamos el formato binario .rpt y lo convertimos al vuelo, sin software de SAP en ninguna parte. La plantilla original no se toca." data-en="We interpret the binary .rpt format and convert it on the fly, with no SAP software anywhere. The original template is left alone.">Interpretamos el formato binario .rpt y lo convertimos al vuelo, sin software de SAP en ninguna parte. La plantilla original no se toca.</dd>
+            </div>
+            <div>
+              <dt data-i18n="cases.result">El resultado</dt>
+              <dd data-es="Cogimos 44 informes reales distribuidos con SAP Business One. Los 44 convirtieron y renderizaron. La compatibilidad medida es del 81 %, y publicamos ese número con el comando que lo reproduce en lugar de redondearlo hacia arriba." data-en="We took 44 real reports shipped with SAP Business One. All 44 converted and rendered. Measured compatibility is 81%, and we publish that number with the command that reproduces it rather than rounding it up.">Cogimos 44 informes reales distribuidos con SAP Business One. Los 44 convirtieron y renderizaron. La compatibilidad medida es del 81 %, y publicamos ese número con el comando que lo reproduce en lugar de redondearlo hacia arriba.</dd>
+            </div>
+          </dl>
+          <a class="more" href="/gmr-reports/#conformance" data-i18n="cases.more">Ver c&oacute;mo se mide &rarr;</a>
+        </article>
+      </div>
+    </section>
+
+    
+        <section id="partners">
+      <div class="wrap">
+        <p class="eyebrow"><b>06</b> <span data-i18n="partners.eyebrow">Alianzas</span></p>
+        <h2 data-i18n="partners.title">Partners</h2>
+        <p class="section-lede" data-i18n="partners.lede">Con quienes trabajamos.</p>
+        <div class="logos">
+          <img src="/assets/partners/redhat.png" alt="Red Hat" loading="lazy" width="120" height="30">
+          <img src="/assets/partners/ibm.png" alt="IBM" loading="lazy" width="120" height="30">
+          <img src="/assets/partners/Atos-Logo.wine.svg" alt="Atos" loading="lazy" width="120" height="30">
+          <img src="/assets/partners/tibco.png" alt="TIBCO" loading="lazy" width="120" height="30">
+          <img src="/assets/partners/elasticsearch.png" alt="Elastic" loading="lazy" width="120" height="30">
+          <img src="/assets/partners/gitlab.png" alt="GitLab" loading="lazy" width="120" height="30">
+          <img src="/assets/partners/pivotal.svg" alt="Pivotal" loading="lazy" width="120" height="30">
+        </div>
+      </div>
+    </section>
+
+
+    <section id="plataformas">
+      <div class="wrap">
+        <p class="eyebrow"><b>07</b> <span data-i18n="platforms.eyebrow">D&oacute;nde corre</span></p>
+        <h2 data-i18n="platforms.title">En la nube o en tu centro de datos</h2>
+        <p class="section-lede" data-i18n="platforms.lede">Los proveedores sobre los que operamos hoy. Lo que construimos no depende de ninguno en particular.</p>
+        <div class="platforms">
+        <div class="platform">
+          <h3 data-i18n="platforms.cloud">Nube p&uacute;blica</h3>
+          <ul>
+            <li>Amazon Web Services</li>
+            <li>Microsoft Azure</li>
+            <li>Google Cloud</li>
+            <li>Oracle Cloud</li>
+          </ul>
+        </div>
+        <div class="platform">
+          <h3 data-i18n="platforms.onprem">En tu infraestructura</h3>
+          <ul>
+            <li>Red Hat OpenShift</li>
+            <li>Kubernetes</li>
+            <li>VMware</li>
+            <li>Bare metal</li>
+          </ul>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="como-trabajamos">
+      <div class="wrap">
+        <p class="eyebrow"><b>08</b> <span data-i18n="how.eyebrow">C&oacute;mo trabajamos</span></p>
+        <h2 data-i18n="how.title">Tres cosas que puedes comprobar</h2>
+        <p class="section-lede" data-i18n="how.lede">No tres promesas.</p>
+        <div class="points">
+          <div class="point">
+            <h3 data-i18n="how.p1_title">Los n&uacute;meros se publican con el comando que los reproduce</h3>
+            <p data-i18n="how.p1_body">Cuando decimos cu&aacute;nto tarda algo o qu&eacute; porcentaje de compatibilidad alcanza, va acompa&ntilde;ado de c&oacute;mo medirlo. Incluidas las cifras que no nos favorecen.</p>
+          </div>
+          <div class="point">
+            <h3 data-i18n="how.p2_title">Lo que construimos, lo operamos</h3>
+            <p data-i18n="how.p2_body">Nuestros productos corren en producci&oacute;n atendiendo clientes, no en una demo. Los fallos los encontramos nosotros primero porque somos quienes est&aacute;n de guardia.</p>
+          </div>
+          <div class="point">
+            <h3 data-i18n="how.p3_title">En tu casa o en la nuestra</h3>
+            <p data-i18n="how.p3_body">Cada producto se puede contratar como servicio o licenciar para instalarlo en tu infraestructura, incluso sin salida a internet. La decisi&oacute;n es tuya y no cambia el producto.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="grupo">
+      <div class="wrap">
+        <p class="eyebrow"><b>09</b> <span data-i18n="group.eyebrow">El grupo</span></p>
+        <h2 data-i18n="group.title">Cuatro sociedades, un solo equipo</h2>
+        <p class="section-lede" data-i18n="group.lede">Contratas con la entidad que te corresponda y trabaja la misma gente.</p>
+        <div class="group">
+          <div class="entity" data-status="live">
+            <span class="city" data-es="Estados Unidos" data-en="United States">Estados Unidos</span>
+            <b>GMResearch-US LLC</b>
+            <span data-es="Sede central del grupo" data-en="Group headquarters">Sede central del grupo</span>
+          </div>
+          <div class="entity" data-status="live">
+            <span class="city" data-es="Quito, Ecuador" data-en="Quito, Ecuador">Quito, Ecuador</span>
+            <b>GMResearch-EC Cía. Ltda.</b>
+            <span data-es="Ingeniería y entrega" data-en="Engineering and delivery">Ingeniería y entrega</span>
+          </div>
+          <div class="entity" data-status="live">
+            <span class="city" data-es="Londres, Reino Unido" data-en="London, United Kingdom">Londres, Reino Unido</span>
+            <b>GMResearch-UK Limited</b>
+            <span data-es="Operación europea" data-en="European operation">Operación europea</span>
+          </div>
+          <div class="entity" data-status="coming">
+            <span class="city" data-es="Medellín, Colombia" data-en="Medellín, Colombia">Medellín, Colombia</span>
+            <b>GMResearch-CO</b>
+            <span data-es="Próxima apertura" data-en="Opening soon">Próxima apertura</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto">
+      <div class="wrap">
+        <p class="eyebrow"><b>10</b> <span data-i18n="contact.eyebrow">Contacto</span></p>
+        <h2 data-i18n="contact.title">Hablemos</h2>
+        <p class="section-lede" data-i18n="contact.lede">Si algo de lo de arriba encaja con un problema que tengas, escr&iacute;benos y te responde alguien que trabaja en ello.</p>
+        <div class="contact-row">
+          <a class="btn primary" href="mailto:support@gmrglobe.com" data-i18n="contact.email">Escribir a GMResearch</a>
+          <a class="btn" href="https://www.linkedin.com/company/gmresearch" rel="noopener" data-i18n="contact.linkedin">LinkedIn</a>
+          <a class="btn" href="https://github.com/gmreserarch-io" rel="noopener" data-i18n="contact.github">GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>
+        <h4 data-i18n="foot.products">Productos</h4>
+        
+        <a href="/gmr-reports/">GMR Reports</a>
+      </div>
+      <div>
+        <h4 data-i18n="foot.company">Empresa</h4>
+        <a href="https://www.linkedin.com/company/gmresearch" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/gmreserarch-io" rel="noopener">GitHub</a>
+        <a href="mailto:support@gmrglobe.com">support@gmrglobe.com</a>
+      </div>
+      <div>
+        <p style="margin:0">&copy; 2026 GMResearch-US LLC</p>
+        <p style="margin:6px 0 0">Actualizado el 2026-09-20</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="ai-launch" id="aiLaunch" type="button" aria-haspopup="dialog" aria-controls="aiPanel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 11.5a8.4 8.4 0 01-9 8.4L3 21l1.1-4.2A8.4 8.4 0 1121 11.5z"/>
+      <path d="M8.5 10.5h7M8.5 14h4.5"/>
+    </svg>
+    <span data-i18n="ai.launch">Preguntar al asistente</span>
+  </button>
+
+  <div class="ai-panel" id="aiPanel" role="dialog" aria-modal="false" aria-labelledby="aiTitle" hidden>
+    <div class="ai-head">
+      <i class="dot" aria-hidden="true"></i>
+      <b id="aiTitle" data-i18n="ai.title">Asistente GMR</b>
+      <span data-i18n="ai.subtitle">Responde sobre lo que hacemos</span>
+      <button class="ai-close" id="aiClose" type="button" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="ai-log" id="aiLog" aria-live="polite"></div>
+    <div class="ai-suggest" id="aiSuggest"></div>
+    <form class="ai-form" id="aiForm">
+      <input id="aiInput" type="text" autocomplete="off" placeholder="Escribe tu pregunta" aria-label="Tu pregunta">
+      <button type="submit" id="aiSend" data-i18n="ai.send">Enviar</button>
+    </form>
+  </div>
+
+  <script id="aiContext" type="application/json">{"company":"GMResearch-US LLC (GMR)","tagline":"Science in Action","products":"GMR Reports — Tus facturas e informes, generados solos (disponible); GMR Friday — Un programador sénior más, y le puedes hablar (en preparacion)","services":"Ingeniería IT, Consultoría, Auditoría, DevSecOps, Software factory, I+D","group":"GMResearch-US LLC (Estados Unidos); GMResearch-EC Cía. Ltda. (Quito, Ecuador); GMResearch-UK Limited (Londres, Reino Unido); GMResearch-CO (Medellín, Colombia) — en preparacion","contact":"support@gmrglobe.com","site":"https://gmrglobe.com"}</script>
+
+  <script>
+    // A small dictionary kept in the page. The product sites share a large one; this page
+    // has a few dozen strings and no reason to fetch 80 kB to show them.
+    const DICT = {
+      es: {
+        "brand.tagline": "Science in Action",
+        "nav.products": "Productos", "nav.services": "Servicios", "nav.ai": "IA e I+D",
+        "nav.cases": "Casos", "nav.contact": "Contacto",
+        "hero.kicker": "GMResearch-US LLC — Science in Action",
+        "hero.line1": "Construimos software",
+        "hero.line2": "que está en producción.",
+        "hero.lede": "Hacemos productos y los operamos, y ponemos el mismo equipo a trabajar en los sistemas de nuestros clientes.",
+        "hero.cta_products": "Ver los productos",
+        "hero.cta_talk": "Hablar con nosotros",
+        "hero.art_alt": "Datos entrando por un lado y documentos terminados saliendo por el otro",
+        "results.eyebrow": "Medido",
+        "results.title": "Números que puedes comprobar",
+        "results.lede": "De nuestro propio producto, no de un estudio de mercado.",
+        "results.note": "Cada una se publica con el comando que la reproduce. Incluida la que no nos favorece.",
+        "products.eyebrow": "Productos",
+        "products.title": "Lo que hacemos",
+        "products.lede": "Cada producto resuelve un problema concreto de una empresa concreta, y se puede probar hoy.",
+        "products.open": "Ver el producto →",
+        "products.soon": "Próximamente",
+        "services.eyebrow": "Servicios",
+        "services.title": "Y lo que hacemos para otros",
+        "services.lede": "El mismo equipo que construye nuestros productos trabaja en los sistemas de nuestros clientes.",
+        "ai.eyebrow": "Inteligencia artificial e I+D",
+        "ai.title": "Investigación que acaba en producto",
+        "ai.lede": "Trabajamos con muchos modelos y con ninguno en exclusiva. Estos corren hoy dentro de cosas que hemos construido.",
+        "cases.eyebrow": "Casos",
+        "cases.title": "Lo que ha salido de aquí",
+        "cases.lede": "Problemas reales, con el resultado medido y no redondeado.",
+        "cases.problem": "El problema",
+        "cases.approach": "Qué hicimos",
+        "cases.result": "El resultado",
+        "cases.more": "Ver cómo se mide →",
+        "partners.eyebrow": "Alianzas",
+        "partners.title": "Partners",
+        "partners.lede": "Con quienes trabajamos.",
+        "clients.eyebrow": "Clientes",
+        "clients.title": "Clientes",
+        "clients.lede": "Empresas que confiaron en nosotros.",
+        "platforms.eyebrow": "Dónde corre",
+        "platforms.title": "En la nube o en tu centro de datos",
+        "platforms.lede": "Los proveedores sobre los que operamos hoy. Lo que construimos no depende de ninguno en particular.",
+        "platforms.cloud": "Nube pública",
+        "platforms.onprem": "En tu infraestructura",
+        "how.eyebrow": "Cómo trabajamos",
+        "how.title": "Tres cosas que puedes comprobar",
+        "how.lede": "No tres promesas.",
+        "how.p1_title": "Los números se publican con el comando que los reproduce",
+        "how.p1_body": "Cuando decimos cuánto tarda algo o qué porcentaje de compatibilidad alcanza, va acompañado de cómo medirlo. Incluidas las cifras que no nos favorecen.",
+        "how.p2_title": "Lo que construimos, lo operamos",
+        "how.p2_body": "Nuestros productos corren en producción atendiendo clientes, no en una demo. Los fallos los encontramos nosotros primero porque somos quienes están de guardia.",
+        "how.p3_title": "En tu casa o en la nuestra",
+        "how.p3_body": "Cada producto se puede contratar como servicio o licenciar para instalarlo en tu infraestructura, incluso sin salida a internet. La decisión es tuya y no cambia el producto.",
+        "group.eyebrow": "El grupo",
+        "group.title": "Cuatro sociedades, un solo equipo",
+        "group.lede": "Contratas con la entidad que te corresponda y trabaja la misma gente.",
+        "contact.eyebrow": "Contacto",
+        "contact.title": "Hablemos",
+        "contact.lede": "Si algo de lo de arriba encaja con un problema que tengas, escríbenos y te responde alguien que trabaja en ello.",
+        "contact.email": "Escribir a GMResearch",
+        "contact.linkedin": "LinkedIn",
+        "contact.github": "GitHub",
+        "foot.products": "Productos",
+        "foot.company": "Empresa",
+        "ai.launch": "Preguntar al asistente",
+        "ai.title": "Asistente GMR",
+        "ai.subtitle": "Responde sobre lo que hacemos",
+        "ai.send": "Enviar",
+        "ai.placeholder": "Escribe tu pregunta",
+        "ai.greeting": "Hola. Puedo responder sobre nuestros productos, los servicios que prestamos y cómo trabajamos. ¿Qué te interesa?",
+        "ai.error": "No he podido responder ahora mismo. Escríbenos a support@gmrglobe.com y te contesta una persona.",
+        "ai.q1": "¿Qué es GMR Reports?",
+        "ai.q2": "¿Qué servicios dan?",
+        "ai.q3": "¿Dónde están?"
+      },
+      en: {
+        "brand.tagline": "Science in Action",
+        "nav.products": "Products", "nav.services": "Services", "nav.ai": "AI and R&D",
+        "nav.cases": "Cases", "nav.contact": "Contact",
+        "hero.kicker": "GMResearch-US LLC — Science in Action",
+        "hero.line1": "We build software",
+        "hero.line2": "that is in production.",
+        "hero.lede": "We make products and we run them, and we put the same team to work on our customers' systems.",
+        "hero.cta_products": "See the products",
+        "hero.cta_talk": "Talk to us",
+        "hero.art_alt": "Data going in one side and finished documents coming out the other",
+        "results.eyebrow": "Measured",
+        "results.title": "Numbers you can check",
+        "results.lede": "From our own product, not from a market study.",
+        "results.note": "Each one is published with the command that reproduces it. Including the one that does not flatter us.",
+        "products.eyebrow": "Products",
+        "products.title": "What we make",
+        "products.lede": "Each product solves one concrete problem for a real business, and you can try it today.",
+        "products.open": "Open the product →",
+        "products.soon": "Coming soon",
+        "services.eyebrow": "Services",
+        "services.title": "And what we do for others",
+        "services.lede": "The same team that builds our products works on our customers' systems.",
+        "ai.eyebrow": "Artificial intelligence and R&D",
+        "ai.title": "Research that ends up in a product",
+        "ai.lede": "We work with many models and are wedded to none. These run today inside things we have built.",
+        "cases.eyebrow": "Cases",
+        "cases.title": "What has come out of it",
+        "cases.lede": "Real problems, with the result measured rather than rounded.",
+        "cases.problem": "The problem",
+        "cases.approach": "What we did",
+        "cases.result": "The result",
+        "cases.more": "See how it is measured →",
+        "partners.eyebrow": "Alliances",
+        "partners.title": "Partners",
+        "partners.lede": "Who we work with.",
+        "clients.eyebrow": "Clients",
+        "clients.title": "Clients",
+        "clients.lede": "Companies that trusted us.",
+        "platforms.eyebrow": "Where it runs",
+        "platforms.title": "In the cloud or in your data centre",
+        "platforms.lede": "The providers we operate on today. What we build depends on none of them in particular.",
+        "platforms.cloud": "Public cloud",
+        "platforms.onprem": "On your infrastructure",
+        "how.eyebrow": "How we work",
+        "how.title": "Three things you can check",
+        "how.lede": "Rather than three promises.",
+        "how.p1_title": "Figures are published with the command that reproduces them",
+        "how.p1_body": "When we say how long something takes, or what share of a format it supports, it comes with how to measure it. Including the numbers that do not flatter us.",
+        "how.p2_title": "We run what we build",
+        "how.p2_body": "Our products serve customers in production, not in a demo. We find the faults first because we are the ones on call.",
+        "how.p3_title": "On your machines or on ours",
+        "how.p3_body": "Every product can be bought as a service or licensed to install on your own infrastructure, with no connection to the outside world if that is what the rules require. Your choice, same product.",
+        "group.eyebrow": "The group",
+        "group.title": "Four companies, one team",
+        "group.lede": "You contract with whichever entity fits, and the same people do the work.",
+        "contact.eyebrow": "Contact",
+        "contact.title": "Talk to us",
+        "contact.lede": "If any of the above matches a problem you have, write to us and someone who works on it will answer.",
+        "contact.email": "Email GMResearch",
+        "contact.linkedin": "LinkedIn",
+        "contact.github": "GitHub",
+        "foot.products": "Products",
+        "foot.company": "Company",
+        "ai.launch": "Ask the assistant",
+        "ai.title": "GMR Assistant",
+        "ai.subtitle": "Answers about what we do",
+        "ai.send": "Send",
+        "ai.placeholder": "Type your question",
+        "ai.greeting": "Hello. I can answer about our products, the services we provide and how we work. What would you like to know?",
+        "ai.error": "I could not answer just now. Write to support@gmrglobe.com and a person will reply.",
+        "ai.q1": "What is GMR Reports?",
+        "ai.q2": "What services do you offer?",
+        "ai.q3": "Where are you based?"
+      }
+    };
+
+    function pick() {
+      try {
+        const saved = localStorage.getItem('gmr_lang');
+        if (saved && DICT[saved]) return saved;
+      } catch (e) { /* private windows throw; the default below is fine */ }
+      return (navigator.language || 'es').toLowerCase().startsWith('en') ? 'en' : 'es';
+    }
+
+    function apply(lang) {
+      const d = DICT[lang] || DICT.es;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const v = d[el.getAttribute('data-i18n')];
+        if (v !== undefined) el.textContent = v;
+      });
+      // Cards carry both languages, written in at build time.
+      document.querySelectorAll('[data-es]').forEach(el => {
+        el.textContent = el.getAttribute('data-' + lang) || el.getAttribute('data-es');
+      });
+      document.querySelectorAll('.lang button').forEach(b => {
+        b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+      });
+      try { localStorage.setItem('gmr_lang', lang); } catch (e) { /* not essential */ }
+    }
+
+    document.querySelectorAll('.lang button').forEach(b => {
+      b.addEventListener('click', () => apply(b.dataset.lang));
+    });
+    apply(pick());
+
+    // ── assistant ────────────────────────────────────────────────────────────────────
+    // Same endpoint the product console uses. Its own prompt is written around the
+    // report engine, so the company context below is seeded into the history: without
+    // it the assistant answers a question about the group as if it were about a
+    // renderer.
+    (function () {
+      const ENDPOINT = 'https://api.gmrglobe.com/api/ai/chat';
+      const launch = document.getElementById('aiLaunch');
+      const panel = document.getElementById('aiPanel');
+      const log = document.getElementById('aiLog');
+      const form = document.getElementById('aiForm');
+      const input = document.getElementById('aiInput');
+      const send = document.getElementById('aiSend');
+      const suggest = document.getElementById('aiSuggest');
+      if (!launch || !panel || !log || !form) return;
+
+      let ctx = {};
+      try { ctx = JSON.parse(document.getElementById('aiContext').textContent || '{}'); } catch (e) { /* the widget still works */ }
+
+      const t = (k) => (DICT[document.documentElement.lang] || DICT.es)[k] || '';
+      let history = [];
+      let busy = false;
+      let greeted = false;
+
+      // Escape first, then allow back only the few marks the model actually uses. The
+      // reply is text from a model, so it never reaches innerHTML unescaped.
+      function render(md) {
+        let h = String(md)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+        h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        h = h.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        const lines = h.split('\n');
+        let out = '', list = false;
+        for (const raw of lines) {
+          const line = raw.trim();
+          const item = line.match(/^[-*]\s+(.*)$/);
+          if (item) {
+            if (!list) { out += '<ul>'; list = true; }
+            out += '<li>' + item[1] + '</li>';
+            continue;
+          }
+          if (list) { out += '</ul>'; list = false; }
+          if (line) out += '<p>' + line.replace(/^#{1,6}\s*/, '') + '</p>';
+        }
+        if (list) out += '</ul>';
+        return out || '<p></p>';
+      }
+
+      function bubble(who, text, isHtml) {
+        const el = document.createElement('div');
+        el.className = 'ai-msg ' + who;
+        if (isHtml) el.innerHTML = render(text); else el.textContent = text;
+        log.appendChild(el);
+        log.scrollTop = log.scrollHeight;
+        return el;
+      }
+
+      function chips() {
+        suggest.textContent = '';
+        ['ai.q1', 'ai.q2', 'ai.q3'].forEach((k) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = t(k);
+          b.addEventListener('click', () => { input.value = t(k); form.requestSubmit(); });
+          suggest.appendChild(b);
+        });
+      }
+
+      // One priming turn, not a second system prompt: the backend owns that.
+      function seed() {
+        const lines = [
+          'Contexto de la empresa para esta conversacion:',
+          ctx.company ? ('Empresa: ' + ctx.company) : '',
+          ctx.tagline ? ('Lema: ' + ctx.tagline) : '',
+          ctx.products ? ('Productos: ' + ctx.products) : '',
+          ctx.services ? ('Servicios: ' + ctx.services) : '',
+          ctx.group ? ('Sociedades del grupo: ' + ctx.group) : '',
+          ctx.contact ? ('Contacto: ' + ctx.contact) : '',
+          'Quien pregunta esta en la web corporativa, no en la consola del producto.',
+          'Responde breve, en el idioma de la pregunta, y no inventes clientes ni cifras.'
+        ].filter(Boolean).join('\n');
+        history = [
+          { role: 'user', content: lines },
+          { role: 'model', content: 'Entendido. Respondo sobre la empresa, sus productos y sus servicios.' }
+        ];
+      }
+
+      async function ask(text) {
+        if (busy) return;
+        busy = true;
+        send.disabled = true;
+        bubble('me', text, false);
+        const wait = bubble('bot', '', false);
+        wait.innerHTML = '<span class="ai-dots"><i></i><i></i><i></i></span>';
+        try {
+          const res = await fetch(ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text, history: history })
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const data = await res.json();
+          const reply = (data && data.reply) || '';
+          if (!reply) throw new Error('empty');
+          wait.innerHTML = render(reply);
+          history.push({ role: 'user', content: text });
+          history.push({ role: 'model', content: reply });
+          if (history.length > 12) history = history.slice(0, 2).concat(history.slice(-8));
+        } catch (e) {
+          wait.className = 'ai-msg bot err';
+          wait.textContent = t('ai.error');
+        } finally {
+          busy = false;
+          send.disabled = false;
+          log.scrollTop = log.scrollHeight;
+        }
+      }
+
+      function open() {
+        panel.hidden = false;
+        launch.hidden = true;
+        if (!greeted) { seed(); bubble('bot', t('ai.greeting'), false); chips(); greeted = true; }
+        input.placeholder = t('ai.placeholder');
+        input.focus();
+      }
+      function close() { panel.hidden = true; launch.hidden = false; launch.focus(); }
+
+      launch.addEventListener('click', open);
+      document.getElementById('aiClose').addEventListener('click', close);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) close(); });
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const v = input.value.trim();
+        if (!v) return;
+        input.value = '';
+        ask(v);
+      });
+
+      // The language switch repaints the static labels; these are built at runtime.
+      document.querySelectorAll('.lang button').forEach((b) => {
+        b.addEventListener('click', () => {
+          input.placeholder = t('ai.placeholder');
+          if (greeted) chips();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,3043 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GMR Reports — Developer Console & Studio Sandbox</title>
+  <link rel="icon" type="image/svg+xml" href="/gmr-reports/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <script src="/gmr-reports/assets/i18n.js"></script>
+  <script src="/gmr-reports/assets/samples-cache.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body class="h-full flex flex-col font-sans selection:bg-emerald-500 selection:text-white bg-slate-950 text-slate-100">
+
+  <!-- Clean Enterprise Navbar -->
+  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-6 py-2.5 flex items-center justify-between sticky top-0 z-50 shrink-0">
+    <!-- Brand & Platform Identity -->
+    <div class="flex items-center gap-4">
+      <a href="/gmr-reports/" class="h-9 px-2.5 py-1 rounded-lg bg-white flex items-center justify-center shadow hover:opacity-95 transition" title="Corporate Portal">
+        <img src="/gmr-reports/assets/logo-gmr.jpg" alt="GMR" class="h-5 w-auto object-contain" />
+      </a>
+      <div class="flex items-center gap-2.5">
+        <span class="font-bold text-sm tracking-tight text-white flex items-center gap-2">
+          GMR Reports <span class="text-emerald-400 font-semibold">Studio</span>
+        </span>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">v1.3 GA</span>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hidden sm:inline">GraalVM Native</span>
+      </div>
+    </div>
+
+    <!-- Center / Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Active Tenant Selector -->
+      <div class="flex items-center gap-2 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-lg text-xs">
+        <span class="text-slate-400 text-[11px]" data-i18n="console.active_tenant">Inquilino:</span>
+        <select id="tenantSelect" onchange="onTenantChanged()" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
+          <option value="tenant-free" class="bg-slate-900 text-white">Comunidad (Free Tier)</option>
+          <option value="tenant-pro" class="bg-slate-900 text-white" selected>Acme Logistics (Pro Tier)</option>
+          <option value="tenant-enterprise" class="bg-slate-900 text-white">Global Finance (Enterprise Tier)</option>
+        </select>
+      </div>
+
+      <!-- Language Selector -->
+      <div class="inline-flex items-center rounded-lg bg-slate-900 border border-slate-700/80 p-0.5 text-xs">
+        <button type="button" onclick="GMR_I18N.setLanguage('es')" data-lang="es" class="gmr-lang-btn px-2 py-0.5 rounded text-[11px] font-semibold transition-all">
+          ES
+        </button>
+        <button type="button" onclick="GMR_I18N.setLanguage('en')" data-lang="en" class="gmr-lang-btn px-2 py-0.5 rounded text-[11px] font-semibold transition-all">
+          EN
+        </button>
+      </div>
+
+      <!-- Resources & Docs Dropdown -->
+      <div class="relative group">
+        <button class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700/80 transition flex items-center gap-1.5">
+          <span>📚 Recursos</span>
+          <span class="text-[10px] text-slate-400">▼</span>
+        </button>
+        <div class="absolute right-0 mt-1 w-48 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-50">
+          <a href="/gmr-reports/portal" class="px-3.5 py-2 text-xs text-slate-300 hover:text-emerald-400 hover:bg-slate-800/80 flex items-center gap-2 transition">
+            <span>🏢</span> <span>Portal Clientes</span>
+          </a>
+          <a href="https://api.gmrglobe.com/q/swagger-ui/" target="_blank" class="px-3.5 py-2 text-xs text-slate-300 hover:text-emerald-400 hover:bg-slate-800/80 flex items-center gap-2 transition">
+            <span>⚡</span> <span>Swagger UI</span>
+          </a>
+          <a href="https://api.gmrglobe.com/q/openapi" target="_blank" class="px-3.5 py-2 text-xs text-slate-300 hover:text-emerald-400 hover:bg-slate-800/80 flex items-center gap-2 transition">
+            <span>📄</span> <span>OpenAPI 3.1 Spec</span>
+          </a>
+          <a href="/gmr-reports/docs/pdf/Manual_Usuario_GMR_Reports_v1.3.pdf" download="Manual_Usuario_GMR_Reports_v1.3.pdf" class="px-3.5 py-2 text-xs text-emerald-400 hover:text-emerald-300 hover:bg-slate-800/80 flex items-center gap-2 font-semibold transition border-t border-slate-800/80">
+            <span>📥</span> <span>Manual de Usuario (Tenant)</span>
+          </a>
+          <div class="border-t border-slate-800 my-1"></div>
+          <div class="px-3 py-1.5 text-[10px] text-slate-500 uppercase font-semibold">SSO Login</div>
+          <div class="grid grid-cols-2 gap-1 px-2 pb-1">
+            <button onclick="loginWithProvider('github')" class="px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded text-[11px] text-center">GitHub</button>
+            <button onclick="loginWithProvider('google')" class="px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded text-[11px] text-center">Google</button>
+            <button onclick="loginWithProvider('microsoft')" class="px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded text-[11px] text-center">Entra ID</button>
+            <button onclick="loginWithProvider('linkedin')" class="px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded text-[11px] text-center">LinkedIn</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="bg-slate-900/40 border-b border-slate-800/80 px-6 flex gap-6 text-sm shrink-0">
+    <button onclick="switchTab('studio')" id="tabBtn-studio" data-i18n="console.tab_studio" class="py-2.5 border-b-2 font-semibold transition border-emerald-500 text-emerald-400 flex items-center gap-2 text-xs">
+      <span>⚡</span> Studio Sandbox
+    </button>
+    <button onclick="switchTab('analytics')" id="tabBtn-analytics" data-i18n="console.tab_usage" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">
+      <span>📊</span> Uso &amp; Cuotas
+    </button>
+    <button onclick="switchTab('keys')" id="tabBtn-keys" data-i18n="console.tab_keys" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">
+      <span>🔑</span> Claves API &amp; Aprovisionamiento
+    </button>
+    <button onclick="switchTab('quickstart')" id="tabBtn-quickstart" data-i18n="console.tab_quickstart" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">
+      <span>📦</span> SDK &amp; Inicio Rápido
+    </button>
+  </div>
+
+  <!-- TAB 1: STUDIO SANDBOX -->
+  <div id="tabContent-studio" class="flex-1 flex flex-col md:flex-row overflow-hidden">
+
+    <!-- LEFT COLUMN: Workspace (Editor, AI, Data) -->
+    <div class="w-full md:w-1/2 flex flex-col border-r border-slate-800/80 bg-slate-900/30">
+
+      <!-- Engine & Preset Toolbar -->
+      <div class="px-4 py-2 bg-slate-900/90 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <!-- Motor selector -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-slate-300">Motor:</span>
+          <select id="templateFormatSelect" onchange="onFormatSelected()" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-lg px-2.5 py-1 focus:outline-none font-semibold cursor-pointer">
+            <option value="crystal">Crystal Reports (.rpt o .rpt.xml)</option>
+            <option value="jrxml">JasperReports (.jrxml)</option>
+            <option value="birt">Eclipse BIRT (.rptdesign)</option>
+          </select>
+          <span id="formatDescription" class="text-[11px] text-slate-400 hidden lg:inline font-mono">AOT Native Sub-Millisecond</span>
+        </div>
+
+        <!-- Presets, Mis Plantillas & Reset -->
+        <div class="flex items-center gap-2">
+          <!-- Mis Plantillas Guardadas Dropdown -->
+          <div class="relative group">
+            <button class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition">
+              <span>📁</span> <span>Mis Plantillas</span>
+              <span id="savedTemplatesCountBadge" class="text-[10px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300">0</span>
+              <span class="text-[10px] text-slate-400">▼</span>
+            </button>
+            <div id="savedTemplatesMenu" class="absolute right-0 mt-1 w-72 bg-slate-900 border border-slate-700/90 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-50">
+              <div class="px-3 py-1.5 text-[11px] font-semibold text-slate-400 border-b border-slate-800 flex justify-between items-center">
+                <span>Plantillas en tu Tenant</span>
+                <button onclick="loadSavedTenantTemplates()" class="text-cyan-400 hover:underline text-[10px]">↻ Actualizar</button>
+              </div>
+              <div id="savedTemplatesList" class="max-h-56 overflow-y-auto py-1">
+                <div class="px-3 py-3 text-center text-slate-500 text-xs">Sin plantillas guardadas aún.<br><span class="text-[10px] text-slate-600">Guarda una con el botón "Guardar en Tenant"</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enterprise Presets Dropdown -->
+          <div class="relative group">
+            <button class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700/80 flex items-center gap-1.5 transition">
+              <span>💎</span> <span class="hidden sm:inline">Ejemplos</span>
+              <span class="text-[10px] text-slate-400">▼</span>
+            </button>
+            <div class="absolute right-0 mt-1 w-64 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1 hidden group-hover:block z-50">
+              <button onclick="loadTemplatePreset('crystal')" class="w-full text-left px-3 py-2 text-xs text-purple-300 hover:bg-purple-950/40 flex items-center gap-2 transition">
+                <span>💎</span> <div><div class="font-bold">SAP Crystal Reports</div><div class="text-[10px] text-slate-400">Drilldown jerárquico &amp; Cross-Tabs</div></div>
+              </button>
+              <button onclick="loadTemplatePreset('jrxml')" class="w-full text-left px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-950/40 flex items-center gap-2 transition">
+                <span>🧾</span> <div><div class="font-bold">JasperReports Factura</div><div class="text-[10px] text-slate-400">Código QR 2D, tablas &amp; totales</div></div>
+              </button>
+              <button onclick="loadTemplatePreset('birt')" class="w-full text-left px-3 py-2 text-xs text-cyan-300 hover:bg-cyan-950/40 flex items-center gap-2 transition">
+                <span>🌐</span> <div><div class="font-bold">Eclipse BIRT Logistics</div><div class="text-[10px] text-slate-400">Auditoría de flota &amp; gráficos</div></div>
+              </button>
+            </div>
+          </div>
+
+          <button onclick="loadSampleTemplate()" class="text-xs text-cyan-400 hover:text-cyan-300 font-medium px-2 py-1 rounded hover:bg-slate-800 transition" title="Restablecer plantilla original">
+            ↺
+          </button>
+        </div>
+      </div>
+
+      <!-- Studio Workspaces Sub-Tabs -->
+      <div class="px-4 bg-slate-950/70 border-b border-slate-800/80 flex items-center justify-between shrink-0">
+        <div class="flex gap-4 text-xs font-semibold">
+          <button onclick="switchEditorTab('template')" id="tabSubBtn-template" class="py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-1.5 transition">
+            <span>📝</span> Plantilla de Reporte
+          </button>
+          <button onclick="switchEditorTab('data')" id="tabSubBtn-data" class="py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition">
+            <span>📊</span> Datos &amp; Parámetros (JSON)
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Quick Render Button -->
+          <button onclick="renderDynamicPdf()" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold transition flex items-center gap-1.5 shadow-sm" title="Compilar y visualizar PDF en vivo">
+            <span>⚡</span> <span>Generar PDF</span>
+          </button>
+
+          <!-- AI Assistant Toggle Button -->
+          <button onclick="toggleAiDrawer()" id="btnToggleAi" class="px-2.5 py-1 rounded-lg bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 text-[11px] font-semibold transition flex items-center gap-1.5">
+            <span>✨</span> <span>Asistente IA</span>
+            <span class="text-[9px] px-1 py-0.2 rounded bg-purple-500/20 text-purple-200">Gemini</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Collapsible AI Prompt Drawer -->
+      <div id="aiDrawer" class="p-3 bg-gradient-to-r from-purple-950/30 via-slate-900/50 to-slate-950/80 border-b border-purple-500/30 space-y-2 shrink-0">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-purple-300 flex items-center gap-1">✨ Diseñar o Modificar con IA</span>
+            <span class="text-[10px] text-slate-400">Pide cambios en lenguaje natural</span>
+          </div>
+          <div class="flex items-center gap-1 text-[10px]">
+            <button onclick="applyAiPromptPreset('Añade un encabezado con fondo gris claro y bordes redondeados')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Estilo Encabezado</button>
+            <button onclick="applyAiPromptPreset('Convierte en factura comercial con desglose de impuestos e ítems')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Factura</button>
+            <button onclick="applyAiPromptPreset('Genera estado de cuenta bancario con balance y transacciones')" class="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-purple-900/40 text-slate-300 border border-slate-700 transition">Estado Cuenta</button>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <input type="text" id="aiTemplatePrompt" placeholder="Ej: Cambia los colores a azul marino y agrega un campo de descuento..." class="flex-1 bg-slate-950 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-400" onkeydown="if(event.key === 'Enter') generateTemplateWithAi()" />
+          <button onclick="generateTemplateWithAi()" id="btnAiGenerate" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-bold text-xs shadow-lg shadow-purple-900/30 transition flex items-center gap-1.5 shrink-0">
+            <span id="aiBtnIcon">✨</span> <span id="aiBtnText">Aplicar</span>
+          </button>
+          <button id="btnUndoAi" onclick="undoLastAiChange()" disabled title="Deshacer último cambio AI" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 text-[11px] font-semibold transition flex items-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed shrink-0">
+            <span>↩</span> <span>Deshacer</span>
+          </button>
+        </div>
+        <div id="aiTemplateFeedback" class="text-[11px] text-slate-400 hidden flex items-center gap-2 pt-0.5">
+          <span id="aiFeedbackBadge" class="px-1.5 py-0.5 rounded text-[10px] font-mono"></span>
+          <span id="aiFeedbackMessage" class="truncate"></span>
+        </div>
+      </div>
+
+      <!-- WORKSPACE VIEW 1: TEMPLATE CODE EDITOR (Full Height) -->
+      <div id="editorView-template" class="flex-1 flex flex-col p-3 overflow-hidden relative">
+        <input type="file" id="templateFileInput" class="hidden" accept=".jrxml,.xml,.rpt,.rptdesign" onchange="handleTemplateFileUpload(event)" />
+        <input type="file" id="bundleFileInput" class="hidden" accept=".zip,.tar.gz,.tgz,.tar" onchange="handleBundleFileUpload(event)" />
+        <input type="file" id="folderFileInput" class="hidden" webkitdirectory directory multiple onchange="handleFolderUpload(event)" />
+        <input type="file" id="assetMultiFileInput" class="hidden" multiple accept=".jrxml,.jasper,.xml,.png,.jpg,.jpeg,.svg" onchange="handleAssetMultiUpload(event)" />
+        <div class="flex items-center justify-between pb-2 text-[11px] text-slate-400 font-mono shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-slate-300">Fuente de la Plantilla (XML / JRXML / RPT):</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Edición en vivo</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="document.getElementById('bundleFileInput').click()" class="px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Importa un paquete comprimido (.zip o .tar.gz) con plantilla, subreportes y assets">
+              <span>📦</span> <span>Cargar Bundle (.zip/.tar.gz)</span>
+            </button>
+            <button type="button" onclick="document.getElementById('folderFileInput').click()" class="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Importa una carpeta completa de reporte con sus subdirectorios y assets">
+              <span>📁</span> <span>Cargar Carpeta</span>
+            </button>
+            <button type="button" onclick="document.getElementById('templateFileInput').click()" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Importa un archivo .jrxml, .rpt o .rptdesign desde tu equipo">
+              <span>📥</span> <span>Cargar Plantilla</span>
+            </button>
+            <button type="button" onclick="insertBankLogoToTemplate()" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm" title="Inserta el logotipo oficial del banco en el encabezado de la plantilla">
+              <span>🏦</span> <span>Insertar Logo Banco</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Template Required Assets Banner -->
+        <div id="requiredAssetsBanner" class="hidden mb-2.5 p-2.5 bg-amber-950/40 border border-amber-500/40 rounded-xl flex flex-col gap-2 shrink-0 transition-all duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400 text-sm">📦</span>
+              <span class="text-xs font-bold text-amber-200" id="requiredAssetsTitle">Recursos Externos Detectados</span>
+              <span id="requiredAssetsBadge" class="text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">0 requeridos</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="cancelAndClearAssets()" id="btnCancelAssets" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-red-400 border border-slate-700 text-[11px] font-semibold transition flex items-center gap-1 shadow-sm" title="Cancelar vinculación y purgar recursos cargados de la memoria">
+                <span>✕</span> <span>Cancelar / Limpiar</span>
+              </button>
+              <button type="button" onclick="document.getElementById('assetMultiFileInput').click()" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] transition flex items-center gap-1 shadow-md shadow-amber-950/50">
+                <span>📤</span> <span>Cargar Subreportes / Assets</span>
+              </button>
+            </div>
+          </div>
+          <div id="requiredAssetsList" class="flex flex-wrap gap-1.5 pt-0.5 text-[11px] font-mono">
+            <!-- Asset tags injected dynamically -->
+          </div>
+        </div>
+
+        <textarea id="jrxmlInput" oninput="debounceScanAssets()" class="w-full flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500/60 shadow-inner resize-none leading-relaxed transition-all duration-200" spellcheck="false" placeholder="Arrastra y suelta tu archivo de plantilla (.jrxml, .rpt, .rptdesign) aquí o edita el código fuente..."></textarea>
+      </div>
+
+      <!-- WORKSPACE VIEW 2: DATA & PARAMETERS (Split View with full height) -->
+      <div id="editorView-data" class="flex-1 p-3 overflow-hidden hidden flex flex-col gap-3">
+        <div class="flex-1 flex flex-col md:flex-row gap-3 overflow-hidden">
+          <!-- Parameters -->
+          <div class="w-full md:w-1/2 flex flex-col bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+            <div class="flex items-center justify-between pb-2">
+              <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <span>🔑</span> Parámetros (Map):
+              </label>
+              <button onclick="formatJsonEditor('paramsInput')" class="text-[10px] text-cyan-400 hover:underline font-mono">Formatear JSON</button>
+            </div>
+            <textarea id="paramsInput" class="flex-1 bg-slate-900/90 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500/50 resize-none leading-relaxed" spellcheck="false">{
+  "REPORT_TITLE": "SAP Xtreme Sales by Customer & Region",
+  "CORPORATION_NAME": "Xtreme Mountain Sports & Industrial Holding AG",
+  "REGION_PROMPT": "Americas",
+  "TAX_RATE": 0.18
+}</textarea>
+          </div>
+
+          <!-- Dataset Records -->
+          <div class="w-full md:w-1/2 flex flex-col bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+            <div class="flex items-center justify-between pb-2">
+              <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <span>📋</span> Registros de Datos (List):
+              </label>
+              <button onclick="formatJsonEditor('dataInput')" class="text-[10px] text-cyan-400 hover:underline font-mono">Formatear JSON</button>
+            </div>
+            <textarea id="dataInput" class="flex-1 bg-slate-900/90 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500/50 resize-none leading-relaxed" spellcheck="false">[
+  {
+    "Customer_Name": "Alloy Wheels Inc. [North America]",
+    "Region": "North America",
+    "Order_ID": "ORD-10821",
+    "Product_Line": "Racing Wheels & Aerodynamic Rims",
+    "Order_Amount": 28500.30
+  },
+  {
+    "Customer_Name": "Bavarian Motor Dynamics [EMEA]",
+    "Region": "Europe",
+    "Order_ID": "ORD-20345",
+    "Product_Line": "Telemetry Inverters & Controllers",
+    "Order_Amount": 77200.00
+  },
+  {
+    "Customer_Name": "Tokyo Cybernetics Corp [APAC]",
+    "Region": "Asia-Pacific",
+    "Order_ID": "ORD-30081",
+    "Product_Line": "Optoelectronic Cryo-Valves",
+    "Order_Amount": 61400.00
+  }
+]</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Footer (Sticky at bottom) -->
+      <div class="p-3 border-t border-slate-800/80 bg-slate-900/80 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2 text-xs font-mono text-slate-400" id="renderMetrics">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Listo para compilar</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <button onclick="renderSampleExcel()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition border border-slate-700/80 flex items-center gap-1.5">
+            <span>📊</span> <span>Exportar XLSX</span>
+          </button>
+          <button onclick="renderDynamicPdf()" id="btnRenderPdf" class="px-5 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs transition shadow-lg shadow-emerald-500/25 flex items-center gap-2">
+            <span>⚡</span> <span>Generar / Renderizar PDF</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Live PDF Preview Viewer (Full Height) -->
+    <div class="w-full md:w-1/2 flex flex-col bg-slate-950">
+      <div class="px-4 py-2 border-b border-slate-800/80 bg-slate-900/60 flex items-center justify-between text-xs shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="font-bold text-slate-200 flex items-center gap-1.5">
+            <span>👁️</span> Vista Previa en Vivo
+          </span>
+          <span id="previewStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-slate-800 text-slate-400">Awaiting Render</span>
+        </div>
+        <div class="flex items-center gap-2" id="downloadLinks">
+          <!-- Dynamic Download Button inserted here -->
+        </div>
+      </div>
+      <div class="flex-1 relative flex items-center justify-center p-3 bg-slate-900/20">
+        <div id="emptyPreviewPlaceholder" class="text-center text-slate-500 max-w-xs">
+          <div class="text-5xl mb-3">📄</div>
+          <p class="text-sm font-semibold text-slate-300">Sin documento generado</p>
+          <p class="text-xs mt-1 text-slate-500">Presiona "Renderizar Reporte" para compilar AOT en milisegundos con GraalVM</p>
+        </div>
+        <iframe id="pdfViewer" class="w-full h-full rounded-xl border border-slate-800/80 shadow-2xl hidden bg-white"></iframe>
+      </div>
+    </div>
+
+  </div>
+
+    <!-- TAB 2: USAGE & QUOTAS -->
+    <div id="tabContent-analytics" class="flex-1 p-8 overflow-y-auto hidden">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Tenant Usage & Quotas</h2>
+            <p class="text-sm text-slate-400">Real-time consumption metrics tracked by the SaaS Gateway</p>
+          </div>
+          <button onclick="refreshUsage()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700">
+            🔄 Refresh Metrics
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Current Plan</div>
+            <div id="metricPlan" class="text-2xl font-bold text-emerald-400 mt-2">PRO</div>
+            <div id="metricRpm" class="text-xs text-slate-500 mt-1">300 req / min limit</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Monthly Used</div>
+            <div id="metricMonthlyUsed" class="text-2xl font-bold text-white mt-2">0</div>
+            <div id="metricMonthlyQuota" class="text-xs text-slate-500 mt-1">of 25,000 monthly quota</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quota Remaining</div>
+            <div id="metricRemaining" class="text-2xl font-bold text-cyan-400 mt-2">25,000</div>
+            <div class="text-xs text-slate-500 mt-1">resets at month end</div>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex flex-col justify-between">
+            <div>
+              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Volume Generated</div>
+              <div id="metricVolume" class="text-2xl font-bold text-purple-400 mt-2">0 KB</div>
+              <div id="metricTotalReqs" class="text-xs text-slate-500 mt-1">0 total requests</div>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between">
+              <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
+                <span>📉</span> <span>Ahorro RAM vs JVM:</span>
+              </span>
+              <span id="metricRamSavings" class="text-xs font-mono font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">885 MB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quota Progress Bar -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
+          <div class="flex justify-between text-xs font-semibold">
+            <span class="text-slate-300">Billing Cycle Quota Consumption</span>
+            <span id="quotaPercentage" class="text-emerald-400">0%</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+            <div id="quotaProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: API KEYS & PROVISIONING -->
+    <div id="tabContent-keys" class="flex-1 p-8 overflow-y-auto hidden">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-white tracking-tight">API Key Management</h2>
+          <p class="text-sm text-slate-400">Manage tenant credentials and provision new customer accounts</p>
+        </div>
+
+        <!-- Active Key Display Card -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-4">
+          <div class="text-xs font-semibold text-slate-300">Active Tenant Secret Key:</div>
+          <div class="flex items-center gap-3">
+            <input type="text" id="activeKeyInput" readonly class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm font-mono text-emerald-400 focus:outline-none">
+            <button id="btnCopyKey" onclick="copyActiveKey()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
+              Copy Key
+            </button>
+          </div>
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-800/80 justify-between">
+            <span class="text-xs text-slate-500">Authenticate requests by passing this token via <code class="text-slate-300 font-mono">X-API-Key</code>.</span>
+            <button onclick="revokeActiveTenant()" class="px-3 py-1.5 bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800/50 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5">
+              <span>🗑️</span> <span>Revoke & Delete Tenant</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Upgrade Banner -->
+        <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div>
+            <div class="font-bold text-white flex items-center gap-2">
+              <span>💳 Subscribe via Stripe Billing</span>
+              <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded">Self-Service</span>
+            </div>
+            <p class="text-slate-400 mt-0.5">Need 25k+ documents, multi-tenancy quotas, or SLA 99.9%? Activate Launch ($49/mo), Growth ($149/mo), or Scale ($499/mo).</p>
+          </div>
+          <a href="/gmr-reports/#pricing" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition shrink-0">
+            View Stripe Plans →
+          </a>
+        </div>
+
+        <!-- Provision New Tenant Form -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-4">
+          <h3 class="text-sm font-bold text-white">Crear un sandbox</h3>
+          <p class="text-xs text-slate-400 -mt-1">
+            Alta inmediata, sin tarjeta. El identificador y la clave los genera el servidor
+            y la clave se muestra una sola vez.
+            <span class="text-slate-300">100 documentos/mes, 20 peticiones/minuto.</span>
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-slate-400">Nombre de la organizacion:</label>
+              <input type="text" id="newTenantName" placeholder="MyCorp S.A." class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-xs text-slate-200 mt-1 focus:outline-none">
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">Plan:</label>
+              <div class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-xs text-slate-400 mt-1">
+                Sandbox &mdash; para produccion, <a href="/gmr-reports/licensing" class="text-emerald-400 hover:underline">suscribete</a>
+              </div>
+            </div>
+          </div>
+          <button onclick="provisionTenant()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white rounded-lg border border-slate-700 transition">
+            + Crear sandbox
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: SDK & QUICKSTART -->
+    <div id="tabContent-quickstart" class="flex-1 p-8 overflow-y-auto hidden">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-white tracking-tight">Client Integration & Quickstart</h2>
+          <p class="text-sm text-slate-400">Copy pre-configured code snippets with your active API key</p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- TypeScript Snippet -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="px-4 py-2 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs font-semibold text-slate-300">
+              <span>TypeScript / Node.js SDK</span>
+              <span class="text-slate-500 font-mono">npm install @gmresearch/reports-client</span>
+            </div>
+            <pre class="p-4 text-xs font-mono text-slate-300 overflow-x-auto"><code id="codeSnippetTs">import { GmrReportsClient } from "@gmresearch/reports-client";
+
+const client = new GmrReportsClient({
+  baseUrl: window.location.origin,
+  apiKey: "YOUR_API_KEY"
+});
+
+// Render dynamic PDF with automatic 429 retry backoff
+const pdfBuffer = await client.renderDynamicPdf({
+  jrxml: "&lt;jasperReport ...&gt;...&lt;/jasperReport&gt;",
+  parameters: { INVOICE_NUMBER: "FAC-1001" },
+  data: [{ code: "SRV-01", description: "SaaS Subscription", total: 100.0 }]
+});</code></pre>
+          </div>
+
+          <!-- Python Snippet -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="px-4 py-2 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs font-semibold text-slate-300">
+              <span>Python SDK</span>
+              <span class="text-slate-500 font-mono">pip install gmr-reports-client</span>
+            </div>
+            <pre class="p-4 text-xs font-mono text-slate-300 overflow-x-auto"><code id="codeSnippetPy">from gmr_reports import GmrReportsClient
+
+client = GmrReportsClient(
+    base_url="http://localhost:8080",
+    api_key="YOUR_API_KEY"
+)
+
+pdf_bytes = client.render(report_type="invoice")
+with open("invoice.pdf", "wb") as f:
+    f.write(pdf_bytes)</code></pre>
+          </div>
+
+          <!-- cURL Snippet -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="px-4 py-2 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs font-semibold text-slate-300">
+              <span>cURL (HTTP REST)</span>
+            </div>
+            <pre class="p-4 text-xs font-mono text-slate-300 overflow-x-auto"><code id="codeSnippetCurl">curl -X GET "http://localhost:8080/api/reports/render?type=invoice&output=pdf" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --output invoice.pdf</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  
+  </div>
+
+  <script>
+
+    // Studio Workspace Sub-Tabs Switcher
+    function switchEditorTab(tab) {
+      const templateTab = document.getElementById('tabSubBtn-template');
+      const dataTab = document.getElementById('tabSubBtn-data');
+      const templateView = document.getElementById('editorView-template');
+      const dataView = document.getElementById('editorView-data');
+
+      if (tab === 'template') {
+        templateTab.className = "py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-1.5 transition";
+        dataTab.className = "py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition";
+        templateView.classList.remove('hidden');
+        dataView.classList.add('hidden');
+      } else {
+        dataTab.className = "py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-1.5 transition";
+        templateTab.className = "py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition";
+        dataView.classList.remove('hidden');
+        templateView.classList.add('hidden');
+      }
+    }
+
+    // AI Drawer toggle
+    let aiDrawerOpen = true;
+    function toggleAiDrawer() {
+      const drawer = document.getElementById('aiDrawer');
+      aiDrawerOpen = !aiDrawerOpen;
+      if (aiDrawerOpen) {
+        drawer.classList.remove('hidden');
+      } else {
+        drawer.classList.add('hidden');
+      }
+    }
+
+    // ── AI Template History (Undo Stack) ────────────────────────────────────
+    const templateHistory = [];
+    const MAX_TEMPLATE_HISTORY = 10;
+
+    function pushTemplateToHistory(xml) {
+      if (!xml || xml.trim().length < 10) return;
+      templateHistory.push(xml);
+      if (templateHistory.length > MAX_TEMPLATE_HISTORY) templateHistory.shift();
+      const btn = document.getElementById('btnUndoAi');
+      if (btn) btn.disabled = false;
+    }
+
+    function undoLastAiChange() {
+      if (templateHistory.length === 0) return;
+      const previous = templateHistory.pop();
+      document.getElementById('jrxmlInput').value = previous;
+      if (templateHistory.length === 0) {
+        const btn = document.getElementById('btnUndoAi');
+        if (btn) btn.disabled = true;
+      }
+      if (typeof showConsoleToast === 'function') {
+        showConsoleToast('↩ Último cambio AI deshecho');
+      } else {
+        const feedbackMsg = document.getElementById('aiFeedbackMessage');
+        if (feedbackMsg) feedbackMsg.innerText = '↩ Último cambio AI deshecho';
+      }
+      renderDynamicPdf();
+    }
+
+    // ── Asset Management & Dependency Scanner ──────────────────────────────
+    const uploadedAssets = {}; // filename -> string content or base64 data URI
+    let detectedAssetNames = [];
+    let assetScanTimer = null;
+
+    function debounceScanAssets() {
+      clearTimeout(assetScanTimer);
+      assetScanTimer = setTimeout(scanCurrentTemplateAssets, 300);
+    }
+
+    function scanTemplateDependencies(xml) {
+      if (!xml || typeof xml !== 'string') return [];
+      const found = new Set();
+
+      // 1. Subreport expressions: match .jasper or .jrxml inside subreport tags
+      const subreportRegex = /<subreportExpression>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/subreportExpression>/gi;
+      let match;
+      while ((match = subreportRegex.exec(xml)) !== null) {
+        const expr = match[1];
+        const fileMatch = expr.match(/["']([^"']+\.(?:jasper|jrxml))["']/i);
+        if (fileMatch) {
+          const fname = fileMatch[1].replace(/^.*[\\\/]/, '').trim();
+          if (fname) found.add(fname);
+        }
+      }
+
+      // 2. Image expressions: match local filenames
+      const imgRegex = /<imageExpression>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/imageExpression>/gi;
+      while ((match = imgRegex.exec(xml)) !== null) {
+        const expr = match[1];
+        if (!expr.includes('http://') && !expr.includes('https://') && !expr.includes('data:')) {
+          const fileMatch = expr.match(/["']([^"']+\.(?:png|jpg|jpeg|gif|svg|bmp))["']/i);
+          if (fileMatch) {
+            const fname = fileMatch[1].replace(/^.*[\\\/]/, '').trim();
+            if (fname) found.add(fname);
+          }
+        }
+      }
+
+      return Array.from(found);
+    }
+
+    // Escaneo recursivo profundo (árbol de dependencias multinivel: plantilla -> subreporte -> sub-subreporte / imágenes)
+    function scanAllDependenciesDeep() {
+      const mainXml = document.getElementById('jrxmlInput')?.value || '';
+      const allFound = new Set();
+      const visitedXmls = new Set();
+
+      function scanRecursive(xml) {
+        if (!xml || typeof xml !== 'string' || visitedXmls.has(xml)) return;
+        visitedXmls.add(xml);
+
+        const directDeps = scanTemplateDependencies(xml);
+        directDeps.forEach(dep => {
+          allFound.add(dep);
+          const baseName = dep.replace(/\.(?:jasper|jrxml)$/i, '');
+          // Si el subreporte ya está cargado en uploadedAssets y es texto XML, escanear sus dependencias hijas
+          const subContent = uploadedAssets[dep] || uploadedAssets[baseName + '.jrxml'] || uploadedAssets[baseName + '.jasper'] || uploadedAssets[baseName];
+          if (subContent && typeof subContent === 'string' && (subContent.includes('<jasperReport') || subContent.includes('<?xml'))) {
+            scanRecursive(subContent);
+          }
+        });
+      }
+
+      scanRecursive(mainXml);
+      return Array.from(allFound);
+    }
+
+    function scanCurrentTemplateAssets() {
+      detectedAssetNames = scanAllDependenciesDeep();
+      updateRequiredAssetsBanner();
+    }
+
+    function updateRequiredAssetsBanner() {
+      const banner = document.getElementById('requiredAssetsBanner');
+      const listEl = document.getElementById('requiredAssetsList');
+      const badgeEl = document.getElementById('requiredAssetsBadge');
+      if (!banner || !listEl || !badgeEl) return;
+
+      if (detectedAssetNames.length === 0) {
+        banner.classList.add('hidden');
+        return;
+      }
+
+      banner.classList.remove('hidden');
+
+      let missingCount = 0;
+      let html = '';
+
+      detectedAssetNames.forEach(name => {
+        const baseName = name.replace(/\.(?:jasper|jrxml)$/i, '');
+        // Check if uploaded either with exact name or .jrxml alternative
+        const isUploaded = !!(uploadedAssets[name] || uploadedAssets[baseName + '.jrxml'] || uploadedAssets[baseName + '.jasper'] || uploadedAssets[baseName]);
+
+        if (!isUploaded) missingCount++;
+
+        const isSubreport = name.endsWith('.jasper') || name.endsWith('.jrxml');
+        const icon = isSubreport ? '📑' : '🖼️';
+
+        if (isUploaded) {
+          html += `
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 group">
+              <span>${icon}</span>
+              <span class="font-semibold">${name}</span>
+              <span class="text-emerald-400 font-bold" title="Cargado en memoria">✓</span>
+              <button type="button" onclick="removeUploadedAsset('${name}')" title="Desvincular y eliminar este recurso" class="ml-1 text-slate-400 hover:text-red-300 transition text-xs font-bold leading-none">✕</button>
+            </span>
+          `;
+        } else {
+          const subreportHint = isSubreport ? ' (sube .jrxml o .jasper)' : '';
+          html += `
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse" title="Recurso requerido${subreportHint}">
+              <span>${icon}</span>
+              <span class="font-semibold">${name}</span>
+              <span class="text-red-400 font-bold">⚠️ Falta</span>
+            </span>
+          `;
+        }
+      });
+
+      listEl.innerHTML = html;
+
+      if (missingCount === 0) {
+        badgeEl.className = "text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        badgeEl.innerText = `✓ Todos los ${detectedAssetNames.length} assets vinculados`;
+      } else {
+        badgeEl.className = "text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold bg-red-500/20 text-red-300 border border-red-500/30";
+        badgeEl.innerText = `${missingCount} de ${detectedAssetNames.length} pendientes`;
+      }
+    }
+
+    function handleAssetMultiUpload(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      let loadedCount = 0;
+      const total = files.length;
+
+      Array.from(files).forEach(file => {
+        const fname = file.name;
+        const isBinary = fname.endsWith('.png') || fname.endsWith('.jpg') || fname.endsWith('.jpeg') || fname.endsWith('.gif') || fname.endsWith('.bmp');
+
+        const reader = new FileReader();
+        if (isBinary) {
+          reader.onload = function(e) {
+            uploadedAssets[fname] = e.target.result; // Data URL (data:image/...)
+            loadedCount++;
+            if (loadedCount === total) {
+              onAssetsFinishedLoading(total);
+            }
+          };
+          reader.readAsDataURL(file);
+        } else {
+          reader.onload = function(e) {
+            uploadedAssets[fname] = e.target.result; // Text XML/JRXML
+            const base = fname.replace(/\.(?:jrxml|jasper)$/i, '');
+            uploadedAssets[base + '.jrxml'] = e.target.result;
+            uploadedAssets[base + '.jasper'] = e.target.result;
+            loadedCount++;
+            if (loadedCount === total) {
+              onAssetsFinishedLoading(total);
+            }
+          };
+          reader.readAsText(file);
+        }
+      });
+
+      event.target.value = '';
+    }
+
+    function cancelAndClearAssets() {
+      const keys = Object.keys(uploadedAssets);
+      keys.forEach(k => delete uploadedAssets[k]);
+      const fileInput = document.getElementById('assetMultiFileInput');
+      if (fileInput) fileInput.value = '';
+      updateRequiredAssetsBanner();
+      showConsoleToast('🧹 Memoria limpiada: Todos los recursos externos vinculados fueron eliminados.');
+      renderDynamicPdf();
+    }
+
+    function removeUploadedAsset(assetName) {
+      const base = assetName.replace(/\.(?:jasper|jrxml)$/i, '');
+      delete uploadedAssets[assetName];
+      delete uploadedAssets[base + '.jasper'];
+      delete uploadedAssets[base + '.jrxml'];
+      delete uploadedAssets[base];
+      updateRequiredAssetsBanner();
+      showConsoleToast(`🗑️ Recurso "${assetName}" desvinculado de la memoria.`);
+      renderDynamicPdf();
+    }
+
+    function onAssetsFinishedLoading(count) {
+      updateRequiredAssetsBanner();
+      showConsoleToast(`✓ ${count} asset(s) cargado(s) correctamente para el render.`);
+      renderDynamicPdf();
+    }
+
+    // Format JSON in Textarea
+    function formatJsonEditor(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      try {
+        const obj = JSON.parse(el.value);
+        el.value = JSON.stringify(obj, null, 2);
+      } catch (err) {
+        alert('JSON inválido: ' + err.message);
+      }
+    }
+
+    // Populated at runtime by signing in or creating an account. It used to ship with
+    // three live production keys in it, including an ENTERPRISE one, which made this
+    // public page a credential handout.
+    const tenantKeys = {};
+
+    const sampleJrxml = `<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="ExecutiveEnterpriseInvoice" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="25" bottomMargin="25">
+    <parameter name="INVOICE_NUMBER" class="java.lang.String"/>
+    <parameter name="CUSTOMER_NAME" class="java.lang.String"/>
+    <parameter name="CUSTOMER_TAX_ID" class="java.lang.String"/>
+    <parameter name="CUSTOMER_TIER" class="java.lang.String"/>
+    <parameter name="BILLING_PERIOD" class="java.lang.String"/>
+    <parameter name="ISSUE_DATE" class="java.lang.String"/>
+    <parameter name="DUE_DATE" class="java.lang.String"/>
+    <parameter name="QR_VERIFY_URL" class="java.lang.String"/>
+    <parameter name="CURRENCY_SYMBOL" class="java.lang.String"/>
+    <parameter name="SUBTOTAL" class="java.math.BigDecimal"/>
+    <parameter name="TAX_AMOUNT" class="java.math.BigDecimal"/>
+    <parameter name="DISCOUNT_AMOUNT" class="java.math.BigDecimal"/>
+    <parameter name="TOTAL_NET" class="java.math.BigDecimal"/>
+
+    <field name="lineNo" class="java.lang.Integer"/>
+    <field name="sku" class="java.lang.String"/>
+    <field name="description" class="java.lang.String"/>
+    <field name="category" class="java.lang.String"/>
+    <field name="quantity" class="java.lang.Integer"/>
+    <field name="unitPrice" class="java.math.BigDecimal"/>
+    <field name="discountPct" class="java.math.BigDecimal"/>
+    <field name="total" class="java.math.BigDecimal"/>
+
+    <title>
+        <band height="120">
+            <rectangle radius="6">
+                <reportElement x="0" y="0" width="535" height="110" forecolor="#0f172a" backcolor="#0f172a"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="16" y="14" width="300" height="24" forecolor="#ffffff"/>
+                <textElement><font size="16" isBold="true"/></textElement>
+                <text><![CDATA[GMR GLOBAL AEROSPACE &amp; CLOUD]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="16" y="38" width="300" height="14" forecolor="#94a3b8"/>
+                <textElement><font size="9"/></textElement>
+                <text><![CDATA[High-Performance AOT Reports Engine — Tier-4 Enterprise]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="16" y="58" width="280" height="40" forecolor="#cbd5e1"/>
+                <textElement><font size="8"/></textElement>
+                <text><![CDATA[One World Trade Center, Suite 8500, New York, NY
+Tax ID: US-EIN-884920194 | SWIFT: GMRGUS33
+Support: gmr-rep-support@gmrglobe.com]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="330" y="14" width="185" height="16" forecolor="#10b981"/>
+                <textElement textAlignment="Right"><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[CORPORATE TAX INVOICE]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="330" y="32" width="185" height="18" forecolor="#ffffff"/>
+                <textElement textAlignment="Right"><font size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{INVOICE_NUMBER}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="330" y="54" width="185" height="14" forecolor="#94a3b8"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Issue: " + $P{ISSUE_DATE} + " | Due: " + $P{DUE_DATE}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="330" y="70" width="185" height="14" forecolor="#38bdf8"/>
+                <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["Billing Cycle: " + $P{BILLING_PERIOD}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <pageHeader>
+        <band height="65">
+            <rectangle radius="4">
+                <reportElement x="0" y="0" width="535" height="58" forecolor="#e2e8f0" backcolor="#f8fafc"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="12" y="8" width="80" height="12" forecolor="#64748b"/>
+                <textElement><font size="7" isBold="true"/></textElement>
+                <text><![CDATA[BILLED TO:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="12" y="20" width="260" height="16" forecolor="#0f172a"/>
+                <textElement><font size="10" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{CUSTOMER_NAME}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="12" y="36" width="260" height="14" forecolor="#475569"/>
+                <textElement><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Tax ID / VAT: " + $P{CUSTOMER_TAX_ID} + " | Tier: " + $P{CUSTOMER_TIER}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="330" y="8" width="185" height="12" forecolor="#64748b"/>
+                <textElement textAlignment="Right"><font size="7" isBold="true"/></textElement>
+                <text><![CDATA[PAYMENT STATUS &amp; SETTLEMENT:]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="330" y="20" width="185" height="14" forecolor="#10b981"/>
+                <textElement textAlignment="Right"><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[DIRECT DEBIT PRE-AUTHORIZED]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="330" y="36" width="185" height="14" forecolor="#64748b"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <text><![CDATA[Currency: USD ($) | SLA: Platinum 99.999%]]></text>
+            </staticText>
+        </band>
+    </pageHeader>
+
+    <columnHeader>
+        <band height="24">
+            <rectangle>
+                <reportElement x="0" y="2" width="535" height="20" forecolor="#0f172a" backcolor="#0f172a"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="8" y="6" width="30" height="14" forecolor="#ffffff"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[#]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="42" y="6" width="60" height="14" forecolor="#ffffff"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[SKU]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="106" y="6" width="180" height="14" forecolor="#ffffff"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[SERVICE / ITEM SPECIFICATION]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="290" y="6" width="40" height="14" forecolor="#ffffff"/>
+                <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[QTY]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="335" y="6" width="65" height="14" forecolor="#ffffff"/>
+                <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[UNIT PRICE]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="405" y="6" width="45" height="14" forecolor="#ffffff"/>
+                <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[DISC]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="455" y="6" width="72" height="14" forecolor="#ffffff"/>
+                <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[LINE TOTAL]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <line>
+                <reportElement x="0" y="19" width="535" height="1" forecolor="#e2e8f0"/>
+            </line>
+            <textField>
+                <reportElement x="8" y="3" width="30" height="14" forecolor="#64748b"/>
+                <textElement><font size="8"/></textElement>
+                <textFieldExpression><![CDATA[$F{lineNo}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="42" y="3" width="60" height="14" forecolor="#0f172a"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{sku}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="106" y="3" width="180" height="14" forecolor="#1e293b"/>
+                <textElement><font size="8"/></textElement>
+                <textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="290" y="3" width="40" height="14" forecolor="#0f172a"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
+            </textField>
+            <textField pattern="$#,##0.00">
+                <reportElement x="335" y="3" width="65" height="14" forecolor="#0f172a"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA[$F{unitPrice}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.0%">
+                <reportElement x="405" y="3" width="45" height="14" forecolor="#64748b"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA[$F{discountPct}]]></textFieldExpression>
+            </textField>
+            <textField pattern="$#,##0.00">
+                <reportElement x="455" y="3" width="72" height="14" forecolor="#0f172a"/>
+                <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <summary>
+        <band height="140">
+            <!-- QR Verification Badge -->
+            <componentElement>
+                <reportElement x="10" y="15" width="80" height="80"/>
+                <QRCode>
+                    <codeExpression><![CDATA[$P{QR_VERIFY_URL}]]></codeExpression>
+                </QRCode>
+            </componentElement>
+            <staticText>
+                <reportElement x="100" y="20" width="180" height="14" forecolor="#0f172a"/>
+                <textElement><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[DIGITAL TAX VERIFICATION]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="100" y="36" width="200" height="40" forecolor="#64748b"/>
+                <textElement><font size="7"/></textElement>
+                <text><![CDATA[Scan QR to verify cryptographic signature.
+SHA-256 Hash: e3b0c44298fc1c149afbf4c8996fb924
+Certified under RFC-3161 Timestamp Authority.]]></text>
+            </staticText>
+
+            <!-- Financial Subtotals & Tax Breakdown -->
+            <rectangle radius="4">
+                <reportElement x="310" y="10" width="225" height="115" forecolor="#e2e8f0" backcolor="#f8fafc"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="320" y="18" width="100" height="14" forecolor="#64748b"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[SUBTOTAL (GROSS):]]></text>
+            </staticText>
+            <textField pattern="$#,##0.00">
+                <reportElement x="420" y="18" width="105" height="14" forecolor="#0f172a"/>
+                <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{SUBTOTAL}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="320" y="36" width="100" height="14" forecolor="#64748b"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[DISCOUNTS (VOLUME):]]></text>
+            </staticText>
+            <textField pattern="-$#,##0.00">
+                <reportElement x="420" y="36" width="105" height="14" forecolor="#e11d48"/>
+                <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{DISCOUNT_AMOUNT}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="320" y="54" width="100" height="14" forecolor="#64748b"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[SALES TAX / VAT (18%):]]></text>
+            </staticText>
+            <textField pattern="$#,##0.00">
+                <reportElement x="420" y="54" width="105" height="14" forecolor="#0f172a"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA[$P{TAX_AMOUNT}]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="320" y="74" width="205" height="1" forecolor="#cbd5e1"/>
+            </line>
+
+            <staticText>
+                <reportElement x="320" y="82" width="100" height="18" forecolor="#0f172a"/>
+                <textElement><font size="10" isBold="true"/></textElement>
+                <text><![CDATA[TOTAL DUE (USD):]]></text>
+            </staticText>
+            <textField pattern="$#,##0.00">
+                <reportElement x="420" y="82" width="105" height="18" forecolor="#10b981"/>
+                <textElement textAlignment="Right"><font size="11" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_NET}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+
+    <pageFooter>
+        <band height="30">
+            <line>
+                <reportElement x="0" y="5" width="535" height="1" forecolor="#e2e8f0"/>
+            </line>
+            <staticText>
+                <reportElement x="0" y="12" width="350" height="14" forecolor="#94a3b8"/>
+                <textElement><font size="8"/></textElement>
+                <text><![CDATA[GMR Reports™ Native Engine v1.3.0 — Sub-Millisecond AOT PDF Compilation]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="435" y="12" width="100" height="14" forecolor="#94a3b8"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>`;
+
+    function init() {
+      setupTemplateDragAndDrop();
+      loadSampleTemplate();
+      handleSsoSession();
+      handleCustomApiKey();
+      onTenantChanged();
+    }
+
+    function handleCustomApiKey() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const customKey = urlParams.get('key') || localStorage.getItem('gmr_active_api_key');
+      const customTenant = localStorage.getItem('gmr_active_tenant');
+
+      if (customKey) {
+        let tId = 'tenant-custom';
+        let tName = 'My Subscription';
+        let tPlan = 'PRO';
+
+        if (customTenant) {
+          try {
+            const parsed = JSON.parse(customTenant);
+            tId = parsed.tenantId || tId;
+            tName = parsed.name || tName;
+            tPlan = parsed.plan || tPlan;
+          } catch(e) {}
+        }
+
+        tenantKeys[tId] = customKey;
+        const select = document.getElementById('tenantSelect');
+        let opt = Array.from(select.options).find(o => o.value === tId);
+        if (!opt) {
+          opt = document.createElement('option');
+          opt.value = tId;
+          opt.textContent = `${tName} (${tPlan} Tier)`;
+          select.appendChild(opt);
+        }
+        select.value = tId;
+        const keyInput = document.getElementById('activeKeyInput');
+        if (keyInput) keyInput.value = customKey;
+      }
+    }
+
+    function handleSsoSession() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const tenantId = urlParams.get('tenantId');
+      const apiKey = urlParams.get('apiKey');
+      const name = urlParams.get('name');
+      const provider = urlParams.get('provider');
+
+      if (token && tenantId && apiKey) {
+        const session = { token, tenantId, apiKey, name: name || 'SSO User', provider: provider || 'sso' };
+        localStorage.setItem('gmr_sso_session', JSON.stringify(session));
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      renderSsoProfile();
+    }
+
+    function renderSsoProfile() {
+      const saved = localStorage.getItem('gmr_sso_session');
+      const container = document.getElementById('ssoContainer');
+      if (!container) return;
+
+      if (saved) {
+        try {
+          const session = JSON.parse(saved);
+          tenantKeys[session.tenantId] = session.apiKey;
+
+          // Add to tenant select if not already present
+          const select = document.getElementById('tenantSelect');
+          let opt = Array.from(select.options).find(o => o.value === session.tenantId);
+          if (!opt) {
+            opt = document.createElement('option');
+            opt.value = session.tenantId;
+            opt.textContent = `${session.name} (${session.provider.toUpperCase()} SSO)`;
+            select.appendChild(opt);
+          }
+          select.value = session.tenantId;
+
+          const icons = { github: '🐙', google: '🌐', microsoft: '🏢', linkedin: '💼' };
+          const icon = icons[session.provider.toLowerCase()] || '🔐';
+
+          container.innerHTML = `
+            <div class="flex items-center gap-2 bg-emerald-950/60 border border-emerald-600/40 px-3 py-1 rounded-lg">
+              <span>${icon}</span>
+              <span class="text-emerald-300 font-medium">${session.name}</span>
+              <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded uppercase font-semibold">${session.provider}</span>
+              <button onclick="ssoLogout()" title="Sign out" class="text-xs text-slate-400 hover:text-red-400 ml-1">✕</button>
+            </div>
+          `;
+        } catch (e) {
+          console.error("Invalid SSO session in storage", e);
+        }
+      }
+    }
+
+    let API_BASE = (window.location.hostname.includes('gmrglobe.com') || window.location.hostname.includes('github.io'))
+      ? 'https://api.gmrglobe.com'
+      : '';
+
+    // The key comes from whatever the user signed in with or created. It used to fall
+    // back to a hard-coded GROWTH-tier key in five places - a working credential on
+    // api.gmrglobe.com, published in this page's source. Naming it here would publish
+    // it again, so it is only described.
+    function currentApiKey() {
+      const el = document.getElementById('activeKeyInput');
+      return (el && el.value ? el.value : '').trim();
+    }
+
+    function loginWithProvider(provider) {
+      // This used to invent the whole session in the browser: a fake JWT, a fake tenant
+      // id and an API key made from Date.now(). The UI then showed you as signed in
+      // while every render returned 401, because none of it had ever reached the server.
+      // The real flow already works - handleSsoSession() below reads what the callback
+      // sends back - so hand the browser to the provider, the way admin.html does.
+      const target = encodeURIComponent(window.location.pathname || '/console');
+      window.location.href = `${API_BASE}/api/auth/login/${encodeURIComponent(provider)}?redirect_to=${target}`;
+    }
+
+    function ssoLogout() {
+      localStorage.removeItem('gmr_sso_session');
+      window.location.href = window.location.pathname;
+    }
+
+    function applyAiPromptPreset(presetText) {
+      const input = document.getElementById('aiTemplatePrompt');
+      input.value = presetText;
+      generateTemplateWithAi();
+    }
+
+
+    function synthesizeLocalTemplate(prompt, format, currentTemplate, currentParams, currentData) {
+      const p = (prompt || '').toLowerCase();
+      const hasExisting = currentTemplate && currentTemplate.trim().length > 80;
+
+      // Intent detection
+      const createKeywords = ['crea ', 'crear ', 'genera ', 'generar ', 'nuevo ', 'nueva ', 'diseña ', 'diseñar ', 'desde cero', 'create', 'generate', 'new report', 'build me'];
+      const isCreate = !hasExisting || createKeywords.some(kw => p.includes(kw));
+
+      // If EDIT mode and template exists: make surgical changes without destroying user template
+      if (!isCreate && hasExisting) {
+        let modified = currentTemplate;
+        let changes = [];
+
+        // Color replacements (simple hex swap)
+        const colorMap = {
+          'azul': ['#3B82F6', '#1D4ED8', '#60A5FA'],
+          'rojo': ['#EF4444', '#DC2626', '#F87171'],
+          'verde': ['#22C55E', '#16A34A', '#4ADE80'],
+          'naranja': ['#F97316', '#EA580C', '#FB923C'],
+          'morado': ['#A855F7', '#9333EA', '#C084FC'],
+          'negro': ['#000000', '#111827'],
+          'gris': ['#6B7280', '#9CA3AF', '#E5E7EB'],
+          'blanco': ['#FFFFFF', '#F8FAFC']
+        };
+        for (const [colorName, hexValues] of Object.entries(colorMap)) {
+          if (p.includes(colorName) && (p.includes('color') || p.includes('fondo') || p.includes('titulo') || p.includes('encabezado') || p.includes('header'))) {
+            const primaryHex = hexValues[0];
+            if (p.includes('fondo') || p.includes('backcolor') || p.includes('background')) {
+              modified = modified.replace(/backcolor="#[0-9A-Fa-f]{6}"/i, `backcolor="${primaryHex}"`);
+              modified = modified.replace(/BackgroundColor="#[0-9A-Fa-f]{6}"/i, `BackgroundColor="${primaryHex}"`);
+            } else {
+              modified = modified.replace(/forecolor="#[0-9A-Fa-f]{6}"/i, `forecolor="${primaryHex}"`);
+              modified = modified.replace(/ForeColor="#[0-9A-Fa-f]{6}"/i, `ForeColor="${primaryHex}"`);
+            }
+            changes.push(`Color cambiado a ${colorName} (${primaryHex})`);
+          }
+        }
+
+        // Bold text in title/header
+        if (p.includes('negrita') || p.includes('bold') || p.includes('grueso')) {
+          modified = modified.replace(/isBold="false"/g, 'isBold="true"');
+          modified = modified.replace(/Bold="false"/g, 'Bold="true"');
+          changes.push('Texto puesto en negrita');
+        }
+
+        // Font size increase/decrease
+        if (p.includes('más grande') || p.includes('más alto') || p.includes('aumenta') || p.includes('font size')) {
+          modified = modified.replace(/size="(\d+)"/g, (m, n) => `size="${Math.min(72, parseInt(n) + 2)}"`);
+          changes.push('Tamaño de fuente aumentado');
+        }
+        if (p.includes('más pequeño') || p.includes('reduce') || p.includes('pequeño')) {
+          modified = modified.replace(/size="(\d+)"/g, (m, n) => `size="${Math.max(6, parseInt(n) - 2)}"`);
+          changes.push('Tamaño de fuente reducido');
+        }
+
+        const explanation = changes.length > 0
+          ? 'GMR Synthesizer aplicó: ' + changes.join(', ') + '.'
+          : 'Se conservó la estructura de tu plantilla existente. Para transformaciones avanzadas, el Asistente AI utiliza Gemini 2.0 Flash.';
+
+        return {
+          intent: 'EDIT_EXISTING',
+          format: format,
+          template: modified,
+          params: currentParams ? tryParseJson(currentParams) : undefined,
+          data: currentData ? tryParseJson(currentData) : undefined,
+          explanation: explanation,
+          source: 'gmr-smart-synthesizer'
+        };
+      }
+
+      // CREATE mode: use appropriate sample template
+      const isCrystal = p.includes('crystal') || p.includes('sap') || p.includes('xtreme') || p.includes('drilldown');
+      const isBirt = p.includes('birt') || p.includes('logística') || p.includes('logistica') || p.includes('despacho');
+
+      if (isCrystal) {
+        return { intent: 'CREATE_NEW', format: 'crystal', template: sampleCrystalXml,
+          params: { 'REPORT_TITLE': 'SAP Crystal Report', 'CORPORATION_NAME': 'Corporation SA' },
+          data: [{ 'Customer_Name': 'Cliente A', 'Region': 'LATAM', 'Extended_Price': '$1,000.00' }],
+          explanation: 'Template SAP Crystal Reports generado desde base estándar.', source: 'gmr-smart-synthesizer' };
+      }
+      if (isBirt) {
+        return { intent: 'CREATE_NEW', format: 'birt', template: sampleBirtXml,
+          params: { 'ORGANIZATION_NAME': 'Mi Organización' },
+          data: [{ 'flightId': 'CARGO-001', 'destination': 'Destino A', 'carrier': 'Carrier', 'payloadKg': '1,000 kg', 'status': 'ACTIVO', 'turnaroundTime': '30 min' }],
+          explanation: 'Template Eclipse BIRT generado para logística.', source: 'gmr-smart-synthesizer' };
+      }
+      return { intent: 'CREATE_NEW', format: 'jrxml', template: sampleJrxml,
+        params: { 'INVOICE_NUMBER': 'INV-001', 'CUSTOMER_NAME': 'Cliente Ejemplo' },
+        data: [{ 'lineNo': 1, 'description': 'Producto A', 'quantity': 1, 'unitPrice': 100.0, 'total': 100.0 }],
+        explanation: 'Template JasperReports base generado.', source: 'gmr-smart-synthesizer' };
+    }
+
+    function tryParseJson(str) {
+      if (!str) return undefined;
+      try { return JSON.parse(str); } catch(e) { return undefined; }
+    }
+
+    async function generateTemplateWithAi() {
+      const promptInput = document.getElementById('aiTemplatePrompt');
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        alert('Por favor escribe qué deseas hacer (ej: agrega un footer con fecha, cambia el color a azul).');
+        promptInput.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnAiGenerate');
+      const btnIcon = document.getElementById('aiBtnIcon');
+      const btnText = document.getElementById('aiBtnText');
+      const feedback = document.getElementById('aiTemplateFeedback');
+      const feedbackBadge = document.getElementById('aiFeedbackBadge');
+      const feedbackMsg = document.getElementById('aiFeedbackMessage');
+
+      btn.disabled = true;
+      btnIcon.innerText = '⏳';
+      btnText.innerText = 'Analizando...';
+      feedback.classList.remove('hidden');
+      feedbackBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30';
+      feedbackBadge.innerText = '✨ Gemini 2.0 Flash';
+      feedbackMsg.innerText = 'Detectando intención y preparando edición quirúrgica...';
+
+      try {
+        const selectedFormat = document.getElementById('templateFormatSelect')?.value || 'jrxml';
+        const currentJrxml = document.getElementById('jrxmlInput').value;
+        const currentParams = document.getElementById('paramsInput')?.value || '';
+        const currentData = document.getElementById('dataInput')?.value || '';
+        const hasExistingTemplate = currentJrxml && currentJrxml.trim().length > 80;
+
+        // Intent detection
+        const p = prompt.toLowerCase();
+        const createKeywords = ['crea ', 'crear ', 'genera ', 'generar ', 'nuevo ', 'nueva ', 'diseña ', 'diseñar ', 'desde cero', 'create', 'generate', 'new report', 'build me'];
+        const isCreateIntent = !hasExistingTemplate || createKeywords.some(kw => p.includes(kw));
+        const mode = isCreateIntent ? 'CREATE_NEW' : 'EDIT_EXISTING';
+
+        let result = null;
+
+        // Strategy 1: the backend AI gateway. The model key lives in a server-side
+        // secret, never here - the browser only ever talks to our own origin.
+        // An empty API_BASE means same-origin, so it must not gate this call.
+        if (!result) {
+          try {
+            const res = await fetch(`${API_BASE}/api/ai/template-assistant`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt, format: selectedFormat, currentJrxml, currentParams, currentData, mode })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data?.template || data?.jrxml) {
+                result = { template: data.template || data.jrxml, intent: mode, format: data.format || selectedFormat,
+                  params: data.params, data: data.data,
+                  explanation: data.explanation || 'Cambio aplicado vía backend.', source: 'backend-ai' };
+              }
+            }
+          } catch (e) { console.warn('Backend gateway failed:', e); }
+        }
+
+        // Strategy 2: Local surgical synthesizer (no longer destructive)
+        if (!result) {
+          result = synthesizeLocalTemplate(prompt, selectedFormat, currentJrxml, currentParams, currentData);
+        }
+
+        // Validate result
+        if (!result?.template) throw new Error('No se pudo generar la plantilla. Por favor reformula tu requerimiento.');
+
+        // Update format selector if AI detected another engine
+        if (result.format) {
+          const select = document.getElementById('templateFormatSelect');
+          if (select && select.value !== result.format) select.value = result.format;
+        }
+
+        feedbackBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30';
+        feedbackBadge.innerText = result.source === 'gemini-ai' ? '✨ Gemini 2.0 Flash' : '⚡ GMR Smart Synthesizer';
+        feedbackMsg.innerText = result.explanation;
+
+        // Show preview modal before touching the editor!
+        showAiPreview(result);
+
+      } catch (err) {
+        console.error('Error in AI assistant:', err);
+        const feedbackBadge = document.getElementById('aiFeedbackBadge');
+        const feedbackMsg = document.getElementById('aiFeedbackMessage');
+        if (feedbackBadge) {
+          feedbackBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-400 border border-red-500/30';
+          feedbackBadge.innerText = 'Error';
+        }
+        if (feedbackMsg) feedbackMsg.innerText = err.message;
+      } finally {
+        btn.disabled = false;
+        btnIcon.innerText = '✨';
+        btnText.innerText = 'Diseñar con AI';
+      }
+    }
+
+    const sampleBirtXml = `<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1" name="OperationalFleetAuditReport">
+    <simple-master-page name="MasterPage" orientation="portrait"/>
+    
+    <!-- BIRT Scalar Parameters -->
+    <scalar-parameter name="ORGANIZATION_NAME"/>
+    <scalar-parameter name="DISPATCH_FACILITY"/>
+    <scalar-parameter name="AUDIT_CYCLE"/>
+    <scalar-parameter name="TOTAL_PAYLOAD_METRIC"/>
+    <scalar-parameter name="COMPLIANCE_SCORE"/>
+
+    <!-- BIRT Dataset Columns -->
+    <column name="flightId"/>
+    <column name="destination"/>
+    <column name="carrier"/>
+    <column name="payloadKg"/>
+    <column name="status"/>
+    <column name="turnaroundTime"/>
+
+    <page-header id="10">
+        <label id="11">
+            <text-property name="text">ECLIPSE BIRT ENTERPRISE — LOGISTICS &amp; CARGO DISPATCH AUDIT</text-property>
+            <property name="fontSize">15pt</property>
+            <property name="fontWeight">bold</property>
+        </label>
+        <data id="12">
+            <property name="expression">params["ORGANIZATION_NAME"]</property>
+        </data>
+        <data id="13">
+            <property name="expression">params["DISPATCH_FACILITY"]</property>
+        </data>
+        <data id="14">
+            <property name="expression">params["AUDIT_CYCLE"]</property>
+        </data>
+        <text id="15">
+            <text-property name="text">------------------------------------------------------------------------------------------------------------------------</text-property>
+        </text>
+        <label id="16">
+            <text-property name="text">FLIGHT / DESTINATION / CARRIER / PAYLOAD (KG) / STATUS / SLA TURNAROUND</text-property>
+            <property name="fontSize">9pt</property>
+            <property name="fontWeight">bold</property>
+        </label>
+        <text id="17">
+            <text-property name="text">------------------------------------------------------------------------------------------------------------------------</text-property>
+        </text>
+    </page-header>
+
+    <detail id="20">
+        <data id="21">
+            <property name="resultSetColumn">flightId</property>
+        </data>
+        <data id="22">
+            <property name="resultSetColumn">destination</property>
+        </data>
+        <data id="23">
+            <property name="resultSetColumn">carrier</property>
+        </data>
+        <data id="24">
+            <property name="resultSetColumn">payloadKg</property>
+        </data>
+        <data id="25">
+            <property name="resultSetColumn">status</property>
+        </data>
+        <data id="26">
+            <property name="resultSetColumn">turnaroundTime</property>
+        </data>
+    </detail>
+
+    <page-footer id="30">
+        <text id="31">
+            <text-property name="text">------------------------------------------------------------------------------------------------------------------------</text-property>
+        </text>
+        <data id="32">
+            <property name="expression">params["TOTAL_PAYLOAD_METRIC"]</property>
+        </data>
+        <data id="33">
+            <property name="expression">params["COMPLIANCE_SCORE"]</property>
+        </data>
+        <text id="34">
+            <text-property name="text">GMR Reports™ AOT Execution — Native compilation from Eclipse BIRT XML without Java runtime overhead.</text-property>
+        </text>
+    </page-footer>
+</report>`;
+
+    const sampleCrystalXml = `<?xml version="1.0" encoding="UTF-8"?>
+<CrystalReport Name="SAP_Xtreme_Sales_By_Customer_Grouped" MajorVersion="14" MinorVersion="0">
+    <PageOptions Orientation="Portrait"/>
+
+    <!-- Crystal Parameter Prompts & Selection Formulas ({?Param}) -->
+    <ParameterField Name="REPORT_TITLE"/>
+    <ParameterField Name="CORPORATION_NAME"/>
+    <ParameterField Name="REGION_PROMPT"/>
+    <ParameterField Name="DATE_RANGE_PROMPT"/>
+    <ParameterField Name="DRILLDOWN_LEVEL"/>
+    <ParameterField Name="CURRENCY_CODE"/>
+    <ParameterField Name="CONFIDENTIALITY_NOTICE"/>
+    <ParameterField Name="TOTAL_REVENUE_METRIC"/>
+    <ParameterField Name="TOTAL_ORDERS_METRIC"/>
+    <ParameterField Name="AVG_ORDER_METRIC"/>
+    <ParameterField Name="AUDIT_SIGNATURE"/>
+
+    <!-- Database Fields & Formulas ({Table.Field}) -->
+    <DatabaseField Name="Customer_Name"/>
+    <DatabaseField Name="Region"/>
+    <DatabaseField Name="Order_ID"/>
+    <DatabaseField Name="Product_Line"/>
+    <DatabaseField Name="Quantity"/>
+    <DatabaseField Name="Unit_Price"/>
+    <DatabaseField Name="Discount_Rate"/>
+    <DatabaseField Name="Extended_Price"/>
+
+    <!-- Report Header Section (Title, Subtitle, Filter Criteria) -->
+    <Section Type="ReportHeaderSection">
+        <TextObject>
+            <Text>SAP CRYSTAL REPORTS ENTERPRISE — DRILLDOWN SALES HIERARCHY</Text>
+            <Font Size="15" Bold="true"/>
+        </TextObject>
+        <TextObject>
+            <Text>Database Schema: SAP Xtreme Retail Database (xtreme.mdb Benchmark Model)</Text>
+            <Font Size="9"/>
+        </TextObject>
+        <LineObject/>
+        <FieldObject FieldName="{?CORPORATION_NAME}"/>
+        <FieldObject FieldName="{?DATE_RANGE_PROMPT}"/>
+        <FieldObject FieldName="{?REGION_PROMPT}"/>
+        <FieldObject FieldName="{?DRILLDOWN_LEVEL}"/>
+        <LineObject/>
+    </Section>
+
+    <!-- Page Header Section (Column Headers & Group Summary Indicator) -->
+    <Section Type="PageHeaderSection">
+        <TextObject>
+            <Text>HIERARCHICAL GROUP: [REGION] &gt;&gt; [CUSTOMER] &gt;&gt; [ORDERS]</Text>
+            <Font Size="10" Bold="true"/>
+        </TextObject>
+        <LineObject/>
+        <TextObject>
+            <Text>CUSTOMER / REGION / ORDER ID / PRODUCT / EXTENDED PRICE</Text>
+            <Font Size="8" Bold="true"/>
+        </TextObject>
+        <LineObject/>
+    </Section>
+
+    <!-- Group Header Section (Simulated Group Header in Crystal XML) -->
+    <Section Type="GroupHeaderSection">
+        <TextObject>
+            <Text>&gt;&gt; GROUP SUMMARY: COMMERCIAL &amp; AEROSPACE FLEET ACCOUNTS</Text>
+            <Font Size="9" Bold="true"/>
+        </TextObject>
+    </Section>
+
+    <!-- Detail Section (Repeated per transaction record) -->
+    <Section Type="DetailSection">
+        <FieldObject FieldName="{Customer.Customer_Name}"/>
+        <FieldObject FieldName="{Orders.Order_ID}"/>
+        <FieldObject FieldName="{Orders.Product_Line}"/>
+        <FieldObject FieldName="{Orders.Extended_Price}"/>
+    </Section>
+
+    <!-- Report Footer Section (Grand Totals, Cross-Tab Summary & Signoff) -->
+    <Section Type="ReportFooterSection">
+        <LineObject/>
+        <TextObject>
+            <Text>EXECUTIVE SUMMARY &amp; CROSS-TAB FINANCIAL TOTALS</Text>
+            <Font Size="11" Bold="true"/>
+        </TextObject>
+        <FieldObject FieldName="{?TOTAL_REVENUE_METRIC}"/>
+        <FieldObject FieldName="{?TOTAL_ORDERS_METRIC}"/>
+        <FieldObject FieldName="{?AVG_ORDER_METRIC}"/>
+        <LineObject/>
+        <FieldObject FieldName="{?AUDIT_SIGNATURE}"/>
+    </Section>
+
+    <!-- Page Footer Section (Legal Notice & Engine Attestation) -->
+    <Section Type="PageFooterSection">
+        <LineObject/>
+        <TextObject>
+            <Text>GMR Reports AOT GraalVM Native Engine — Sub-Millisecond Native Crystal Compilation</Text>
+            <Font Size="8"/>
+        </TextObject>
+        <FieldObject FieldName="{?CONFIDENTIALITY_NOTICE}"/>
+    </Section>
+</CrystalReport>`;
+
+    function loadTemplatePreset(fmt) {
+      const select = document.getElementById('templateFormatSelect');
+      if (select) {
+        select.value = fmt;
+        onFormatSelected();
+      }
+    }
+
+    function displayCachedPresetPreview(fmt) {
+      if (!window.PRESET_CACHED_PDFS || !window.PRESET_CACHED_PDFS[fmt]) return;
+      const cached = window.PRESET_CACHED_PDFS[fmt];
+      const viewer = document.getElementById('pdfViewer');
+      const placeholder = document.getElementById('emptyPreviewPlaceholder');
+      const statusBadge = document.getElementById('previewStatusBadge');
+      const metrics = document.getElementById('renderMetrics');
+      const downloadLinks = document.getElementById('downloadLinks');
+
+      if (viewer && placeholder && statusBadge) {
+        placeholder.classList.add('hidden');
+        viewer.classList.remove('hidden');
+        viewer.src = cached.dataUri;
+
+        statusBadge.className = "text-[10px] px-2.5 py-0.5 rounded-full font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold flex items-center gap-1 shadow-sm";
+        statusBadge.innerHTML = `<span>⚡</span> <span>Compilado AOT en ${cached.timing}</span>`;
+
+        if (metrics) {
+          metrics.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span> <span>Compilado en <b class="text-emerald-400">${cached.timing}</b></span> • <span>Tamaño: <b>${cached.sizeKb}</b></span> • <span class="text-cyan-400">GraalVM Native Cache</span>`;
+        }
+
+        if (downloadLinks) {
+          downloadLinks.innerHTML = `
+            <a href="${cached.dataUri}" download="${cached.name}" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition border border-slate-700 flex items-center gap-1">
+              <span>⬇</span> <span>Descargar PDF</span>
+            </a>
+          `;
+        }
+      }
+    }
+
+    function onFormatSelected() {
+      const fmt = document.getElementById('templateFormatSelect').value;
+      const desc = document.getElementById('formatDescription');
+      if (fmt === 'birt') {
+        desc.innerText = 'Eclipse BIRT (.rptdesign) — Master Page Layout, Scalar Parameter Expressions & Multi-Column Matrix';
+        displayCachedPresetPreview('birt');
+        document.getElementById('jrxmlInput').value = sampleBirtXml;
+        document.getElementById('paramsInput').value = JSON.stringify({
+          "ORGANIZATION_NAME": "Global Multimodal Freight & Orbital Logistics Hub",
+          "DISPATCH_FACILITY": "Terminal 4 Cargo Logistics Center (JFK-FRA Direct)",
+          "AUDIT_CYCLE": "Operational Shift: 24/7 Peak Cycle — September 2026",
+          "TOTAL_PAYLOAD_METRIC": "Consolidated Cargo Mass: 142,850.00 kg (100% manifest verified)",
+          "COMPLIANCE_SCORE": "FAA / ICAO Compliance Index: 99.98% SLA Met"
+        }, null, 2);
+        document.getElementById('dataInput').value = JSON.stringify([
+          { "flightId": "GMR-CARGO-101", "destination": "Frankfurt Cargo City (FRA)", "carrier": "Lufthansa Cargo B777F", "payloadKg": "42,500 kg", "status": "CLEARED FOR DEPARTURE", "turnaroundTime": "42 min" },
+          { "flightId": "GMR-CARGO-102", "destination": "Tokyo Haneda Logistics (HND)", "carrier": "All Nippon B777-200F", "payloadKg": "38,200 kg", "status": "RAMP LOADED", "turnaroundTime": "35 min" },
+          { "flightId": "GMR-CARGO-103", "destination": "Singapore Changi Air (SIN)", "carrier": "Singapore Cargo A350F", "payloadKg": "35,150 kg", "status": "IN-TRANSIT (FLIGHT GMR92)", "turnaroundTime": "28 min" },
+          { "flightId": "GMR-CARGO-104", "destination": "London Heathrow Sky (LHR)", "carrier": "British Cargo B747-8F", "payloadKg": "27,000 kg", "status": "CUSTOMS INSPECTED", "turnaroundTime": "19 min" }
+        ], null, 2);
+      } else if (fmt === 'crystal') {
+        desc.innerText = 'SAP Crystal Reports XI-2020 — SAP Xtreme DB Drilldown, Group Hierarchies & Cross-Tab KPIs';
+        displayCachedPresetPreview('crystal');
+        document.getElementById('jrxmlInput').value = sampleCrystalXml;
+        document.getElementById('paramsInput').value = JSON.stringify({
+          "REPORT_TITLE": "SAP Xtreme Sales by Customer & Region",
+          "CORPORATION_NAME": "Xtreme Mountain Sports & Industrial Holding AG",
+          "REGION_PROMPT": "Filter: Region = 'Americas & Western Europe' (Interactive Prompt)",
+          "DATE_RANGE_PROMPT": "Period: Fiscal Year 2026 (01/01/2026 - 31/12/2026)",
+          "DRILLDOWN_LEVEL": "Active Drilldown Path: Region > Customer Name > Order Breakdown",
+          "CURRENCY_CODE": "USD ($)",
+          "CONFIDENTIALITY_NOTICE": "CONFIDENTIAL — STRICTLY FOR INTERNAL MANAGEMENT & AUDIT PURPOSES",
+          "TOTAL_REVENUE_METRIC": "Consolidated Net Revenue: $3,842,500.00 USD (100% Reconciled)",
+          "TOTAL_ORDERS_METRIC": "Total Processed Orders: 1,482 Commercial Transactions",
+          "AVG_ORDER_METRIC": "Average Transaction Value: $2,592.78 USD (Growth +14.2% YoY)",
+          "AUDIT_SIGNATURE": "Audited & Verified: SAP Xtreme Certified Data Model // GMR AOT Engine"
+        }, null, 2);
+        document.getElementById('dataInput').value = JSON.stringify([
+          { "Customer_Name": "Alloy Wheels Inc. [North America]", "Region": "North America", "Order_ID": "ORD-10021", "Product_Line": "Racing Wheels & Aerodynamic Rims", "Quantity": 24, "Unit_Price": "$1,250.00", "Discount_Rate": "5%", "Extended_Price": "$28,500.00" },
+          { "Customer_Name": "Alloy Wheels Inc. [North America]", "Region": "North America", "Order_ID": "ORD-10022", "Product_Line": "Carbon Composite Struts", "Quantity": 10, "Unit_Price": "$3,200.00", "Discount_Rate": "0%", "Extended_Price": "$32,000.00" },
+          { "Customer_Name": "Bavarian Motor Dynamics [EMEA]", "Region": "EMEA", "Order_ID": "ORD-20045", "Product_Line": "Telemetry Inverters & Controllers", "Quantity": 40, "Unit_Price": "$2,100.00", "Discount_Rate": "8%", "Extended_Price": "$77,280.00" },
+          { "Customer_Name": "Bavarian Motor Dynamics [EMEA]", "Region": "EMEA", "Order_ID": "ORD-20046", "Product_Line": "Avionics Bus Master Sensors", "Quantity": 15, "Unit_Price": "$4,500.00", "Discount_Rate": "10%", "Extended_Price": "$60,750.00" },
+          { "Customer_Name": "Tokyo Cybernetics Corp [APAC]", "Region": "APAC", "Order_ID": "ORD-30089", "Product_Line": "Optoelectronic Cryo-Valves", "Quantity": 50, "Unit_Price": "$1,850.00", "Discount_Rate": "12%", "Extended_Price": "$81,400.00" },
+          { "Customer_Name": "Tokyo Cybernetics Corp [APAC]", "Region": "APAC", "Order_ID": "ORD-30090", "Product_Line": "Superconducting Thermal Couplers", "Quantity": 8, "Unit_Price": "$12,400.00", "Discount_Rate": "5%", "Extended_Price": "$94,240.00" }
+        ], null, 2);
+      } else {
+        desc.innerText = 'JasperReports .jrxml — 2D QR Verification, Vector Rounded Cards, AST Expressions & Currency Patterns';
+        displayCachedPresetPreview('jrxml');
+        document.getElementById('jrxmlInput').value = sampleJrxml;
+        document.getElementById('paramsInput').value = JSON.stringify({
+          "INVOICE_NUMBER": "INV-2026-X990",
+          "CUSTOMER_NAME": "Palantir Defense & Intelligence Ltd",
+          "CUSTOMER_TAX_ID": "US-EIN-45-9876210",
+          "CUSTOMER_TIER": "Enterprise Mission-Critical",
+          "BILLING_PERIOD": "September 2026",
+          "ISSUE_DATE": "2026-09-01",
+          "DUE_DATE": "2026-09-30",
+          "QR_VERIFY_URL": "https://gmrglobe.com/verify/INV-2026-X990",
+          "CURRENCY_SYMBOL": "$",
+          "SUBTOTAL": 57400.00,
+          "DISCOUNT_AMOUNT": 5740.00,
+          "TAX_AMOUNT": 9298.80,
+          "TOTAL_NET": 60958.80
+        }, null, 2);
+        // Pre-render immediately
+        document.getElementById('dataInput').value = JSON.stringify([
+          { "lineNo": 1, "sku": "GMR-AOT-01", "description": "GMR Core Engine Enterprise Cluster (8 Nodes, Sub-ms)", "category": "Licensing", "quantity": 1, "unitPrice": 32000.0, "discountPct": 0.10, "total": 28800.0 },
+          { "lineNo": 2, "sku": "GMR-HSM-02", "description": "FIPS 140-2 Level 3 BouncyCastle Hardware HSM Integration", "category": "Security", "quantity": 2, "unitPrice": 4500.0, "discountPct": 0.10, "total": 8100.0 },
+          { "lineNo": 3, "sku": "GMR-SUP-03", "description": "24/7/365 Tier-4 Dedicated Mission Support SLA (15-min)", "category": "Support", "quantity": 12, "unitPrice": 1200.0, "discountPct": 0.10, "total": 12960.0 },
+          { "lineNo": 4, "sku": "GMR-MIG-04", "description": "Automated Crystal Reports & BIRT Binary Migration Toolkit", "category": "Tooling", "quantity": 1, "unitPrice": 8500.0, "discountPct": 0.10, "total": 7650.0 }
+        ], null, 2);
+      }
+    }
+
+    function loadSampleTemplate() {
+      onFormatSelected();
+    }
+
+    function switchTab(tabName) {
+      const tabs = ['studio', 'analytics', 'keys', 'quickstart'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tabBtn-' + t);
+        const content = document.getElementById('tabContent-' + t);
+        if (t === tabName) {
+          btn.className = "py-3 border-b-2 font-semibold transition border-emerald-500 text-emerald-400";
+          content.classList.remove('hidden');
+        } else {
+          btn.className = "py-3 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200";
+          content.classList.add('hidden');
+        }
+      });
+      if (tabName === 'analytics') {
+        refreshUsage();
+      }
+    }
+
+    function onTenantChanged() {
+      const tenantId = document.getElementById('tenantSelect').value;
+      const key = tenantKeys[tenantId] || "";
+      document.getElementById('activeKeyInput').value = key;
+      updateCodeSnippets(key);
+      const serverOrigin = API_BASE || window.location.origin;
+      // Update snippets
+      document.getElementById('codeSnippetTs').textContent = `import { GmrReportsClient } from "@gmresearch/reports-client";\n\nconst client = new GmrReportsClient({\n  baseUrl: "${serverOrigin}",\n  apiKey: "${key}"\n});\n\nconst pdf = await client.getInvoicePdf();`;
+      document.getElementById('codeSnippetPy').textContent = `from gmr_reports import GmrReportsClient\n\nclient = GmrReportsClient(\n    base_url="${serverOrigin}",\n    api_key="${key}"\n)\n\npdf_bytes = client.render(report_type="invoice")`;
+      document.getElementById('codeSnippetCurl').textContent = `curl -X GET "${serverOrigin}/api/reports/render?type=invoice&output=pdf" \\\n  -H "X-API-Key: ${key}" \\\n  --output invoice.pdf`;
+    }
+
+    function updateCodeSnippets(key) {
+      const activeKey = key || currentApiKey() || "YOUR_API_KEY";
+      const serverOrigin = API_BASE || window.location.origin;
+
+      const tsEl = document.getElementById('codeSnippetTs');
+      if (tsEl) {
+        tsEl.textContent = `import { GmrReportsClient } from "@gmresearch/reports-client";\n\nconst client = new GmrReportsClient({\n  baseUrl: "${serverOrigin}",\n  apiKey: "${activeKey}"\n});\n\n// Render dynamic PDF with automatic 429 retry backoff\nconst pdfBuffer = await client.renderDynamicPdf({\n  jrxml: "<jasperReport ...>...</jasperReport>",\n  parameters: { INVOICE_NUMBER: "INV-2026-X990" },\n  data: [{ sku: "GMR-AOT-01", description: "Cluster Enterprise", total: 28800.0 }]\n});`;
+      }
+
+      const pyEl = document.getElementById('codeSnippetPy');
+      if (pyEl) {
+        pyEl.textContent = `from gmr_reports import GmrReportsClient\n\nclient = GmrReportsClient(\n    base_url="${serverOrigin}",\n    api_key="${activeKey}"\n)\n\n# El tipo y el formato son argumentos: "statement", "aging", "xlsx"...\npdf_bytes = client.render(report_type="invoice", output_format="pdf")\nwith open("invoice.pdf", "wb") as f:\n    f.write(pdf_bytes)`;
+      }
+
+      const curlEl = document.getElementById('codeSnippetCurl');
+      if (curlEl) {
+        curlEl.textContent = `curl -X GET "${serverOrigin}/api/reports/render?type=invoice&output=pdf" \\\n  -H "X-API-Key: ${activeKey}" \\\n  --output invoice.pdf`;
+      }
+    }
+
+    function showConsoleToast(msg) {
+      let toast = document.getElementById('consoleToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'consoleToast';
+        toast.className = 'fixed bottom-5 right-5 z-50 bg-slate-900/95 backdrop-blur-md border border-emerald-500/60 text-emerald-300 text-xs px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 transform transition-all duration-300 opacity-0 translate-y-2 pointer-events-none';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = `<span class="text-emerald-400 font-bold">⚡</span> <span>${msg}</span>`;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(window._toastTimeout);
+      window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-2');
+      }, 3500);
+    }
+
+    function copyActiveKey() {
+      const key = document.getElementById('activeKeyInput').value;
+      navigator.clipboard.writeText(key);
+      updateCodeSnippets(key);
+
+      const copyBtn = document.getElementById('btnCopyKey');
+      if (copyBtn) {
+        const originalHtml = copyBtn.innerHTML;
+        copyBtn.className = "px-4 py-2 bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20";
+        copyBtn.innerHTML = "<span>✓</span> <span>¡Clave Copiada!</span>";
+        setTimeout(() => {
+          copyBtn.className = "px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20";
+          copyBtn.innerHTML = originalHtml;
+        }, 2000);
+      }
+
+      showConsoleToast('✓ Clave copiada y snippets de cURL / Python / TS actualizados');
+    }
+
+    async function renderDynamicPdf() {
+      const btn = document.getElementById('btnRenderPdf');
+      const metrics = document.getElementById('renderMetrics');
+      const statusBadge = document.getElementById('previewStatusBadge');
+      const viewer = document.getElementById('pdfViewer');
+      const placeholder = document.getElementById('emptyPreviewPlaceholder');
+
+      btn.disabled = true;
+      btn.innerText = "Rendering...";
+      metrics.innerHTML = '<span class="text-cyan-400 animate-pulse">Compiling AST & vectorizing PDF...</span>';
+
+      const t0 = performance.now();
+      try {
+        const templateContent = document.getElementById('jrxmlInput').value;
+        const selectedFormat = document.getElementById('templateFormatSelect') ? document.getElementById('templateFormatSelect').value : 'jrxml';
+        const params = JSON.parse(document.getElementById('paramsInput').value || '{}');
+        let data = JSON.parse(document.getElementById('dataInput').value || '[]');
+        if (!Array.isArray(data)) {
+          data = data && typeof data === 'object' ? (data.data && Array.isArray(data.data) ? data.data : [data]) : [];
+        }
+        const activeKey = currentApiKey();
+        if (!activeKey && API_BASE) {
+          // This host renders through the authenticated product plane. Without a key the
+          // request is a 401, and "401" on screen reads as a broken page rather than as
+          // the posture it is. The public showcase is sandbox.gmrglobe.com, which renders
+          // for anyone.
+          throw new Error('Se necesita una API key. Inicia sesion, o prueba sin registro en sandbox.gmrglobe.com');
+        }
+
+        const res = await fetch(`${API_BASE}/api/reports/render`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/pdf',
+            'X-API-Key': activeKey
+          },
+          body: JSON.stringify({
+            templateSource: templateContent,
+            templateFormat: selectedFormat,
+            outputFormat: 'pdf',
+            parameters: params,
+            data: data,
+            resources: uploadedAssets
+          })
+        });
+
+        const elapsed = (performance.now() - t0).toFixed(1);
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`HTTP ${res.status}: ${errText}`);
+        }
+
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        placeholder.classList.add('hidden');
+        viewer.classList.remove('hidden');
+        viewer.src = blobUrl;
+
+        const sizeKb = (blob.size / 1024).toFixed(1);
+        metrics.innerHTML = `<span>Rendered in <b class="text-emerald-400">${elapsed} ms</b></span> • <span>Size: <b>${sizeKb} KB</b></span>`;
+        statusBadge.className = "text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+        statusBadge.innerText = `Success (${elapsed}ms)`;
+
+        document.getElementById('downloadLinks').innerHTML = `
+          <a href="${blobUrl}" download="dynamic_invoice.pdf" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded transition border border-slate-700">
+            ⬇ Download PDF
+          </a>
+        `;
+      } catch (err) {
+        alert("Render error: " + err.message);
+        metrics.innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
+        statusBadge.className = "text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30";
+        statusBadge.innerText = "Error";
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "⚡ Render Live PDF";
+      }
+    }
+
+    async function renderSampleExcel() {
+      // window.open cannot carry a header, so this used to pass the key as a query
+      // parameter: the filter only reads the header, so it was a 401, and query strings
+      // are the one place a credential is certain to be logged. Fetch, then hand the
+      // browser a blob.
+      const activeKey = currentApiKey();
+      if (!activeKey) {
+        alert('Crea una cuenta o inicia sesion para obtener una API key.');
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/api/reports/render?type=invoice&output=xlsx`, {
+          headers: { 'X-API-Key': activeKey }
+        });
+        if (!res.ok) {
+          throw new Error(`El servidor respondio ${res.status}`);
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'invoice.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert(`No se pudo descargar el Excel: ${e.message}`);
+      }
+    }
+
+    async function refreshUsage() {
+      const tenantId = document.getElementById('tenantSelect').value;
+      try {
+        const activeKey = currentApiKey();
+        const res = await fetch(`${API_BASE}/api/saas/tenants/${encodeURIComponent(tenantId)}/usage`,
+          activeKey ? { headers: { 'X-API-Key': activeKey } } : {});
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('metricPlan').innerText = data.plan;
+          document.getElementById('metricMonthlyUsed').innerText = data.monthlyUsed.toLocaleString();
+          document.getElementById('metricMonthlyQuota').innerText = `of ${data.monthlyQuota.toLocaleString()} monthly quota`;
+          document.getElementById('metricRemaining').innerText = data.quotaRemaining.toLocaleString();
+          document.getElementById('metricVolume').innerText = `${(data.totalBytesGenerated / 1024).toFixed(1)} KB`;
+          document.getElementById('metricTotalReqs').innerText = `${data.totalRequests} total requests`;
+
+          const pct = Math.min(100, Math.round((data.monthlyUsed / data.monthlyQuota) * 100));
+          document.getElementById('quotaPercentage').innerText = `${pct}%`;
+          document.getElementById('quotaProgressBar').style.width = `${pct}%`;
+
+          // Infrastructure RAM savings gamification vs JVM
+          const monthlyUsed = data.monthlyUsed || 0;
+          const ramSavedMb = Math.round(850 + (monthlyUsed * 1.2));
+          const ramSavingsEl = document.getElementById('metricRamSavings');
+          if (ramSavingsEl) {
+            ramSavingsEl.innerText = `${ramSavedMb} MB`;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load usage", e);
+      }
+    }
+
+    async function provisionTenant() {
+      const name = document.getElementById('newTenantName').value.trim();
+
+      if (!name) {
+        alert("Indica el nombre de la organizacion");
+        return;
+      }
+
+      // The public console creates sandbox tenants and nothing else. The identifier,
+      // the plan and the key are the server's to decide: a key minted here with
+      // Math.random() is not a secret, and a plan chosen here is a plan anyone can
+      // choose. Production tenants come from a Stripe checkout or from an administrator.
+      try {
+        const res = await fetch(`${API_BASE}/api/saas/tenants/sandbox`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 429) {
+          alert(data.error || 'Demasiadas altas de sandbox desde esta direccion. Intentalo mas tarde.');
+          return;
+        }
+        if (!res.ok) {
+          alert(data.error || 'No se pudo crear el sandbox');
+          return;
+        }
+
+        tenantKeys[data.tenantId] = data.apiKey;
+        const opt = document.createElement('option');
+        opt.value = data.tenantId;
+        opt.textContent = `${data.name} (${data.planName})`;
+        document.getElementById('tenantSelect').appendChild(opt);
+        document.getElementById('tenantSelect').value = data.tenantId;
+        onTenantChanged();
+        alert(`Sandbox "${data.name}" creado.\n\nTenant: ${data.tenantId}\nAPI Key: ${data.apiKey}\n\n`
+            + `Guarda la clave: se muestra una sola vez.\n`
+            + `Cupo: ${data.monthlyQuota} documentos/mes, ${data.requestsPerMinute} peticiones/minuto.\n`
+            + `Para produccion, suscribete o contacta con nosotros.`);
+        switchTab('analytics');
+      } catch (e) {
+        alert('Error creando el sandbox: ' + e.message);
+      }
+    }
+
+    async function revokeActiveTenant() {
+      const tenantId = document.getElementById('tenantSelect').value;
+      if (!tenantId) return;
+
+      if (!confirm(`Are you sure you want to permanently revoke and delete tenant "${tenantId}"? Their API key will be immediately invalidated.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/saas/tenants/${encodeURIComponent(tenantId)}`, {
+          method: 'DELETE'
+        });
+
+        delete tenantKeys[tenantId];
+        const select = document.getElementById('tenantSelect');
+        const opt = Array.from(select.options).find(o => o.value === tenantId);
+        if (opt) select.removeChild(opt);
+
+        if (select.options.length > 0) {
+          select.selectedIndex = 0;
+          onTenantChanged();
+        }
+
+        alert(`Tenant "${tenantId}" has been revoked and removed.`);
+      } catch (err) {
+        alert("Error revoking tenant: " + err.message);
+      }
+    }
+
+
+    // ── Drag & Drop + Upload de Plantilla Propia ─────────────────────────────────
+    function setupTemplateDragAndDrop() {
+      const editor = document.getElementById('jrxmlInput');
+      const container = document.getElementById('editorView-template');
+      if (!editor || !container) return;
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        container.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          editor.classList.add('border-cyan-400', 'bg-cyan-950/30', 'ring-2', 'ring-cyan-500/40');
+        }, false);
+      });
+
+      ['dragleave', 'dragend'].forEach(eventName => {
+        container.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          editor.classList.remove('border-cyan-400', 'bg-cyan-950/30', 'ring-2', 'ring-cyan-500/40');
+        }, false);
+      });
+
+      container.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        editor.classList.remove('border-cyan-400', 'bg-cyan-950/30', 'ring-2', 'ring-cyan-500/40');
+
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          loadTemplateFile(e.dataTransfer.files[0]);
+        }
+      }, false);
+    }
+
+    function handleTemplateFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) {
+        loadTemplateFile(file);
+        event.target.value = '';
+      }
+    }
+
+    function closeBinaryRptModal() {
+      const modal = document.getElementById('binaryRptModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // El .rpt que el usuario acaba de soltar, a la espera de que pulse Convertir.
+    let pendingBinaryRpt = null;
+
+    async function convertPendingRpt() {
+      if (!pendingBinaryRpt) return;
+      const btn = document.getElementById('convertRptBtn');
+      const status = document.getElementById('convertRptStatus');
+      const key = (document.getElementById('activeKeyInput') || {}).value || '';
+      if (!key) {
+        status.textContent = 'Necesitas una clave de API. Crea un sandbox en la pestaña de cuentas.';
+        status.className = 'text-xs text-amber-400';
+        return;
+      }
+
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Convirtiendo...';
+      status.textContent = 'Decodificando el binario...';
+      status.className = 'text-xs text-slate-400';
+
+      try {
+        const name = pendingBinaryRpt.name.replace(/\.rpt$/i, '');
+        const res = await fetch(`${API_BASE}/api/reports/convert?name=${encodeURIComponent(name)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/octet-stream', 'X-API-Key': key },
+          body: pendingBinaryRpt
+        });
+
+        if (res.status === 501) {
+          const d = await res.json().catch(() => ({}));
+          status.textContent = d.error || 'Este despliegue no tiene el Migration Toolkit.';
+          status.className = 'text-xs text-amber-400';
+          return;
+        }
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          status.textContent = d.error || `No se pudo convertir (HTTP ${res.status}).`;
+          status.className = 'text-xs text-rose-400';
+          return;
+        }
+
+        const xml = await res.text();
+        // Lo que no se pudo trasladar viene en la respuesta, no en silencio: un informe
+        // que pierde una tabla cruzada y no lo dice es como el cliente se entera mirando
+        // la página.
+        const omitted = res.headers.get('X-Gmr-Not-Converted');
+
+        document.getElementById('jrxmlInput').value = xml;
+        const selector = document.getElementById('templateFormatSelect');
+        if (selector) selector.value = 'crystal';
+
+        closeBinaryRptModal();
+        showConsoleToast(omitted
+          ? `Convertido. No se trasladó: ${omitted}. Revisa antes de publicar.`
+          : 'Convertido. La definición está en el editor, lista para renderizar.');
+        pendingBinaryRpt = null;
+      } catch (e) {
+        status.textContent = 'Error de red: ' + e.message;
+        status.className = 'text-xs text-rose-400';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    }
+
+    function openBinaryRptModal() {
+      const modal = document.getElementById('binaryRptModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function loadTemplateFile(file) {
+      const filename = file.name.toLowerCase();
+
+      // Control de Seguridad & Antivirus: Inspección de Magic Bytes
+      const headerSlice = file.slice(0, 8);
+      const headerReader = new FileReader();
+      headerReader.onload = function(headerEvt) {
+        const bytes = new Uint8Array(headerEvt.target.result);
+
+        // 1. Detección de binario OLE2 de Crystal Reports (0xD0 0xCF 0x11 0xE0)
+        if (bytes.length >= 4 && bytes[0] === 0xD0 && bytes[1] === 0xCF && bytes[2] === 0x11 && bytes[3] === 0xE0) {
+          // El fichero se conserva: el modal ya no describe una conversión, la hace.
+          pendingBinaryRpt = file;
+          openBinaryRptModal();
+          return;
+        }
+
+        // 2. Detección de Troyanos / Ejecutables Windows (MZ / 0x4D 0x5A)
+        if (bytes.length >= 2 && bytes[0] === 0x4D && bytes[1] === 0x5A) {
+          showConsoleToast('🛡️ Bloqueo Antivirus: Se detectó encabezado de archivo ejecutable de Windows (MZ). Archivo rechazado.');
+          return;
+        }
+
+        // 3. Detección de Ejecutables Linux ELF (0x7F 0x45 0x4C 0x46)
+        if (bytes.length >= 4 && bytes[0] === 0x7F && bytes[1] === 0x45 && bytes[2] === 0x4C && bytes[3] === 0x46) {
+          showConsoleToast('🛡️ Bloqueo Antivirus: Se detectó binario ejecutable de Linux (ELF). Archivo rechazado.');
+          return;
+        }
+
+        // 4. Detección de Archivos ZIP / TAR.GZ: Extraer bundle automáticamente
+        if ((bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04) ||
+            filename.endsWith('.zip') || filename.endsWith('.tar.gz') || filename.endsWith('.tgz')) {
+          processCompressedBundleFile(file);
+          return;
+        }
+
+        // Archivo seguro de texto plano: Proceder a la carga
+        let format = 'jrxml';
+        if (filename.endsWith('.rpt') || filename.endsWith('.rpt.xml')) {
+          format = 'crystal';
+        } else if (filename.endsWith('.rptdesign')) {
+          format = 'birt';
+        } else if (filename.endsWith('.jrxml') || filename.endsWith('.xml')) {
+          format = 'jrxml';
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const content = e.target.result;
+          document.getElementById('jrxmlInput').value = content;
+
+        const select = document.getElementById('templateFormatSelect');
+        if (select) {
+          select.value = format;
+          const desc = document.getElementById('formatDescription');
+          if (desc) {
+            if (format === 'crystal') desc.innerText = 'SAP Crystal Reports (.rpt / .rpt.xml) — Cargado desde archivo local';
+            else if (format === 'birt') desc.innerText = 'Eclipse BIRT (.rptdesign) — Cargado desde archivo local';
+            else desc.innerText = 'JasperReports (.jrxml) — Cargado desde archivo local';
+          }
+        }
+
+        switchEditorTab('template');
+        // Limpiar recursos anteriores para evitar datos huérfanos entre diferentes plantillas
+        const prevKeys = Object.keys(uploadedAssets);
+        prevKeys.forEach(k => delete uploadedAssets[k]);
+        scanCurrentTemplateAssets();
+        showConsoleToast(`✓ Archivo "${file.name}" cargado exitosamente. Formato detectado: ${format.toUpperCase()}`);
+      };
+      reader.readAsText(file);
+      };
+      headerReader.readAsArrayBuffer(headerSlice);
+    }
+
+    // ── Ingesta de Bundles Comprimidos y Carpetas ──────────────────────────────
+    let pendingBundleFiles = {}; // path -> string|base64
+
+    function handleBundleFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) {
+        processCompressedBundleFile(file);
+        event.target.value = '';
+      }
+    }
+
+    function handleFolderUpload(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+      processFileListAsBundle(Array.from(files));
+      event.target.value = '';
+    }
+
+    async function processCompressedBundleFile(file) {
+      const fname = file.name.toLowerCase();
+      showConsoleToast('⏳ Extrayendo paquete en memoria...');
+
+      if (fname.endsWith('.zip') || (file.type && file.type.includes('zip'))) {
+        if (typeof JSZip === 'undefined') {
+          showConsoleToast('⚠️ Librería JSZip no disponible para descomprimir en navegador.');
+          return;
+        }
+
+        try {
+          const zip = await JSZip.loadAsync(file);
+          const extractedFiles = [];
+
+          const entries = Object.keys(zip.files);
+          for (const path of entries) {
+            const entry = zip.files[path];
+            if (entry.dir) continue;
+
+            // Zip Slip protection
+            if (path.includes('../') || path.includes('/..') || path.startsWith('/')) {
+              console.warn('Zip Slip attempt ignored: ' + path);
+              continue;
+            }
+
+            const lower = path.toLowerCase();
+            const isBinary = lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.gif') || lower.endsWith('.svg');
+
+            if (isBinary) {
+              const base64 = await entry.async('base64');
+              const mime = lower.endsWith('.png') ? 'image/png' : (lower.endsWith('.svg') ? 'image/svg+xml' : 'image/jpeg');
+              extractedFiles.push({ path, name: path.replace(/^.*[\\\/]/, ''), content: `data:${mime};base64,${base64}`, isBinary: true });
+            } else {
+              const text = await entry.async('string');
+              extractedFiles.push({ path, name: path.replace(/^.*[\\\/]/, ''), content: text, isBinary: false });
+            }
+          }
+
+          applyBundleFiles(extractedFiles);
+        } catch (err) {
+          console.error('Error extracting zip:', err);
+          showConsoleToast('❌ Error al descomprimir el archivo ZIP: ' + err.message);
+        }
+      } else {
+        showConsoleToast('ℹ️ Para paquetes Linux .tar.gz use la opción de Cargar Carpeta o descomprima el archivo.');
+      }
+    }
+
+    function processFileListAsBundle(files) {
+      showConsoleToast('⏳ Leyendo archivos de la carpeta...');
+      const extractedFiles = [];
+      let loaded = 0;
+      const total = files.length;
+
+      files.forEach(file => {
+        const path = file.webkitRelativePath || file.name;
+        const lower = path.toLowerCase();
+        const isBinary = lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.gif') || lower.endsWith('.svg');
+
+        const reader = new FileReader();
+        if (isBinary) {
+          reader.onload = function(e) {
+            extractedFiles.push({ path, name: file.name, content: e.target.result, isBinary: true });
+            loaded++;
+            if (loaded === total) applyBundleFiles(extractedFiles);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          reader.onload = function(e) {
+            extractedFiles.push({ path, name: file.name, content: e.target.result, isBinary: false });
+            loaded++;
+            if (loaded === total) applyBundleFiles(extractedFiles);
+          };
+          reader.readAsText(file);
+        }
+      });
+    }
+
+    function applyBundleFiles(filesList) {
+      pendingBundleFiles = {};
+      const templateCandidates = [];
+
+      // Purgar memoria anterior
+      const prevKeys = Object.keys(uploadedAssets);
+      prevKeys.forEach(k => delete uploadedAssets[k]);
+
+      // Pre-cargar el logo institucional Baninter en base64
+      const BANINTER_LOGO_B64 = "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";
+      const baninterDataUri = 'data:image/png;base64,' + BANINTER_LOGO_B64;
+      uploadedAssets['logo_baninter_reporte.png'] = baninterDataUri;
+      uploadedAssets['logo_baninter_reporte.jpg'] = baninterDataUri;
+      uploadedAssets['imgReportes/logo_baninter_reporte.png'] = baninterDataUri;
+      uploadedAssets['images/logo_baninter_reporte.jpg'] = baninterDataUri;
+
+      // Ordenar: dar prioridad a archivos .jrxml sobre binarios .jasper para no sobreescribir código XML
+      const sortedFiles = [...filesList].sort((a, b) => {
+        const aIsJasper = a.name.toLowerCase().endsWith('.jasper');
+        const bIsJasper = b.name.toLowerCase().endsWith('.jasper');
+        if (aIsJasper && !bIsJasper) return -1;
+        if (!aIsJasper && bIsJasper) return 1;
+        return 0;
+      });
+
+      sortedFiles.forEach(item => {
+        const lower = item.name.toLowerCase();
+        const pathLower = item.path.toLowerCase();
+
+        // 1. Identificar si es JSON de parámetros o datos
+        if (lower === 'params.json' || lower === 'parameters.json') {
+          const paramsEl = document.getElementById('paramsInput');
+          if (paramsEl) paramsEl.value = item.content;
+        } else if (lower === 'data.json' || lower === 'dataset.json') {
+          try {
+            const parsed = JSON.parse(item.content);
+            if (parsed && !Array.isArray(parsed) && (parsed.data || parsed.parameters)) {
+              if (parsed.parameters) {
+                const paramsEl = document.getElementById('paramsInput');
+                if (paramsEl) paramsEl.value = JSON.stringify(parsed.parameters, null, 2);
+              }
+              if (parsed.data) {
+                const dataEl = document.getElementById('dataInput');
+                if (dataEl) dataEl.value = JSON.stringify(Array.isArray(parsed.data) ? parsed.data : [parsed.data], null, 2);
+              }
+            } else {
+              const dataEl = document.getElementById('dataInput');
+              if (dataEl) dataEl.value = item.content;
+            }
+          } catch (e) {
+            const dataEl = document.getElementById('dataInput');
+            if (dataEl) dataEl.value = item.content;
+          }
+        }
+
+        // 2. Registrar en la bolsa de recursos
+        uploadedAssets[item.path] = item.content;
+        uploadedAssets[item.name] = item.content;
+        const base = item.name.replace(/\.(?:jrxml|jasper)$/i, '');
+        uploadedAssets[base + '.jrxml'] = item.content;
+        uploadedAssets[base + '.jasper'] = item.content;
+        uploadedAssets[base] = item.content;
+
+        pendingBundleFiles[item.name] = item.content;
+
+        // 3. Es plantilla candidata?
+        if (!item.isBinary && (lower.endsWith('.jrxml') || lower.endsWith('.rptdesign') || lower.endsWith('.rpt.xml'))) {
+          templateCandidates.push(item);
+        }
+      });
+
+      if (templateCandidates.length === 0) {
+        showConsoleToast('⚠️ No se encontraron plantillas (.jrxml/.rpt/.rptdesign) en el paquete.');
+        updateRequiredAssetsBanner();
+        return;
+      }
+
+      // Prioridad 1: Alguna explícitamente nombrada main, index o report
+      let selectedMain = templateCandidates.find(t => {
+        const l = t.name.toLowerCase();
+        return l === 'main.jrxml' || l === 'index.jrxml' || l === 'report.jrxml';
+      });
+
+      // Prioridad 2: Si solo hay una plantilla en total
+      if (!selectedMain && templateCandidates.length === 1) {
+        selectedMain = templateCandidates[0];
+      }
+
+      // Prioridad 3: Filtrar plantillas que están en la raíz (no dentro de subdirectorios como subreportes/)
+      // o que no contienen 'sub' en su nombre/ruta
+      if (!selectedMain) {
+        const rootCandidates = templateCandidates.filter(t => {
+          const cleanPath = (t.path || '').replace(/\\/g, '/');
+          const isNested = cleanPath.includes('/');
+          const isSub = cleanPath.toLowerCase().includes('sub');
+          return !isNested && !isSub;
+        });
+
+        if (rootCandidates.length === 1) {
+          selectedMain = rootCandidates[0];
+        } else if (rootCandidates.length > 1) {
+          openMainTemplateModal(rootCandidates);
+          return;
+        }
+      }
+
+      if (selectedMain) {
+        setMainTemplateFromBundle(selectedMain);
+      } else {
+        // Múltiples candidatas: abrir modal para que el usuario elija
+        openMainTemplateModal(templateCandidates);
+      }
+    }
+
+    function setMainTemplateFromBundle(candidate) {
+      document.getElementById('jrxmlInput').value = candidate.content;
+      let format = 'jrxml';
+      const lower = candidate.name.toLowerCase();
+      if (lower.endsWith('.rpt') || lower.endsWith('.rpt.xml')) format = 'crystal';
+      else if (lower.endsWith('.rptdesign')) format = 'birt';
+
+      const select = document.getElementById('templateFormatSelect');
+      if (select) select.value = format;
+
+      const desc = document.getElementById('formatDescription');
+      if (desc) {
+        if (format === 'crystal') {
+          desc.innerText = 'SAP Crystal Reports XI-2020 — SAP Xtreme DB Drilldown, Group Hierarchies & Cross-Tab KPIs';
+        } else if (format === 'birt') {
+          desc.innerText = 'Eclipse BIRT (.rptdesign) — Master Page Layout, Scalar Parameter Expressions & Multi-Column Matrix';
+        } else {
+          desc.innerText = 'JasperReports .jrxml — 2D QR Verification, Vector Rounded Cards, AST Expressions & Currency Patterns';
+        }
+      }
+
+      // Auto-detectar pagarés o tablas bancarias sin datos y pre-poblar muestra realista
+      const xmlStr = candidate.content || '';
+      const paramsEl = document.getElementById('paramsInput');
+      const dataEl = document.getElementById('dataInput');
+      const hasEmptyParams = !paramsEl.value || paramsEl.value.trim() === '{}' || paramsEl.value.trim() === '';
+      const hasEmptyData = !dataEl.value || dataEl.value.trim() === '[]' || dataEl.value.trim() === '';
+
+      if ((xmlStr.includes('pagare') || xmlStr.includes('dsTablaPagosSucesivos') || xmlStr.includes('sieteEspacios')) && (hasEmptyParams || hasEmptyData)) {
+        if (hasEmptyParams) {
+          paramsEl.value = JSON.stringify({
+            'numeroSecuencia': '001-2026',
+            'numeroPropuesta': 'PROP-89214',
+            'fechaVencimiento': '15/12/2028',
+            'segmento': 'MICROCREDITO PRODUCTIVO INDIVIDUAL',
+            'tasa_interes_nominal': '15.50',
+            'TIR': '16.20',
+            'tasa_interes_efectiva': '16.64',
+            'fecha_vencimiento_letra': 'QUINCE DE DICIEMBRE DEL DOS MIL VEINTIOCHO',
+            'lugarEmision': 'QUITO',
+            'fecha_emision_letra': '15 DE ENERO DEL 2026',
+            'importe': '5,000.00',
+            'importeLetra': 'CINCO MIL DOLARES',
+            'recargo_mora_letra': 'DOS POR CIENTO',
+            'recargo_mora': '2.00',
+            'parroquia': 'BENALCAZAR',
+            'canton': 'QUITO',
+            'provincia': 'PICHINCHA',
+            'nombreCliente': 'CARLOS MENDOZA',
+            'tipoIdentificacion': 'CEDULA',
+            'identificacion': '1712345678',
+            'SUBREPORT_DIR': '',
+            'IMG_DIR': '',
+            'mostrarNumeroSecuencia': true,
+            'textoRenuncia': 'Renuncio a fuero y domicilio.',
+            'textoPorAval': 'Por aval.',
+            'correoNormativa': 'notificaciones@banco.com',
+            'esNormalizacion': false,
+            'esBlancoOriginal': false,
+            'esJuridico': false
+          }, null, 2);
+        }
+        if (hasEmptyData) {
+          dataEl.value = JSON.stringify([{
+            'dsTablaPagosSucesivos': [
+              { 'etiquetaUno': 'CUOTA', 'etiquetaDos': 'FECHA', 'etiquetaTres': 'CAPITAL', 'etiquetaCuatro': 'INTERES', 'etiquetaCinco': 'RUBROS', 'etiquetaSeis': 'VALOR', 'etiquetaSiete': 'SALDO', 'valorUno': '1', 'valorDos': '15/02/2026', 'valorTres': '180.00', 'valorCuatro': '60.00', 'valorCinco': '10.00', 'valorSeis': '250.00', 'valorSiete': '4,820.00' },
+              { 'etiquetaUno': 'CUOTA', 'etiquetaDos': 'FECHA', 'etiquetaTres': 'CAPITAL', 'etiquetaCuatro': 'INTERES', 'etiquetaCinco': 'RUBROS', 'etiquetaSeis': 'VALOR', 'etiquetaSiete': 'SALDO', 'valorUno': '2', 'valorDos': '15/03/2026', 'valorTres': '185.00', 'valorCuatro': '55.00', 'valorCinco': '10.00', 'valorSeis': '250.00', 'valorSiete': '4,635.00' },
+              { 'etiquetaUno': 'CUOTA', 'etiquetaDos': 'FECHA', 'etiquetaTres': 'CAPITAL', 'etiquetaCuatro': 'INTERES', 'etiquetaCinco': 'RUBROS', 'etiquetaSeis': 'VALOR', 'etiquetaSiete': 'SALDO', 'valorUno': '3', 'valorDos': '15/04/2026', 'valorTres': '190.00', 'valorCuatro': '50.00', 'valorCinco': '10.00', 'valorSeis': '250.00', 'valorSiete': '4,445.00' }
+            ],
+            'dsCodeudores': [],
+            'dsAvales': []
+          }], null, 2);
+        }
+      }
+
+      switchEditorTab('template');
+      scanCurrentTemplateAssets();
+      showConsoleToast(`✓ Bundle cargado. Plantilla principal: "${candidate.name}"`);
+      renderDynamicPdf();
+    }
+
+    function openMainTemplateModal(candidates) {
+      const modal = document.getElementById('mainTemplateSelectorModal');
+      const listEl = document.getElementById('bundleCandidatesList');
+      if (!modal || !listEl) return;
+
+      let html = '';
+      candidates.forEach((cand, idx) => {
+        html += `
+          <button type="button" onclick="selectCandidateMain(${idx})" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-purple-900/40 border border-slate-700 hover:border-purple-500/50 transition flex items-center justify-between group">
+            <div class="flex items-center gap-2">
+              <span class="text-purple-400">📄</span>
+              <div>
+                <div class="text-xs font-semibold text-slate-100 group-hover:text-purple-300 font-mono">${cand.name}</div>
+                <div class="text-[10px] text-slate-400 font-mono">${cand.path}</div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-purple-400 opacity-0 group-hover:opacity-100 transition">Elegir &rarr;</span>
+          </button>
+        `;
+      });
+      listEl.innerHTML = html;
+      window._bundleCandidates = candidates;
+      modal.classList.remove('hidden');
+    }
+
+    function closeMainTemplateModal() {
+      const modal = document.getElementById('mainTemplateSelectorModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function selectCandidateMain(idx) {
+      if (window._bundleCandidates && window._bundleCandidates[idx]) {
+        setMainTemplateFromBundle(window._bundleCandidates[idx]);
+        closeMainTemplateModal();
+      }
+    }
+
+    function insertBankLogoToTemplate() {
+      const editor = document.getElementById('jrxmlInput');
+      if (!editor || !editor.value) {
+        showConsoleToast('⚠️ Primero carga o abre una plantilla en el editor.');
+        return;
+      }
+      let xml = editor.value;
+      if (xml.includes('logo_baninter_reporte')) {
+        showConsoleToast('ℹ️ El logotipo ya está referenciado en la plantilla.');
+        return;
+      }
+
+      // Pre-cargar logo en uploadedAssets por si no estaba
+      const BANINTER_LOGO_B64 = "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";
+      const baninterDataUri = 'data:image/png;base64,' + BANINTER_LOGO_B64;
+      uploadedAssets['logo_baninter_reporte.png'] = baninterDataUri;
+      uploadedAssets['logo_baninter_reporte.jpg'] = baninterDataUri;
+
+      const logoSnippet = `			<image scaleImage="RetainShape">
+				<reportElement x="0" y="0" width="180" height="35" uuid="logo-baninter-auto"/>
+				<imageExpression><![CDATA["logo_baninter_reporte.png"]]></imageExpression>
+			</image>\n`;
+
+      if (xml.includes('<pageHeader>')) {
+        xml = xml.replace(/(<pageHeader>[\s\S]*?<band[^>]*>)/i, '$1\n' + logoSnippet);
+      } else if (xml.includes('<title>')) {
+        xml = xml.replace(/(<title>[\s\S]*?<band[^>]*>)/i, '$1\n' + logoSnippet);
+      } else if (xml.includes('<detail>')) {
+        xml = xml.replace(/(<detail>[\s\S]*?<band[^>]*>)/i, '$1\n' + logoSnippet);
+      } else {
+        showConsoleToast('⚠️ No se encontró sección de encabezado para insertar el logo.');
+        return;
+      }
+
+      editor.value = xml;
+      scanCurrentTemplateAssets();
+      showConsoleToast('✓ Logotipo bancario insertado exitosamente en el encabezado.');
+      renderDynamicPdf();
+    }
+
+    window.onload = init;
+  
+    // ── Descargar Plantilla Localmente ──────────────────────────────────────────
+    function downloadCurrentTemplate() {
+      const content = document.getElementById('jrxmlInput').value;
+      if (!content || !content.trim()) {
+        alert('El editor de plantilla está vacío.');
+        return;
+      }
+
+      const format = document.getElementById('templateFormatSelect').value;
+      let filename = 'plantilla';
+      let mimeType = 'application/xml';
+
+      if (format === 'crystal') {
+        filename = 'reporte_crystal.rpt.xml';
+      } else if (format === 'birt') {
+        filename = 'reporte_birt.rptdesign';
+      } else {
+        filename = 'reporte_jasper.jrxml';
+      }
+
+      const blob = new Blob([content], { type: mimeType + ';charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }
+
+    // ── Guardar Plantilla en Tenant Cloud ─────────────────────────────────────────
+    function openSaveTemplateModal() {
+      const format = document.getElementById('templateFormatSelect').value;
+      const tenant = document.getElementById('tenantSelect').value;
+      const modal = document.getElementById('saveTemplateModal');
+
+      document.getElementById('saveModalFormat').innerText = format.toUpperCase();
+      document.getElementById('saveModalTenant').innerText = tenant;
+      document.getElementById('saveModalAlert').classList.add('hidden');
+
+      if (!document.getElementById('saveModalName').value) {
+        document.getElementById('saveModalName').value = 'reporte-' + format + '-' + new Date().toISOString().slice(0, 10);
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeSaveTemplateModal() {
+      document.getElementById('saveTemplateModal').classList.add('hidden');
+    }
+
+    async function confirmSaveTemplateToTenant() {
+      const name = document.getElementById('saveModalName').value.trim();
+      const desc = document.getElementById('saveModalDesc').value.trim();
+      const format = document.getElementById('templateFormatSelect').value;
+      const content = document.getElementById('jrxmlInput').value;
+      const alertBox = document.getElementById('saveModalAlert');
+      const saveBtn = document.getElementById('btnConfirmSaveTemplate');
+
+      if (!name) {
+        alertBox.className = 'p-3 rounded-lg text-xs bg-red-950/60 border border-red-500/40 text-red-300';
+        alertBox.innerText = 'Por favor ingresa un nombre para la plantilla.';
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      const activeTenant = document.getElementById('tenantSelect').value;
+      const apiKey = currentApiKey();
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span>⏳</span> Guardando...';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/reports/templates`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': apiKey
+          },
+          body: JSON.stringify({
+            name: name,
+            format: format,
+            content: content,
+            description: desc
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          alertBox.className = 'p-3 rounded-lg text-xs bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 space-y-1';
+          alertBox.innerHTML = `
+            <div class="font-bold">✓ Plantilla guardada con éxito en tu tenant</div>
+            <div class="text-[11px] text-slate-300">Endpoint REST listo:</div>
+            <code class="block font-mono text-[10px] bg-slate-950 p-1.5 rounded border border-emerald-500/20 text-emerald-400">POST ${data.renderEndpoint}</code>
+          `;
+          alertBox.classList.remove('hidden');
+          setTimeout(() => {
+            closeSaveTemplateModal();
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<span>💾</span> Guardar Plantilla';
+          }, 2500);
+        } else {
+          throw new Error(data.error || 'Error al guardar');
+        }
+      } catch (err) {
+        alertBox.className = 'p-3 rounded-lg text-xs bg-red-950/60 border border-red-500/40 text-red-300';
+        alertBox.innerText = 'Error: ' + err.message;
+        alertBox.classList.remove('hidden');
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<span>💾</span> Guardar Plantilla';
+      }
+    }
+
+  
+    // ── Cargar y gestionar plantillas guardadas del tenant ──────────────────────
+    async function loadSavedTenantTemplates() {
+      const activeTenant = document.getElementById('tenantSelect').value;
+      const apiKey = currentApiKey();
+      const listContainer = document.getElementById('savedTemplatesList');
+      const badge = document.getElementById('savedTemplatesCountBadge');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/reports/templates`, {
+          headers: { 'X-API-Key': apiKey }
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const templates = data.templates || [];
+        badge.innerText = templates.length;
+
+        if (templates.length === 0) {
+          listContainer.innerHTML = `
+            <div class="px-3 py-3 text-center text-slate-500 text-xs">
+              Sin plantillas guardadas aún.<br>
+              <span class="text-[10px] text-slate-600">Haz clic en "Guardar en Tenant" para agregar una</span>
+            </div>`;
+          return;
+        }
+
+        listContainer.innerHTML = templates.map(t => `
+          <button onclick="selectSavedTemplate('${t.name}')" class="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-slate-800/80 hover:text-emerald-400 flex items-center justify-between border-b border-slate-800/50 transition">
+            <div>
+              <div class="font-semibold text-white">${t.name}</div>
+              <div class="text-[10px] text-slate-400 truncate max-w-[180px]">${t.description || t.format.toUpperCase()}</div>
+            </div>
+            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700 uppercase">${t.format}</span>
+          </button>
+        `).join('');
+
+      } catch (err) {
+        console.warn('Could not load tenant templates:', err);
+      }
+    }
+
+    async function selectSavedTemplate(name) {
+      const activeTenant = document.getElementById('tenantSelect').value;
+      const apiKey = currentApiKey();
+
+      try {
+        const res = await fetch(`${API_BASE}/api/reports/templates/${encodeURIComponent(name)}`, {
+          headers: { 'X-API-Key': apiKey }
+        });
+        if (!res.ok) throw new Error('Plantilla no encontrada');
+
+        const record = await res.json();
+        document.getElementById('jrxmlInput').value = record.content;
+        document.getElementById('templateFormatSelect').value = record.format;
+        onFormatSelected();
+
+        // Switch to template tab
+        switchEditorTab('template');
+
+        // Trigger render
+        renderDynamicPdf();
+
+      } catch (err) {
+        alert('Error al cargar plantilla: ' + err.message);
+      }
+    }
+
+    // Hook onTenantChanged to reload templates list
+    const originalOnTenantChanged = window.onTenantChanged;
+    window.onTenantChanged = function() {
+      if (typeof originalOnTenantChanged === 'function') originalOnTenantChanged();
+      loadSavedTenantTemplates();
+    };
+
+    // Auto-load on startup
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(loadSavedTenantTemplates, 300);
+    });
+
+    // ── AI Preview Modal Handlers ──────────────────────────────────────────
+    let aiPreviewPendingResult = null;
+
+    function showAiPreview(result) {
+      aiPreviewPendingResult = result;
+      const modal = document.getElementById('aiPreviewModal');
+      if (!modal) {
+        applyAiPreview();
+        return;
+      }
+      modal.classList.remove('hidden');
+
+      const currentXml = document.getElementById('jrxmlInput').value || '';
+      const newXml = result.template || '';
+      const currentLines = currentXml.split('\n').length;
+      const newLines = newXml.split('\n').length;
+      const diff = Math.abs(newLines - currentLines);
+
+      const statsEl = document.getElementById('aiPreviewStats');
+      if (statsEl) {
+        statsEl.textContent =
+          `Modo: ${result.intent === 'CREATE_NEW' ? '🆕 Nuevo template' : '✏️ Edición quirúrgica'} · ` +
+          `${newLines} líneas (${diff > 0 ? (newLines > currentLines ? '+' : '-') + diff : 'sin cambio de longitud'} vs actual) · ` +
+          `Origen: ${result.source === 'gemini-ai' ? 'Gemini 2.0 Flash' : 'GMR Synthesizer'}`;
+      }
+
+      const expEl = document.getElementById('aiPreviewExplanation');
+      if (expEl) expEl.textContent = result.explanation || 'Sin descripción adicional.';
+
+      const codeEl = document.getElementById('aiPreviewCode');
+      if (codeEl) {
+        const previewLines = newXml.split('\n').slice(0, 35).join('\n');
+        codeEl.textContent = previewLines + (newLines > 35 ? '\n... (' + (newLines - 35) + ' líneas más)' : '');
+      }
+    }
+
+    function closeAiPreview() {
+      aiPreviewPendingResult = null;
+      const modal = document.getElementById('aiPreviewModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function applyAiPreview() {
+      if (!aiPreviewPendingResult) return;
+      const result = aiPreviewPendingResult;
+      closeAiPreview();
+
+      // Save current to undo history before applying!
+      const currentXml = document.getElementById('jrxmlInput').value;
+      pushTemplateToHistory(currentXml);
+
+      // Apply the template
+      document.getElementById('jrxmlInput').value = result.template;
+
+      if (result.params) {
+        document.getElementById('paramsInput').value = typeof result.params === 'string'
+          ? result.params : JSON.stringify(result.params, null, 2);
+      }
+      if (result.data) {
+        document.getElementById('dataInput').value = typeof result.data === 'string'
+          ? result.data : JSON.stringify(result.data, null, 2);
+      }
+
+      const feedbackBadge = document.getElementById('aiFeedbackBadge');
+      const feedbackMsg = document.getElementById('aiFeedbackMessage');
+      if (feedbackBadge) {
+        feedbackBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        feedbackBadge.innerText = result.source === 'gemini-ai' ? '✨ Gemini 2.0 Flash' : '⚡ GMR Smart Synthesizer';
+      }
+      if (feedbackMsg) feedbackMsg.innerText = result.explanation || 'Cambios aplicados exitosamente.';
+
+      await renderDynamicPdf();
+    }
+
+  </script>
+
+  <!-- Modal: Guardar Plantilla en Tenant -->
+  <div id="saveTemplateModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700/90 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>💾</span> Guardar Plantilla en Tenant Cloud
+        </h3>
+        <button onclick="closeSaveTemplateModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Nombre único de la plantilla (identificador API):</label>
+          <input type="text" id="saveModalName" placeholder="ej: factura-comercial-v1" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-cyan-400" />
+          <p class="text-[10px] text-slate-500 mt-1">Se renderiza con <code>POST /api/reports/render</code> y <code>{"templateName": "{nombre}"}</code></p>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Descripción / Notas:</label>
+          <input type="text" id="saveModalDesc" placeholder="ej: Factura B2B con desglose de impuestos y QR" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-cyan-400" />
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-lg p-3 text-[11px] text-slate-400 space-y-1">
+          <div class="flex justify-between"><span class="text-slate-500">Inquilino activo:</span> <span id="saveModalTenant" class="text-emerald-400 font-semibold"></span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Motor de reporte:</span> <span id="saveModalFormat" class="text-cyan-400 font-semibold"></span></div>
+        </div>
+
+        <div id="saveModalAlert" class="hidden p-3 rounded-lg text-xs"></div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+        <button onclick="closeSaveTemplateModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Cancelar</button>
+        <button onclick="confirmSaveTemplateToTenant()" id="btnConfirmSaveTemplate" class="px-5 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-cyan-500/20">
+          <span>💾</span> Guardar Plantilla
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Archivo Binario Propietario Crystal Detectado -->
+  <div id="binaryRptModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-purple-500/40 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>💎</span> <span>Archivo Binario Propietario SAP Crystal (.rpt)</span>
+        </h3>
+        <button onclick="closeBinaryRptModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-300">
+        <div class="p-3 bg-purple-950/40 border border-purple-500/30 rounded-xl space-y-2">
+          <div class="font-bold text-purple-300 flex items-center gap-1.5">
+            <span>ℹ️</span> <span>Estructura OLE2 de Windows Detectada</span>
+          </div>
+          <p class="leading-relaxed">
+            El archivo que has subido está en formato binario cerrado de Microsoft/SAP (Compound File Binary Format). El motor <b>GMR Reports Cloud AOT</b> ejecuta en entornos Linux ultraligeros y procesa la especificación de definición abierta <b>Crystal Reports XML (.rpt.xml)</b>.
+          </p>
+        </div>
+
+        <div class="space-y-2 pt-1">
+          <div class="font-semibold text-white">¿Cómo compilar este reporte en GMR Reports?</div>
+          <ul class="space-y-1.5 text-slate-300 pl-4 list-disc">
+            <li><b>Desde Crystal Reports Designer:</b> Selecciona <code>Archivo &gt; Exportar &gt; Definición de Reporte (XML)</code> y guarda como <code>.rpt.xml</code>.</li>
+            <li><b>O deja que lo convirtamos ahora:</b> el <b>Migration Toolkit</b> decodifica el
+              <code>.rpt</code> binario en el servidor y te devuelve la definición, sin que instales nada.
+              Medido sobre los 44 informes que SAP distribuye con Business One: los 44 convierten y los 44
+              renderizan.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <div class="flex items-center gap-3">
+          <button onclick="closeBinaryRptModal()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+            Cerrar
+          </button>
+          <button id="convertRptBtn" onclick="convertPendingRpt()" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition shadow-lg shadow-cyan-600/30">
+            Convertir este .rpt
+          </button>
+          <span id="convertRptStatus" class="text-xs text-slate-400"></span>
+        </div>
+        <button onclick="loadTemplatePreset('crystal'); closeBinaryRptModal();" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-purple-600/30">
+          <span>💎</span> <span>Cargar Ejemplo SAP Xtreme XML</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Template Preview/Approval Modal -->
+  <div id="aiPreviewModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl shadow-purple-950/50 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-950/40">
+        <div class="flex items-center gap-2">
+          <span class="text-purple-400 text-base">✨</span>
+          <span class="font-bold text-slate-100 text-sm">Vista Previa — Cambios del Asistente AI</span>
+        </div>
+        <button onclick="closeAiPreview()" class="text-slate-400 hover:text-white text-xl font-mono leading-none transition">&times;</button>
+      </div>
+      <div class="px-5 py-2.5 bg-slate-950/60 border-b border-slate-800/80">
+        <div id="aiPreviewStats" class="text-[11px] text-purple-300 font-mono"></div>
+      </div>
+      <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+        <div>
+          <div class="text-[10px] text-slate-400 mb-1 font-semibold uppercase tracking-wider">Explicación del Cambio:</div>
+          <div id="aiPreviewExplanation" class="text-xs text-slate-200 bg-slate-800/60 rounded-xl px-3.5 py-2.5 border border-slate-700 leading-relaxed"></div>
+        </div>
+        <div>
+          <div class="text-[10px] text-slate-400 mb-1 font-semibold uppercase tracking-wider">Vista previa de la plantilla resultante:</div>
+          <pre id="aiPreviewCode" class="text-[11px] font-mono text-emerald-300 bg-slate-950 rounded-xl p-3 overflow-x-auto border border-slate-800 max-h-56 overflow-y-auto"></pre>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2.5 px-5 py-3.5 border-t border-slate-800 bg-slate-950/40">
+        <button onclick="closeAiPreview()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">
+          ✕ Descartar
+        </button>
+        <button onclick="applyAiPreview()" class="px-5 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white text-xs font-bold shadow-lg shadow-purple-900/40 transition flex items-center gap-1.5">
+          <span>✅</span> <span>Aplicar Cambios</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Selección de Plantilla Principal del Bundle -->
+  <div id="mainTemplateSelectorModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-purple-500/40 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>📦</span> <span>Seleccionar Plantilla Principal</span>
+        </h3>
+        <button onclick="closeMainTemplateModal()" class="text-slate-400 hover:text-white text-lg font-mono leading-none">&times;</button>
+      </div>
+      <p class="text-xs text-slate-300">
+        El paquete contiene múltiples plantillas. Selecciona cuál debe ser la <b>plantilla principal</b> activa en el diseñador (las demás se registrarán como subreportes vinculados):
+      </p>
+      <div id="bundleCandidatesList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+        <button onclick="closeMainTemplateModal()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

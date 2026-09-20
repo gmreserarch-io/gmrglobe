@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Política de Privacidad — GMR Reports</title>
+  <link rel="icon" type="image/svg+xml" href="/gmr-reports/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <script src="/gmr-reports/assets/i18n.js"></script>
+</head>
+<body class="min-h-full flex flex-col font-sans selection:bg-emerald-500 selection:text-white bg-slate-950">
+  <!-- Navbar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/gmr-reports/" class="flex items-center gap-3">
+        <div class="h-9 px-2 py-0.5 rounded-lg bg-white flex items-center justify-center border border-slate-700/40">
+          <img src="/gmr-reports/assets/logo-gmr.jpg" alt="GMR - Science in Action" class="h-6 w-auto object-contain" />
+        </div>
+        <span class="font-bold text-base text-white tracking-tight">GMR Reports</span>
+      </a>
+      
+      <div class="flex items-center gap-4">
+        <div class="inline-flex items-center rounded-lg bg-slate-900/90 border border-slate-700/80 p-0.5 text-xs shadow-inner" role="group" aria-label="Language Selector">
+          <button type="button" onclick="GMR_I18N.setLanguage('es')" data-lang="es" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇪🇸</span> <span class="hidden sm:inline">ES</span>
+          </button>
+          <button type="button" onclick="GMR_I18N.setLanguage('en')" data-lang="en" class="gmr-lang-btn px-2 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 border">
+            <span>🇺🇸</span> <span class="hidden sm:inline">EN</span>
+          </button>
+        </div>
+
+        <a href="/gmr-reports/" data-i18n="common.back_platform" class="text-xs text-slate-400 hover:text-emerald-400 font-semibold flex items-center gap-1 transition">
+          ← Volver a la Plataforma
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Container -->
+  <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div id="contentEs" class="space-y-8">
+      
+      <div class="mb-8">
+        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Protección de Datos & Cumplimiento GDPR</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Política de Privacidad y Arquitectura Zero-Data</h1>
+        <p class="text-xs text-slate-400 mt-2">Fecha de Entrada en Vigor: 8 de Septiembre de 2026 • Conforme a GDPR, CCPA y SOC 2</p>
+      </div>
+
+      <div class="mb-8 p-5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 flex items-start gap-3">
+        <div class="text-2xl">🛡️</div>
+        <div>
+          <h3 class="text-sm font-bold text-emerald-300">Garantía Arquitectónica de Cero Retención de Datos (ZDR)</h3>
+          <p class="text-xs text-emerald-200/80 mt-1 leading-relaxed">
+            GMR Reports <strong>NO</strong> almacena, persiste en disco ni entrena modelos de inteligencia artificial con sus facturas, balances o datos confidenciales. Todos los documentos se compilan y renderizan en memoria RAM volátil y se eliminan inmediatamente tras su entrega.
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-8 text-sm text-slate-300 leading-relaxed">
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">1</span>
+            Compromiso con la Privacidad del Usuario
+          </h2>
+          <p>
+            En GMR Solutions, respetamos profundamente la confidencialidad de la información financiera y operativa que transita por nuestros motores de generación documental. Esta política explica de qué forma protegemos sus datos bajo los más exigentes estándares bancarios globales.
+          </p>
+        </section>
+
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">2</span>
+            Tratamiento de Metadatos de Facturación
+          </h2>
+          <p>
+            Únicamente registramos contadores numéricos de documentos procesados, marcas de tiempo y el identificador de inquilino para efectos de facturación y control de cuotas. En ningún momento se registran importes, datos fiscales de sus clientes o contenidos de las plantillas.
+          </p>
+        </section>
+      </div>
+
+    </div>
+    <div id="contentEn" class="space-y-8 hidden">
+      
+      <div class="mb-8">
+        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Data Protection & GDPR Compliance</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Privacy Policy & Zero-Data Architecture</h1>
+        <p class="text-xs text-slate-400 mt-2">Effective Date: September 8, 2026 • Compliant with GDPR, CCPA, and SOC 2</p>
+      </div>
+
+      <div class="mb-8 p-5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 flex items-start gap-3">
+        <div class="text-2xl">🛡️</div>
+        <div>
+          <h3 class="text-sm font-bold text-emerald-300">Architectural Zero-Data Retention Guarantee</h3>
+          <p class="text-xs text-emerald-200/80 mt-1 leading-relaxed">
+            GMR Reports does <strong>NOT</strong> persist, cache on disk, or train machine learning models on your invoices, financial records, or template payload data. Documents are rendered in volatile RAM and immediately discarded upon transmission.
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-8 text-sm text-slate-300 leading-relaxed">
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">1</span>
+            Our Privacy Commitment
+          </h2>
+          <p>
+            At GMR Solutions, we hold the privacy and integrity of your corporate document data to the highest global banking and regulatory benchmarks. This policy explains how our Zero-Data Architecture ensures security.
+          </p>
+        </section>
+
+        <section class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs flex items-center justify-center font-mono">2</span>
+            Billing Metadata Handling
+          </h2>
+          <p>
+            We strictly collect numeric counters of generated documents, timestamps, and tenant identifiers for billing verification and quota enforcement. In no event are item details or customer names stored.
+          </p>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+    © 2026 GMR Solutions. <span class="text-purple-400 font-semibold">&gt;&gt; Science in Action</span>. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
+  </footer>
+
+  <script>
+    function syncPageLanguage(lang) {
+      const isEn = lang === 'en';
+      document.getElementById('contentEs').classList.toggle('hidden', isEn);
+      document.getElementById('contentEn').classList.toggle('hidden', !isEn);
+      document.getElementById('pageTitle').textContent = isEn ? "Privacy Policy — GMR Reports" : "Política de Privacidad — GMR Reports";
+    }
+
+    window.addEventListener('gmr:languageChanged', function(e) {
+      syncPageLanguage(e.detail.lang);
+    });
+
+    // Initial sync
+    if (window.GMR_I18N) {
+      syncPageLanguage(GMR_I18N.getCurrentLanguage());
+    }
+  </script>
+</body>
+</html>
