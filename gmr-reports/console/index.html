@@ -1265,12 +1265,27 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
       act.textContent = 'Crear espacio de pruebas';
       act.style.cssText = 'background:#fff;color:#7c2d12;border:0;border-radius:6px;padding:5px 12px;' +
         'font:inherit;font-weight:700;cursor:pointer';
-      act.onclick = () => {
+      act.onclick = async () => {
+        // Ask, then run the signup. An earlier version only tried to reveal the form and
+        // did nothing visible when its selectors matched nothing, which is worse than an
+        // error: the page looked fine and the next render failed the same way.
+        const name = window.prompt(
+          'Nombre para tu espacio de pruebas (100 documentos al mes, sin coste)',
+          'Mi organizacion'
+        );
+        if (!name || !name.trim()) return;
         b.remove();
-        const t = document.querySelector('[data-tab="tenants"], #tab-tenants, a[href="#tenants"]');
-        if (t && t.click) t.click();
+        try { switchTab('keys'); } catch (e) { /* the tab is a convenience, not the point */ }
         const nameEl = document.getElementById('newTenantName');
-        if (nameEl && nameEl.focus) nameEl.focus();
+        if (nameEl) {
+          nameEl.value = name.trim();
+          if (nameEl.scrollIntoView) nameEl.scrollIntoView({ block: 'center' });
+        }
+        if (typeof provisionTenant === 'function') {
+          await provisionTenant();
+        } else {
+          alert('Abre la pestana "Claves de API" y crea el espacio de pruebas desde ahi.');
+        }
       };
       const close = document.createElement('button');
       close.textContent = '\u00d7';
@@ -1983,7 +1998,11 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         if (!deadKeyHandled) {
           alert("No se pudo generar el documento. Revisa la plantilla y los datos.");
         }
-        metrics.innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
+        // A dead session is already explained by the banner; repeating the status code
+        // and the JSON body under the editor only adds noise.
+        metrics.innerHTML = deadKeyHandled
+          ? `<span class="text-red-400">Tu sesion ya no es valida. Crea un espacio de pruebas para continuar.</span>`
+          : `<span class="text-red-400">Error: ${err.message}</span>`;
         statusBadge.className = "text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30";
         statusBadge.innerText = "Error";
       } finally {
