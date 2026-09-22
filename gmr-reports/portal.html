@@ -582,7 +582,7 @@
                 <h2 class="text-base font-bold text-white">Repositorios Privados de Artefactos & Contenedores</h2>
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">Acceso Scale & Enterprise</span>
               </div>
-              <p class="text-xs text-slate-400 mt-1">Descargue imágenes de contenedor Docker, artefactos Maven de Spring Boot 3 y SDKs de TypeScript/Python directamente en sus clústeres y canalizaciones de CI/CD.</p>
+              <p class="text-xs text-slate-400 mt-1">La imagen Docker y el starter de Spring Boot 3 son artefactos empresariales (registro privado, habilitados por licencia). Los cinco clientes de lenguaje —TypeScript, Python, .NET, Go y Java— son <strong class="text-slate-300">públicos</strong>: se instalan desde npm, PyPI, NuGet, el proxy de Go y Maven Central sin token.</p>
             </div>
             <span class="text-xs text-slate-400 font-mono bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
               Registry: <strong class="text-emerald-400">ghcr.io / maven.pkg.github.com</strong>
@@ -659,16 +659,14 @@
                 <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                   <span>📦</span> SDK TypeScript / Node.js
                 </span>
-                <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">npm private pkg</span>
+                <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">npm público</span>
               </div>
               <p class="text-xs text-slate-400">Cliente tipado para integración rápida con frameworks frontend y microservicios en Node.js.</p>
 
               <div>
                 <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Instalación con npm</label>
                 <div class="relative">
-                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-amber-300 select-all"><code id="npmSnippet"># Configurar registro en .npmrc:
-# @gmreserarch-io:registry=https://npm.pkg.github.com
-npm install @gmreserarch-io/reports-client</code></pre>
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-amber-300 select-all"><code id="npmSnippet">npm install @gmresearch/reports-client</code></pre>
                   <button onclick="copySnippet('npmSnippet', '¡Instrucciones npm copiadas!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
                 </div>
               </div>
@@ -687,8 +685,69 @@ npm install @gmreserarch-io/reports-client</code></pre>
               <div>
                 <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Instalación con pip</label>
                 <div class="relative">
-                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-purple-300 select-all"><code id="pipSnippet">pip install gmr-reports --extra-index-url https://token@github.com/gmreserarch-io/gmr-reports</code></pre>
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-purple-300 select-all"><code id="pipSnippet">pip install gmr-reports-client</code></pre>
                   <button onclick="copySnippet('pipSnippet', '¡Comando pip copiado!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5: .NET / C# SDK -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-violet-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🔷</span> SDK .NET / C#
+                </span>
+                <span class="text-[10px] bg-violet-500/10 text-violet-400 px-2 py-0.5 rounded font-mono font-bold">NuGet público</span>
+              </div>
+              <p class="text-xs text-slate-400">Cliente para net8.0: ASP.NET Core, servicios en background y automatización de reportes en el ecosistema .NET.</p>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Instalación con dotnet</label>
+                <div class="relative">
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-violet-300 select-all"><code id="dotnetSnippet">dotnet add package GMResearch.Reports.Client</code></pre>
+                  <button onclick="copySnippet('dotnetSnippet', '¡Comando dotnet copiado!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6: Go SDK -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🐹</span> SDK Go
+                </span>
+                <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">Go modules</span>
+              </div>
+              <p class="text-xs text-slate-400">Cliente sin dependencias (solo la librería estándar) para microservicios y CLIs en Go.</p>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Instalación con go get</label>
+                <div class="relative">
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-sky-300 overflow-x-auto select-all"><code id="goSnippet">go get github.com/gmreserarch-io/gmr-reports-go</code></pre>
+                  <button onclick="copySnippet('goSnippet', '¡Comando go copiado!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 7: Java SDK -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>☕</span> SDK Java
+                </span>
+                <span class="text-[10px] bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded font-mono font-bold">Maven Central</span>
+              </div>
+              <p class="text-xs text-slate-400">Cliente Java 17+ con una sola dependencia (Jackson); el HTTP es el del propio JDK. Para Spring Boot, Quarkus o batch.</p>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-300 uppercase mb-1">Dependencia en pom.xml</label>
+                <div class="relative">
+                  <pre class="bg-slate-900 p-3 rounded-lg border border-slate-800 font-mono text-[11px] text-orange-300 overflow-x-auto select-all"><code id="mavenSdkSnippet">&lt;dependency&gt;
+  &lt;groupId&gt;com.gmrglobe.reports&lt;/groupId&gt;
+  &lt;artifactId&gt;gmr-reports-client&lt;/artifactId&gt;
+  &lt;version&gt;1.7.5&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+                  <button onclick="copySnippet('mavenSdkSnippet', '¡Dependencia Maven copiada!')" class="absolute top-2 right-2 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] border border-slate-700">Copiar</button>
                 </div>
               </div>
             </div>

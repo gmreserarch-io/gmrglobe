@@ -552,6 +552,53 @@ with open("invoice.pdf", "wb") as f:
     f.write(pdf_bytes)</code></pre>
           </div>
 
+          <!-- .NET / C# Snippet -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="px-4 py-2 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs font-semibold text-slate-300">
+              <span>.NET / C# SDK</span>
+              <span class="text-slate-500 font-mono">dotnet add package GMResearch.Reports.Client</span>
+            </div>
+            <pre class="p-4 text-xs font-mono text-slate-300 overflow-x-auto"><code id="codeSnippetCs">using GMResearch.Reports;
+
+using var client = new GmrReportsClient("YOUR_API_KEY", "http://localhost:8080");
+
+byte[] pdf = await client.RenderAsync(new RenderOptions { ReportType = "invoice" });
+await File.WriteAllBytesAsync("invoice.pdf", pdf);</code></pre>
+          </div>
+
+          <!-- Go Snippet -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="px-4 py-2 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs font-semibold text-slate-300">
+              <span>Go SDK</span>
+              <span class="text-slate-500 font-mono">go get github.com/gmreserarch-io/gmr-reports-go</span>
+            </div>
+            <pre class="p-4 text-xs font-mono text-slate-300 overflow-x-auto"><code id="codeSnippetGo">import gmrreports "github.com/gmreserarch-io/gmr-reports-go"
+
+client, _ := gmrreports.New(gmrreports.Options{
+    APIKey:  "YOUR_API_KEY",
+    BaseURL: "http://localhost:8080",
+})
+
+pdf, _ := client.Render(context.Background(), gmrreports.OfType("invoice"))
+os.WriteFile("invoice.pdf", pdf, 0o644)</code></pre>
+          </div>
+
+          <!-- Java Snippet -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="px-4 py-2 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs font-semibold text-slate-300">
+              <span>Java SDK</span>
+              <span class="text-slate-500 font-mono">com.gmrglobe.reports:gmr-reports-client (Maven Central)</span>
+            </div>
+            <pre class="p-4 text-xs font-mono text-slate-300 overflow-x-auto"><code id="codeSnippetJava">import com.gmresearch.reports.client.*;
+
+var client = GmrReportsClient.builder()
+        .apiKey("YOUR_API_KEY")
+        .baseUrl("http://localhost:8080")
+        .build();
+
+byte[] pdf = client.render(RenderRequest.ofType("invoice"));</code></pre>
+          </div>
+
           <!-- cURL Snippet -->
           <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
             <div class="px-4 py-2 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs font-semibold text-slate-300">
