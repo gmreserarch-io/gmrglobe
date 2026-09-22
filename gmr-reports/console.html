@@ -2467,6 +2467,19 @@ Certified under RFC-3161 Timestamp Authority.]]></text>
         }
 
         tenantKeys[data.tenantId] = data.apiKey;
+        // Persist to the same slots the loader reads on start and disconnect clears. Without
+        // this the key lived only in this page's memory: any reload dropped it, every render
+        // then sent a blank key and got 401, and the console said "tu sesion ya no es valida"
+        // - though the tenant was alive on the server the whole time. The sandbox is meant to
+        // last a full working session, and server-side it does; it was the browser forgetting.
+        try {
+          localStorage.setItem('gmr_active_api_key', data.apiKey);
+          localStorage.setItem('gmr_active_tenant', JSON.stringify({
+            tenantId: data.tenantId, name: data.name, plan: data.plan,
+          }));
+        } catch (e) {
+          // Private window or blocked storage: the key still works for this page's lifetime.
+        }
         const opt = document.createElement('option');
         opt.value = data.tenantId;
         opt.textContent = `${data.name} (${data.planName})`;
