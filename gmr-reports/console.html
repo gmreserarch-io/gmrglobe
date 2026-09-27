@@ -103,6 +103,11 @@
     <button onclick="switchTab('analytics')" id="tabBtn-analytics" data-i18n="console.tab_usage" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">📊 Usage and quotas</button>
     <button onclick="switchTab('keys')" id="tabBtn-keys" data-i18n="console.tab_keys" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">🔑 API keys</button>
     <button onclick="switchTab('quickstart')" id="tabBtn-quickstart" data-i18n="console.tab_quickstart" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 text-xs">🚀 SDKs and quickstart</button>
+    <!-- The JRXML designer is a page of its own (designer/ in this repository, built into
+         designer.html). It reads the key this console signed in with, from the same origin.
+         Absolute like every link here: mount.mjs puts it under /gmr-reports/, and a relative
+         one broke from /console/, where it resolved to /console/designer.html. -->
+    <a href="/gmr-reports/designer.html" data-i18n="console.tab_designer" class="py-2.5 border-b-2 font-medium transition border-transparent text-slate-400 hover:text-emerald-300 flex items-center gap-2 text-xs ml-auto">✏️ Visual designer (beta)</a>
   </div>
 
   <!-- TAB 1: STUDIO SANDBOX -->
